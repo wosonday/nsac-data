@@ -1,0 +1,14 @@
+created_at_utc,kind,task,run_id,path,rows,bytes,sha256,produced_by
+2026-11-14T07:53:22+00:00,features,hr,2026-11-14_145321,2_features/hr/2026-11-14_145321/table.csv.gz,5301,284536,d695ec43546e1abea2c1039dc6d46571ccc9e20e4616aff9994c4ed2ff842725,sky-ml build-features hr
+2026-11-14T07:53:22+00:00,features,hr,2026-11-14_145321,2_features/hr/2026-11-14_145321/features.json,,116,64943d993dfa389b972809b51dd15984f17fb324c0060bd7cfad9faf59e858b5,sky-ml build-features hr
+2026-11-14T07:53:22+00:00,features,hr,2026-11-14_145321,2_features/hr/2026-11-14_145321/snapshot.json,,373,bcab76d5fb2ed81a5fd81453e66294d4159c614e09f7d045cc1da3f69f76e8d9,sky-ml build-features hr
+2026-11-14T07:53:26+00:00,models,hr,2026-11-14_145321,3_models/hr/2026-11-14_145321/oof.csv.gz,15903,276000,ba2e037e1daba6b59b74f18ede680e6d585a04ed0550d13eb78d87f5f1a503fc,sky-ml train hr
+2026-11-14T07:53:26+00:00,models,hr,2026-11-14_145321,3_models/hr/2026-11-14_145321/folds.json,,1798,6e2ddfaf5171d556b6cb5309e44930cd9ba6aeb4dcbfe9866bfef675c34b4dc1,sky-ml train hr
+2026-11-14T07:53:26+00:00,models,hr,2026-11-14_145321,3_models/hr/2026-11-14_145321/last_value/final.joblib,,72,1bedcf00814c0388571be72d7324ca4bba39c3d0e042b8e6c6775f6e97606396,sky-ml train hr
+2026-11-14T07:53:26+00:00,models,hr,2026-11-14_145321,3_models/hr/2026-11-14_145321/ridge/final.joblib,,1028,93eae992c51438e49443365d573e6b19ffdf2b20199ed3d57ebd2e2975a41280,sky-ml train hr
+2026-11-14T07:53:26+00:00,models,hr,2026-11-14_145321,3_models/hr/2026-11-14_145321/lightgbm/final.joblib,,76340,cc253a24e2d3660f98c0cc58407aa56293ba192822c472881a6a96fd3705653e,sky-ml train hr
+2026-11-14T07:53:26+00:00,models,hr,2026-11-14_145321,3_models/hr/2026-11-14_145321/manifest.json,,2558,f4360176da4020e3eb2cbd393e4b486f07ae8a9ac27ef0fed2855488a719c3fa,sky-ml train hr
+2026-11-14T07:53:28+00:00,models,hr,2026-11-14_145321,3_models/hr/2026-11-14_145321/metrics.csv,,477,37ab62ab5d5bb416e0d7f92027e1d9300965866ca6afe135d9ea10e504e6dbe6,sky-ml evaluate hr
+2026-11-14T07:53:28+00:00,models,hr,2026-11-14_145321,3_models/hr/2026-11-14_145321/summary.json,,1167,e9d8a96980f56bde77becd25c807234b4aa9aef53ff540a213c508cdd8936267,sky-ml evaluate hr
+2026-11-14T07:54:12+00:00,predictions,hr,2026-11-14_145321,4_predictions/hr/2026-11-14_145321/mmash_minutes_latest_ridge_20261114_145412.csv,22,1880,75af977c9b5ad08e5c933e2bd716f606535dbdf88d1ae0beafe6bf50526e05a5,sky-ml predict hr --input mmash_minutes.csv.gz --mode latest
+2026-11-14T07:54:12+00:00,predictions,hr,2026-11-14_145321,4_predictions/hr/2026-11-14_145321/mmash_minutes_latest_ridge_20261114_145412.json,,267,ec0dde115c0521b2a7d8211f594341e33695dcc63b345aabbbc585553fc26d68,sky-ml predict hr --input mmash_minutes.csv.gz --mode latest

@@ -1,0 +1,100 @@
+{
+  "versions": {
+    "python": "3.12.12",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "numpy": "2.5.4",
+    "joblib": "1.6.0"
+  },
+  "task": "hr",
+  "run_id": "2026-11-14_145321",
+  "features": [
+    "last_value",
+    "mean_last_5",
+    "mean_all",
+    "std_all",
+    "change_last_10",
+    "min_all",
+    "max_all"
+  ],
+  "target": "hr_next_5min",
+  "seed": 17,
+  "model_specs": {
+    "last_value": {
+      "class": "sky_ml._models.LastValue"
+    },
+    "ridge": {
+      "class": "sklearn.linear_model.Ridge",
+      "params": {
+        "alpha": 1.0
+      },
+      "scale": true
+    },
+    "lightgbm": {
+      "class": "lightgbm.LGBMRegressor",
+      "params": {
+        "n_estimators": 300,
+        "learning_rate": 0.05,
+        "max_depth": 4,
+        "num_leaves": 15,
+        "min_child_samples": 50,
+        "reg_lambda": 5.0,
+        "verbose": -1,
+        "n_jobs": 2
+      }
+    }
+  },
+  "split": {
+    "type": "leave_one_subject_out"
+  },
+  "features_table": "data/2_features/hr/2026-11-14_145321/table.csv.gz",
+  "data_snapshot": {
+    "files": {
+      "processed/sample-v2/mmash_minutes.csv.gz": "d2df2474d267197a736bbcbd7b0b5e3069ef7b1a160983b6ba4d89d0eb297125"
+    },
+    "python": "3.12.12",
+    "libraries": {
+      "scikit-learn": "1.9.1",
+      "lightgbm": "4.7.0",
+      "pandas": "3.1.1",
+      "numpy": "2.5.4",
+      "scipy": "1.18.1",
+      "mne": "1.13.2",
+      "shap": "0.54.1"
+    },
+    "seed": 17
+  },
+  "note": "final = fit trên toàn bộ người trong table; chỉ dùng cho người mới. Đánh giá dùng oof.csv.gz.",
+  "models": [
+    {
+      "model": "last_value",
+      "kind": "final",
+      "path": "last_value/final.joblib",
+      "n_train_rows": 5301,
+      "n_train_units": 22,
+      "file": "final.joblib",
+      "bytes": 72,
+      "sha256": "1bedcf00814c0388571be72d7324ca4bba39c3d0e042b8e6c6775f6e97606396"
+    },
+    {
+      "model": "ridge",
+      "kind": "final",
+      "path": "ridge/final.joblib",
+      "n_train_rows": 5301,
+      "n_train_units": 22,
+      "file": "final.joblib",
+      "bytes": 1028,
+      "sha256": "93eae992c51438e49443365d573e6b19ffdf2b20199ed3d57ebd2e2975a41280"
+    },
+    {
+      "model": "lightgbm",
+      "kind": "final",
+      "path": "lightgbm/final.joblib",
+      "n_train_rows": 5301,
+      "n_train_units": 22,
+      "file": "final.joblib",
+      "bytes": 76340,
+      "sha256": "cc253a24e2d3660f98c0cc58407aa56293ba192822c472881a6a96fd3705653e"
+    }
+  ]
+}

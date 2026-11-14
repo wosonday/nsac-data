@@ -1,0 +1,112 @@
+[
+  {
+    "name": "mmash:user_1",
+    "n_train": 5046,
+    "n_test": 255
+  },
+  {
+    "name": "mmash:user_10",
+    "n_train": 5085,
+    "n_test": 216
+  },
+  {
+    "name": "mmash:user_11",
+    "n_train": 5042,
+    "n_test": 259
+  },
+  {
+    "name": "mmash:user_12",
+    "n_train": 5037,
+    "n_test": 264
+  },
+  {
+    "name": "mmash:user_13",
+    "n_train": 5035,
+    "n_test": 266
+  },
+  {
+    "name": "mmash:user_14",
+    "n_train": 5034,
+    "n_test": 267
+  },
+  {
+    "name": "mmash:user_15",
+    "n_train": 5062,
+    "n_test": 239
+  },
+  {
+    "name": "mmash:user_16",
+    "n_train": 5028,
+    "n_test": 273
+  },
+  {
+    "name": "mmash:user_17",
+    "n_train": 5036,
+    "n_test": 265
+  },
+  {
+    "name": "mmash:user_18",
+    "n_train": 5058,
+    "n_test": 243
+  },
+  {
+    "name": "mmash:user_19",
+    "n_train": 5032,
+    "n_test": 269
+  },
+  {
+    "name": "mmash:user_2",
+    "n_train": 5113,
+    "n_test": 188
+  },
+  {
+    "name": "mmash:user_20",
+    "n_train": 5061,
+    "n_test": 240
+  },
+  {
+    "name": "mmash:user_21",
+    "n_train": 5030,
+    "n_test": 271
+  },
+  {
+    "name": "mmash:user_22",
+    "n_train": 5044,
+    "n_test": 257
+  },
+  {
+    "name": "mmash:user_3",
+    "n_train": 5042,
+    "n_test": 259
+  },
+  {
+    "name": "mmash:user_4",
+    "n_train": 5076,
+    "n_test": 225
+  },
+  {
+    "name": "mmash:user_5",
+    "n_train": 5051,
+    "n_test": 250
+  },
+  {
+    "name": "mmash:user_6",
+    "n_train": 5041,
+    "n_test": 260
+  },
+  {
+    "name": "mmash:user_7",
+    "n_train": 5045,
+    "n_test": 256
+  },
+  {
+    "name": "mmash:user_8",
+    "n_train": 5169,
+    "n_test": 132
+  },
+  {
+    "name": "mmash:user_9",
+    "n_train": 5154,
+    "n_test": 147
+  }
+]
