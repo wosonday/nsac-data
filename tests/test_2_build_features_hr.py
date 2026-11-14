@@ -1,4 +1,3 @@
-from pathlib import Path
 
 import numpy as np
 import pytest
@@ -30,15 +29,15 @@ def test_latest_missing_raises_hint(settings):
         resolve_run(settings, "hr", "latest")
 
 
-def test_prepare_hr_end_to_end(settings, tmp_path, monkeypatch):
+def test_build_features_writes_card_and_catalog(settings, config_file):
     copy_data(settings)
-    repo_tasks = Path(__file__).parents[1] / "configs/tasks.yaml"
-    cfg = tmp_path / "sky_ml.yaml"
-    cfg.write_text(f"nasa_cl_data: {settings.nasa_cl_data.as_posix()}\ndata_dir: data\nruns_dir: runs\n"
-                   f"tasks_config: {repo_tasks.as_posix()}\n")
-    main(["--config", str(cfg), "build-features", "hr"])
-    run = resolve_run(settings, "hr")
-    assert {"2_table.csv.gz", "2_features.json", "2_snapshot.json"} <= {p.name for p in run.iterdir()}
+    main(["--config", str(config_file), "build-features", "hr"])
+    rp = resolve_run(settings, "hr")
+    assert {"table.csv.gz", "features.json", "snapshot.json", "README.md"} <= {p.name for p in rp.features.iterdir()}
+    card = (rp.features / "README.md").read_text(encoding="utf-8")
+    assert "(1) Dữ liệu đã xử lý" in card and "`last_value`" in card and "bpm" in card
+    catalog = (settings.features_dir.parent / "CATALOG.csv").read_text(encoding="utf-8")
+    assert "features,hr," in catalog and "2_features/hr/" in catalog
 
 
 def test_unknown_feature_in_config_rejected():

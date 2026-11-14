@@ -1,0 +1,58 @@
+# Từ điển dữ liệu: mô tả cột và giới hạn → pipeline tự sinh README.md (data card) cho mỗi thư mục dữ liệu.
+# Đơn vị "{unit}" được thay bằng `unit` của task trong configs/tasks.yaml.
+
+kinds:
+  features:
+    title: "(1) Dữ liệu đã xử lý — đầu vào mô hình"
+    purpose: >-
+      Bảng mẫu sau khi chuẩn hóa và tạo đặc trưng (bước 2). Mỗi hàng là MỘT mẫu đưa vào mô hình:
+      đặc trưng chỉ lấy từ quá khứ, target là giá trị cần dự báo. Đây là dữ liệu duy nhất bước train đọc.
+  models:
+    title: "(3) Mô hình đã huấn luyện"
+    purpose: >-
+      Mô hình đã fit (joblib) + dự đoán ngoài tập huấn luyện (OOF) + kết quả đánh giá.
+      `final` fit trên TOÀN BỘ người của bảng đặc trưng → chỉ dùng dự báo cho NGƯỜI MỚI.
+      Điểm đánh giá luôn lấy từ OOF (mỗi người được dự đoán bởi mô hình chưa từng thấy họ).
+  predictions:
+    title: "(2) Dữ liệu dự đoán"
+    purpose: >-
+      Kết quả dự báo của mô hình đã lưu (bước 5) cho một file đầu vào mới, kèm khoảng 90%,
+      cờ từ chối dự báo (abstain) và cờ in_sample.
+
+columns:
+  subject_id: {unit: "", description: "Mã người/chuỗi, có namespace nguồn (vd. mmash:user_1). Đơn vị độc lập khi chia fold."}
+  cutoff_time: {unit: "phút (tương đối)", description: "Điểm cuối của cửa sổ quá khứ. Không phải UTC."}
+  last_value: {unit: "{unit}", description: "Giá trị đo cuối trong cửa sổ quá khứ."}
+  mean_last_5: {unit: "{unit}", description: "Trung bình 5 điểm cuối."}
+  mean_all: {unit: "{unit}", description: "Trung bình cả cửa sổ quá khứ."}
+  std_all: {unit: "{unit}", description: "Độ lệch chuẩn trong cửa sổ quá khứ (độ dao động)."}
+  change_last_10: {unit: "{unit}", description: "Giá trị cuối − giá trị 10 điểm trước."}
+  min_all: {unit: "{unit}", description: "Nhỏ nhất trong cửa sổ quá khứ."}
+  max_all: {unit: "{unit}", description: "Lớn nhất trong cửa sổ quá khứ."}
+  median_all: {unit: "{unit}", description: "Trung vị cửa sổ quá khứ."}
+  range_all: {unit: "{unit}", description: "max − min trong cửa sổ quá khứ."}
+  slope_all: {unit: "{unit}/điểm", description: "Hệ số góc hồi quy tuyến tính trong cửa sổ quá khứ (xu hướng)."}
+  hr_next_5min: {unit: "bpm", description: "TARGET: HR trung bình 5 phút ngay sau cutoff_time."}
+  fold: {unit: "", description: "Tên fold (LOSO = subject bị giữ ra)."}
+  row: {unit: "", description: "Chỉ số hàng trong bảng đặc trưng (truy ngược về table.csv.gz)."}
+  model: {unit: "", description: "Tên mô hình (khóa trong configs/tasks.yaml → models)."}
+  y_true: {unit: "{unit}", description: "Giá trị thật của target."}
+  y_pred: {unit: "{unit}", description: "Dự đoán OOF (mô hình chưa thấy người này)."}
+  prediction: {unit: "{unit}", description: "Dự báo của mô hình đã lưu."}
+  low90: {unit: "{unit}", description: "Cận dưới khoảng 90% (split-conformal từ sai số OOF)."}
+  high90: {unit: "{unit}", description: "Cận trên khoảng 90%."}
+  unit: {unit: "", description: "Đơn vị của prediction."}
+  abstain: {unit: "bool", description: "True = từ chối dự báo; lý do ở cột reasons."}
+  reasons: {unit: "", description: "missing_features | out_of_training_range | insufficient_calibration_data (phân cách ;)."}
+  in_sample: {unit: "bool", description: "True = người này nằm trong dữ liệu huấn luyện → KHÔNG phải đánh giá trên người mới."}
+  abs_error: {unit: "{unit}", description: "|y_true − prediction| (chỉ chế độ backtest)."}
+
+tasks:
+  hr:
+    cohort: "MMASH 1.0.0 (PhysioNet, ODbL 1.0) — 22 nam khỏe mạnh, mặt đất, ~24 giờ/người"
+    source: "data/1_source/processed/sample-v2/mmash_minutes.csv.gz (bảng phút đã QA của NASA-cl)"
+    caveats:
+      - "Proxy mặt đất, không phải dữ liệu phi hành gia."
+      - "HR ngoài 30–220 bpm coi là thiếu (ngưỡng kỹ thuật, không phải lâm sàng); chưa lọc artifact sinh lý."
+      - "Cửa sổ chồng lấn: số hàng ≠ số người độc lập (22)."
+      - "Thời gian là phút tương đối trong nghiên cứu, không phải UTC."

@@ -8,5 +8,14 @@ wheels/
 
 # Virtual environments
 .venv
-data/
+# dữ liệu: đẩy (1)(2)(3) + catalog; từ 1_source chỉ đẩy phần mô hình hiện tại dùng (xem data/README.md)
+data/1_source/*
+!data/1_source/COPY_MANIFEST.csv
+!data/1_source/processed/
+data/1_source/processed/*
+!data/1_source/processed/sample-v2/
+!data/1_source/raw/
+data/1_source/raw/*
+!data/1_source/raw/mmash/
+_to_delete/
 runs/

@@ -30,10 +30,10 @@ def test_reproduce_2026_11_11(task):
     for step in ("build-features", "train", "evaluate"):
         main(["--config", cfg, step, task])
     run = resolve_run(load_settings(ROOT / "sky_ml.yaml"), task)
-    metrics = pd.read_csv(run / "4_metrics.csv").set_index("model")
+    metrics = pd.read_csv(run.models / "metrics.csv").set_index("model")
     mae, coverage = EXPECTED[task]
     for model, value in mae.items():
         assert metrics.loc[model, "mae"] == pytest.approx(value, abs=1e-6)
-    summary = read_json(run / "4_summary.json")
+    summary = read_json(run.models / "summary.json")
     observed = summary["interval_coverage"]["observed_coverage"]
     assert observed == pytest.approx(coverage, abs=1e-6)

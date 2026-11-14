@@ -5,15 +5,16 @@ from sky_ml._settings import Settings, ensure_writable, load_settings, load_task
 
 def test_env_overrides_source(tmp_path, monkeypatch):
     cfg = tmp_path / "sky_ml.yaml"
-    cfg.write_text("nasa_cl_data: X\ndata_dir: data\nruns_dir: runs\ntasks_config: configs/tasks.yaml\n")
+    cfg.write_text("nasa_cl_data: X\ndata_dir: data/1_source\ntasks_config: configs/tasks.yaml\n")
     monkeypatch.setenv("SKY_NASA_CL_DATA", str(tmp_path / "src"))
     s = load_settings(cfg)
-    assert s.nasa_cl_data == tmp_path / "src" and s.data_dir == tmp_path / "data"
+    assert s.nasa_cl_data == tmp_path / "src" and s.data_dir == tmp_path / "data/1_source"
+    assert s.models_dir == tmp_path / "data/3_models"  # mặc định khi không khai báo
     assert s.tasks_config == tmp_path / "configs/tasks.yaml"
 
 
 def test_refuses_output_inside_source(tmp_path):
-    s = Settings(tmp_path / "ncl", tmp_path / "data", tmp_path / "runs", tmp_path / "t.yaml")
+    s = Settings(tmp_path / "ncl", tmp_path / "d1", tmp_path / "d2", tmp_path / "d3", tmp_path / "d4", tmp_path / "t.yaml")
     with pytest.raises(ValueError, match="NASA-cl"):
         ensure_writable(tmp_path / "ncl" / "runs", s)
 

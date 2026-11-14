@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - Done and verified: `copy-data` (37 files, 496.3 MB, 25 hash-checked against NASA-cl manifests), `check`, and `prepare hr` (5301 windows / 22 subjects; this matches the 11/11 NASA-cl run).
 - Config is **YAML**, not TOML and not Python:
-  - `sky_ml.yaml` holds `nasa_cl_data`, `data_dir`, `runs_dir`, `tasks_config`;
+  - `sky_ml.yaml` holds `nasa_cl_data`, `data_dir` (data/1_source), `features_dir`, `models_dir`, `predictions_dir`, `tasks_config`, `dictionary_config`;
   - `configs/tasks.yaml` holds per-task params;
   - `configs/crew_map.yaml` and `configs/rules.yaml` are planned;
   - `src/sky_ml/tasks.py` is obsolete and should be deleted.
@@ -71,15 +71,16 @@ Things that span several files:
 
 Pipeline steps are numbered in run order; support/config/off-pipeline modules start with `_`.
 
-| Step | Module | Command | Writes to `runs/<task>/<run>/` |
+| Step | Module | Command | Writes to |
 |---|---|---|---|
-| 1 | `1_load_data.py` (copy + verify + snapshot) | `sky-ml load-data [--dry-run]`, `sky-ml check` | `data/` + `data/COPY_MANIFEST.csv` |
-| 2 | `2_build_features/` (features chosen in `configs/tasks.yaml` → `features:`) | `sky-ml build-features <task>` | `2_snapshot.json`, `2_table.csv.gz`, `2_features.json` |
-| 3 | `3_train.py` | `sky-ml train <task>` | `3_oof.csv.gz`, `3_folds.json`, `3_models/` (joblib + `manifest.json` with SHA-256) |
-| 4 | `4_evaluate.py` | `sky-ml evaluate <task>` | `4_metrics.csv`, `4_summary.json` |
-| 5 | `5_predict.py` (load saved model, predict new data) | `sky-ml predict <task> --input X.csv [--mode latest\|backtest] [--model M]` | `5_predictions/*.csv/json` |
+| 1 | `1_load_data.py` (copy + verify + snapshot) | `sky-ml load-data [--dry-run]`, `sky-ml check` | `data/1_source/` + `COPY_MANIFEST.csv` |
+| 2 | `2_build_features/` (features chosen in `configs/tasks.yaml` → `features:`) | `sky-ml build-features <task>` | (1) `data/2_features/<task>/<run>/`: `table.csv.gz`, `features.json`, `snapshot.json` |
+| 3 | `3_train.py` | `sky-ml train <task>` | (3) `data/3_models/<task>/<run>/`: `oof.csv.gz`, `folds.json`, `<model>/final.joblib`, `manifest.json` |
+| 4 | `4_evaluate.py` | `sky-ml evaluate <task>` | (3) same folder: `metrics.csv`, `summary.json` |
+| 5 | `5_predict.py` (load saved model, predict new data) | `sky-ml predict <task> --input X.csv [--mode latest\|backtest] [--model M]` | (2) `data/4_predictions/<task>/<run>/*.csv/json` |
 
-- Support modules: `_settings.py`, `_runs.py`, `_models.py`, `_artifacts.py`, `_hashing.py`, `_steps.py`, `_cli.py`. The entry point is `sky_ml._cli:main`.
+- Data layout (user request 2026-11-14 14:47): three groups share one `run_id`; every run folder gets an auto `README.md` data card (`_datacards.write_card`, column text from `configs/data_dictionary.yaml`) and every file is appended to `data/CATALOG.csv` (`_datacards.register`). Docs: `data/README.md`, `docs/3_HUONG_DAN_DU_LIEU.md`; sources for the current model: `docs/Du_lieu_nguon_mo_hinh_hr.xlsx` (hr only — add rows when a new task is built). `runs/` is obsolete.
+- Support modules: `_settings.py`, `_runs.py`, `_datacards.py`, `_jsonio.py`, `_models.py`, `_artifacts.py`, `_hashing.py`, `_steps.py`, `_cli.py`. The entry point is `sky_ml._cli:main`.
 - Module names starting with a digit cannot be used with `import`. Load steps only via `sky_ml._steps` (importlib); a step that needs another step uses `importlib.import_module("sky_ml.4_evaluate")`.
 - Ruff's N999 rule is ignored for these files in `pyproject.toml`.
 - Tests: `test_<step>_*.py`; support tests use `test_0_*`; the slow reproduction test is `test_9_reproduce.py`.

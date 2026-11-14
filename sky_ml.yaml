@@ -1,5 +1,11 @@
 # Cấu hình chung. Đường dẫn tương đối tính theo thư mục chứa file này.
-nasa_cl_data: D:/Project/NASA-cl/data # nguồn, CHỈ ĐỌC (ghi đè bằng env SKY_NASA_CL_DATA)
-data_dir: data # bản copy
-runs_dir: runs # kết quả từng lần chạy
-tasks_config: configs/tasks.yaml # tham số từng task
+nasa_cl_data: D:/Project/NASA-cl/data   # nguồn, CHỈ ĐỌC (ghi đè bằng env SKY_NASA_CL_DATA)
+
+# Ba nhóm dữ liệu do pipeline tạo ra — xem data/README.md
+data_dir: data/1_source                 # bước 1: bản copy dữ liệu gốc từ NASA-cl (+ COPY_MANIFEST.csv)
+features_dir: data/2_features           # bước 2: (1) DỮ LIỆU ĐÃ XỬ LÝ = đầu vào mô hình (bảng đặc trưng)
+models_dir: data/3_models               # bước 3–4: (3) MÔ HÌNH đã huấn luyện + OOF + metric
+predictions_dir: data/4_predictions     # bước 5: (2) DỮ LIỆU DỰ ĐOÁN
+
+tasks_config: configs/tasks.yaml        # tham số từng task
+dictionary_config: configs/data_dictionary.yaml   # mô tả cột → sinh README (data card) cho từng thư mục
