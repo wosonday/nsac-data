@@ -4,13 +4,13 @@ File trong runs/<task>/<run>/ mang số của bước đã tạo ra nó:
 2_* (build-features), 3_* (train), 4_* (evaluate), 5_predictions/ (predict).
 """
 import argparse
-import json
 from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
 
 from ._artifacts import load_model, save_model, write_manifest
+from ._jsonio import read_json, write_json
 from ._runs import new_run, require, resolve_run
 from ._settings import load_settings, load_tasks
 from ._steps import STEPS, build_features, evaluate, load_data, predict, train
@@ -61,9 +61,9 @@ def _build_features(settings, args):
     load_data.verify_copy(settings, cfg["inputs"])
     table, features = build_features.BUILD[args.task](settings.data_dir, cfg)
     run = new_run(settings, args.task)
-    (run / "2_snapshot.json").write_text(json.dumps(load_data.snapshot(settings, cfg["inputs"]), indent=2))
+    write_json(run / "2_snapshot.json", load_data.snapshot(settings, cfg["inputs"]))
     table.to_csv(run / "2_table.csv.gz", index=False)
-    (run / "2_features.json").write_text(json.dumps(features, indent=2))
+    write_json(run / "2_features.json", features)
     print(f"{args.task}: {len(table)} hàng, {table.subject_id.nunique()} người, {len(features)} đặc trưng → {run}")
 
 
@@ -71,14 +71,14 @@ def _train(settings, args):
     cfg = load_tasks(settings)[args.task]
     run = resolve_run(settings, args.task, args.run)
     table = pd.read_csv(require(run, "2_table.csv.gz", f"build-features {args.task}"))
-    features = json.loads(require(run, "2_features.json", f"build-features {args.task}").read_text())
+    features = read_json(require(run, "2_features.json", f"build-features {args.task}"))
     folds = train.make_folds(table, cfg["split"])
     save = cfg.get("save_models", {"final": True, "folds": False})
     fold_models = {} if save.get("folds") else None
     oof = train.train_predict(table, features, cfg, fold_models)
     oof.to_csv(run / "3_oof.csv.gz", index=False)
-    (run / "3_folds.json").write_text(json.dumps(
-        [{"name": str(f["name"]), "n_train": len(f["train"]), "n_test": len(f["test"])} for f in folds], indent=2))
+    write_json(run / "3_folds.json",
+               [{"name": str(f["name"]), "n_train": len(f["train"]), "n_test": len(f["test"])} for f in folds])
     print(f"{args.task}: {len(folds)} fold × {len(cfg['models'])} mô hình → {run / '3_oof.csv.gz'}")
 
     entries, models_dir = [], run / "3_models"
@@ -96,7 +96,7 @@ def _train(settings, args):
         write_manifest(models_dir, entries, {
             "task": args.task, "features": features, "target": cfg["target"], "seed": cfg.get("seed", 17),
             "model_specs": cfg["models"], "split": cfg["split"],
-            "data_snapshot": json.loads(snap.read_text()) if snap.exists() else None,
+            "data_snapshot": read_json(snap) if snap.exists() else None,
             "note": "final = fit trên toàn bộ người trong table; chỉ dùng cho người mới. Đánh giá dùng 3_oof.csv.gz."})
         print(f"Đã lưu {len(entries)} mô hình → {models_dir}")
 
@@ -115,7 +115,7 @@ def _evaluate(settings, args):
     else:
         evaluate.confusion(oof, best, cfg["classes"]).to_csv(run / "4_confusion.csv")
     metrics.to_csv(run / "4_metrics.csv", index=False)
-    (run / "4_summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False))
+    write_json(run / "4_summary.json", summary)
     print(metrics.round(4).to_string(index=False))
     if "interval_coverage" in summary:
         cov = summary["interval_coverage"]
@@ -129,7 +129,7 @@ def _predict(settings, args):
     models_dir = require(run, "3_models", f"train {args.task}")
     model_name = args.model or cfg.get("deploy_model") or cfg["baseline"]
     model = load_model(models_dir, model_name)                      # kiểm SHA-256 trước khi nạp
-    features = json.loads(require(run, "2_features.json", f"build-features {args.task}").read_text())
+    features = read_json(require(run, "2_features.json", f"build-features {args.task}"))
     if features != cfg["features"]:
         raise ValueError("configs/tasks.yaml `features` đã đổi so với lúc train run này; "
                          "chạy lại build-features + train trước khi predict.")
@@ -150,7 +150,7 @@ def _predict(settings, args):
             "n_in_sample": int(result.in_sample.sum())}
     if "abs_error" in result:
         meta["mae_backtest"] = float(result.abs_error.mean())
-    (out_dir / f"{stem}.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False))
+    write_json(out_dir / f"{stem}.json", meta)
     print(result.head(10).round(2).to_string(index=False))
     print({k: (round(v, 3) if isinstance(v, float) else v) for k, v in meta.items()})
     print(f"→ {out_dir / (stem + '.csv')}")

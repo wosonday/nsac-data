@@ -4,12 +4,13 @@ Cảnh báo bảo mật: joblib/pickle có thể chạy mã khi nạp. Chỉ n�
 `load_model` từ chối file có SHA-256 khác với manifest.
 """
 import hashlib
-import json
 import platform
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
 import joblib
+
+from ._jsonio import read_json, write_json
 
 
 def _sha256(path: Path) -> str:
@@ -42,13 +43,13 @@ def save_model(model, path: Path) -> dict:
 def write_manifest(models_dir: Path, entries: list[dict], context: dict) -> Path:
     manifest = {"versions": _versions(), **context, "models": entries}
     path = models_dir / "manifest.json"
-    path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
+    write_json(path, manifest)
     return path
 
 
 def load_model(models_dir: Path, name: str, kind: str = "final"):
     """Nạp mô hình `name` (kind = 'final' hoặc tên fold) sau khi kiểm SHA-256 theo manifest."""
-    manifest = json.loads((models_dir / "manifest.json").read_text())
+    manifest = read_json(models_dir / "manifest.json")
     entry = next((m for m in manifest["models"] if m["model"] == name and m["kind"] == kind), None)
     if entry is None:
         raise FileNotFoundError(f"Không có mô hình {name}/{kind} trong {models_dir / 'manifest.json'}")

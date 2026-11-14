@@ -31,6 +31,7 @@ packages = ["src/sky_ml"]
 [tool.pytest.ini_options]
 markers = ["slow: cần dữ liệu thật"]
 addopts = "-m 'not slow'"
+testpaths = ["tests"]          # chỉ thu thập test trong tests/ (bỏ qua _to_delete/, runs/, data/)
 
 [tool.ruff.lint.per-file-ignores]
 # Bước pipeline đánh số 1_, 2_, ... (nạp qua importlib trong _steps.py) — tên module bắt đầu bằng số là có chủ ý

@@ -17,6 +17,7 @@ from pathlib import Path
 import pandas as pd
 
 from ._hashing import MANIFEST_NAME, sha256_file
+from ._jsonio import read_json
 from ._settings import Settings, ensure_writable
 
 # Đường dẫn/glob tương đối trong NASA-cl/data
@@ -60,8 +61,8 @@ def _known_hashes(src: Path) -> dict[str, str]:
         ].items():
             known[f"processed/sample-v2/{name}"] = meta["sha256"]
     for meta in (src / "raw/radlab/instruments/Lidal").glob("*.csv.meta.json"):
-        known[meta.relative_to(src).as_posix().removesuffix(".meta.json")] = json.loads(
-            meta.read_text()
+        known[meta.relative_to(src).as_posix().removesuffix(".meta.json")] = read_json(
+            meta
         )["sha256"]
     return known
 
