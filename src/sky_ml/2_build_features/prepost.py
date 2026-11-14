@@ -2,7 +2,8 @@
 
 Dùng chung cho iDXA (khối nạc chân, khối khoáng xương), siêu âm tim (đường kính thất trái)… — mọi tham số ở tasks.yaml:
   archive, member (đường dẫn trong ZIP), value_column, phase_column, day_column, target_phase, target_day, change.
-Baseline = trung bình MỌI lần đo PRE của người đó (giảm nhiễu đo). Target = giá trị tại (target_phase, target_day).
+Baseline = trung bình MỌI lần đo PRE của người đó (giảm nhiễu đo) — hoặc (baseline_phase, baseline_day) nếu khai báo
+(vd. lipid chỉ đo trong nằm giường: baseline = ngày 14). Target = giá trị tại (target_phase, target_day).
 Kiểm SHA-256 + MD5 member theo raw/nlsp/download_manifest.csv. Không dùng nhóm can thiệp làm đặc trưng.
 """
 import zipfile
@@ -30,12 +31,14 @@ def prepost_table(raw: pd.DataFrame, cfg: dict) -> pd.DataFrame:
                       "day": day, "value": value}).dropna(subset=["value"])
     rows = []
     for sid, g in f.groupby("subject_id"):
-        base = g[g.phase.eq("PRE_TEST")].value.mean()
+        bphase, bday = cfg.get("baseline_phase", "PRE_TEST"), cfg.get("baseline_day")
+        bmask = g.phase.eq(bphase) & (g.day.eq(bday) if bday is not None else True)
+        base = g[bmask].value.mean()
         tgt = g[g.phase.eq(cfg["target_phase"]) & g.day.eq(cfg["target_day"])].value.mean()
         if not (np.isfinite(base) and np.isfinite(tgt)) or base == 0:
             continue
         change = 100 * (tgt / base - 1) if cfg.get("change", "percent") == "percent" else tgt - base
-        rows.append({"subject_id": sid, "baseline": base, "n_pre": int(g.phase.eq("PRE_TEST").sum()), cfg["target"]: change})
+        rows.append({"subject_id": sid, "baseline": base, "n_pre": int(bmask.sum()), cfg["target"]: change})
     return pd.DataFrame(rows)
 
 

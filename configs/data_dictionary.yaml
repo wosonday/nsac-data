@@ -213,3 +213,69 @@ tasks:
   bone_mineral: *prepost_dict
   lv_mass: *prepost_dict
   lv_diastolic_volume: *prepost_dict
+  muscle_quadriceps: &mri_dict
+    cohort: "UTMB CFT70 iRATS — MRI thể tích cơ, 27 người (gồm persona dae-jung 8072, lena 8936; KHÔNG có ayla 5160)"
+    source: "data/1_source/raw/nlsp/BEDREST_iRATS.zip › BEDREST_IRATS_MRI_ULTRASOUND_CFT70_MRI_<cơ>.csv"
+    columns:
+      baseline: {unit: "đơn vị nguồn (thể tích MRI)", description: "Giá trị PRE (ngày −6)."}
+      pct_change_day69: {unit: "% so với PRE", description: "TARGET: (thể tích ngày nằm giường 69 / PRE − 1) × 100."}
+    caveats:
+      - "Một hàng / người — pilot; nhóm tập luyện (iRATS) ảnh hưởng mạnh nhưng không dùng làm đặc trưng."
+      - "Persona ayla (5160) và 3 persona Campaign 1 không có MRI → UNKNOWN."
+  muscle_soleus: *mri_dict
+  lipid_ldl:
+    cohort: "UTMB CFT70 NNX10AP86G lipid, 24 người, đo ngày nằm giường 14, 42, 70 (không có PRE)"
+    source: "data/1_source/raw/nlsp/NNX10AP86G.zip › NNX10AP86G_CFT70_LIPIDS.csv"
+    columns:
+      baseline: {unit: "mg/dL", description: "LDL-cholesterol ngày nằm giường 14 (mốc sớm nhất có đo)."}
+      pct_change_day70: {unit: "% so với ngày 14", description: "TARGET: (LDL ngày 70 / ngày 14 − 1) × 100."}
+    caveats:
+      - "Baseline là ngày 14 TRONG nằm giường, không phải trước nằm giường."
+  cognition_cpt_rt: &winscat_dict
+    cohort: "UTMB MR085G WinSCAT — TRAIN: Campaign 3 (25 người); NGOÀI cohort: Campaign 1 C1G0001–3 (= tomas, yuki, noor), 10 lần test/người"
+    source: "data/1_source/raw/nlsp/MR085G.zip › MR085G_Campaign_3_WinSCAT_*.csv, MR085G_Campaign_1_WinSCAT_All.csv"
+    columns:
+      cutoff_time: {unit: "thời điểm test", description: "Ngày giờ của lần test cuối trong cửa sổ (ngày gốc — KHÔNG hiển thị, chỉ dùng thứ tự tương đối)."}
+      cpt_rt_next: {unit: "ms", description: "TARGET: thời gian phản ứng trung bình test hiệu suất liên tục (CPT) lần tới — thấp hơn là tốt hơn."}
+      math_acc_next: {unit: "%", description: "TARGET: độ chính xác test toán lần tới."}
+    caveats:
+      - "WinSCAT = Spaceflight Cognitive Assessment Tool for Windows (NASA); có hiệu ứng học (luyện tập) giữa các lần test."
+      - "Chuỗi theo thứ tự lần test, khoảng cách giữa các lần không đều."
+  cognition_math_acc: *winscat_dict
+  dxa_regional:
+    cohort: "UTMB CFT70 BRSMiDXA — 5 người (5297, 6187, 6464, 8179, 9023), KHÔNG có persona"
+    source: "data/1_source/raw/nlsp/BRSMiDXA.zip › *_L_Hip_*, *_R_Hip_*, *_S_bone_*.csv"
+    columns:
+      region: {unit: "", description: "L_Hip / R_Hip (BMD toàn bộ hông) · S_bone (BMD cột sống L1–L4)."}
+      bmd: {unit: "g/cm²", description: "Mật độ khoáng xương (trung bình các lần quét cùng ngày)."}
+      days_since_first_scan: {unit: "ngày", description: "Số ngày kể từ lần quét đầu (nguồn không ghi pha PRE/IN/POST)."}
+      pct_vs_first_scan: {unit: "%", description: "% thay đổi BMD so với lần quét đầu."}
+    caveats:
+      - "Bảng MÔ TẢ — 5 người quá ít để train/đánh giá mô hình."
+  cortisol:
+    cohort: "UTMB Campaign 3 BRSMLVR — cortisol nước bọt, 14 người"
+    source: "data/1_source/raw/nlsp/BRSMLVR.zip › *Salivary_Cortisol.csv, *Saliva_Cortisol.csv"
+    columns:
+      study_day: {unit: "ngày nghiên cứu", description: "Ngày theo nguồn (âm = trước nằm giường)."}
+      cortisol_mean: {unit: "theo nguồn", description: "Trung bình cortisol nước bọt các mẫu trong ngày (đơn vị nguồn chưa có codebook)."}
+      n_samples: {unit: "", description: "Số mẫu trong ngày."}
+    caveats:
+      - "Bảng MÔ TẢ. Cortisol thay đổi theo giờ trong ngày nhưng nguồn không ghi giờ lấy mẫu → chỉ dùng trung bình ngày."
+      - "File C3F 'Saliva_Cortisol' của nguồn thực chứa cột VZV → bị bỏ qua."
+  inspiration4_labs:
+    cohort: "Inspiration4 (SpaceX, 2021) — 4 phi hành đoàn dân sự THẬT, bay 3 ngày; mẫu L-92, L-44, L-3, R+1, R+45, R+82, R+194"
+    source: "data/1_source/raw/osdr/clinical/OSD-569 (CBC), OSD-575 (CMP, Eve tim mạch, Eve miễn dịch) — bản TRANSFORMED"
+    columns:
+      subject_id: {unit: "", description: "i4:C00x — mã phi hành đoàn Inspiration4 (KHÔNG phải persona nsac)."}
+      panel: {unit: "", description: "Bảng xét nghiệm nguồn."}
+      timepoint: {unit: "", description: "L-n = n ngày trước phóng; R+n = n ngày sau hạ cánh."}
+      relative_day: {unit: "ngày", description: "Số ngày tương đối (âm = trước phóng, dương = sau hạ cánh)."}
+      analyte: {unit: "", description: "Tên chất xét nghiệm (theo nguồn)."}
+      value: {unit: "cột unit", description: "Giá trị đo."}
+      range_min: {unit: "cột unit", description: "Cận dưới khoảng tham chiếu của PHÒNG XÉT NGHIỆM (không phải ngưỡng cảnh báo)."}
+      range_max: {unit: "cột unit", description: "Cận trên khoảng tham chiếu của phòng xét nghiệm."}
+      out_of_range: {unit: "bool", description: "Ngoài khoảng tham chiếu nguồn (chỉ mô tả; rỗng nếu analyte không có khoảng)."}
+    caveats:
+      - "Bảng MÔ TẢ — 4 người, không train mô hình."
+      - "Glucose R+45: 3/4 người 36–44 mg/dL, thấp bất thường so với mọi mốc khác → nghi lỗi tiền phân tích, cần gắn cờ khi hiển thị."
+      - "Khoảng tham chiếu của phòng xét nghiệm KHÔNG phải ngưỡng cảnh báo cho phi hành gia."

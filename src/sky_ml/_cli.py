@@ -178,8 +178,17 @@ def _build_features(settings, args):
     print(f"{args.task}: {len(table)} hàng, {table.subject_id.nunique()} người, {len(features)} đặc trưng → {out}")
 
 
+def _descriptive_only(cfg, task) -> bool:
+    if cfg.get("kind") == "descriptive":
+        print(f"{task}: bảng MÔ TẢ (kind: descriptive) — không train/evaluate; xem data/2_features/{task}/<run>/")
+        return True
+    return False
+
+
 def _train(settings, args):
     cfg = _task_cfg(settings, args.task)
+    if _descriptive_only(cfg, args.task):
+        return
     rp = resolve_run(settings, args.task, args.run)
     table = pd.read_csv(require(rp.features, "table.csv.gz", f"build-features {args.task}"))
     features = read_json(require(rp.features, "features.json", f"build-features {args.task}"))
@@ -223,6 +232,8 @@ def _train(settings, args):
 
 def _evaluate(settings, args):
     cfg = _task_cfg(settings, args.task)
+    if _descriptive_only(cfg, args.task):
+        return
     rp = resolve_run(settings, args.task, args.run)
     oof = pd.read_csv(require(rp.models, "oof.csv.gz", f"train {args.task}"))
     metrics = evaluate.evaluate(oof, cfg)

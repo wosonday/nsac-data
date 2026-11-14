@@ -27,7 +27,10 @@ ALLOWLIST = [
     "raw/nlsp/BRSMAct.zip",                                                      # sleep_act
     "raw/nlsp/CRF.zip",                                                          # vitals
     "raw/nlsp/NNX10AP86G.zip",                                                   # mood, fatigue, glucose, lean_mass_legs, bone_mineral
-    "raw/nlsp/BRSMCF.zip",                                                       # echo_lvdd
+    "raw/nlsp/BRSMCF.zip",                                                       # lv_mass, lv_diastolic_volume
+    "raw/nlsp/BRSMiDXA.zip", "raw/nlsp/BEDREST_iRATS.zip",                       # dxa_regional, muscle MRI
+    "raw/nlsp/MR085G.zip", "raw/nlsp/BRSMLVR.zip",                               # WinSCAT, cortisol
+    "raw/osdr/clinical/*/*_TRANSFORMED.csv", "raw/osdr/clinical/*/*_TRANSFORMED.csv.meta.json",  # Inspiration4 labs
     "raw/sleep_edfx/1.0.0/sleep-cassette/SC40?1*-PSG.edf",                       # sleep
     "raw/sleep_edfx/1.0.0/sleep-cassette/SC40?1*-Hypnogram.edf",
     "raw/sleep_edfx/1.0.0/download_manifest.csv",
@@ -57,6 +60,8 @@ def _known_hashes(src: Path) -> dict[str, str]:
     if sample.exists():
         for name, meta in json.loads(sample.read_text(encoding="utf-8"))["outputs"].items():
             known[f"processed/sample-v2/{name}"] = meta["sha256"]
+    for meta in (src / "raw/osdr/clinical").glob("*/*.csv.meta.json"):              # OSDR: sidecar do NASA-cl ghi khi tải
+        known["raw/osdr/" + read_json(meta)["path"]] = read_json(meta)["sha256"]
     for meta in (src / "raw/radlab/instruments/Lidal").glob("*.csv.meta.json"):
         known[meta.relative_to(src).as_posix().removesuffix(".meta.json")] = read_json(meta)["sha256"]
     return known

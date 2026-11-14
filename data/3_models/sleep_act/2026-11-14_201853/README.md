@@ -3,7 +3,7 @@
 Mô hình đã fit (joblib) + dự đoán ngoài tập huấn luyện (OOF) + kết quả đánh giá. `final` fit trên TOÀN BỘ người của bảng đặc trưng → chỉ dùng dự báo cho NGƯỜI MỚI. Điểm đánh giá luôn lấy từ OOF (mỗi người được dự đoán bởi mô hình chưa từng thấy họ).
 
 - **Tạo bởi:** `sky-ml train/evaluate sleep_act`
-- **README cập nhật (UTC):** 2026-11-14T14:15:10+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:20+00:00
 - **Cohort:** UTMB Bed Rest Campaign 1 (NASA NLSP, BRSMAct) — 3 người C1G0001–3, 2 đêm trước, ~60 đêm nằm giường, 7 đêm sau
 - **Nguồn:** data/1_source/raw/nlsp/BRSMAct.zip › BRSMACT_Campagin_1_Actigraphy.csv (kiểm SHA-256 + MD5 theo download_manifest.csv)
 

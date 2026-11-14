@@ -3,7 +3,7 @@
 Bảng mẫu sau khi chuẩn hóa và tạo đặc trưng (bước 2). Mỗi hàng là MỘT mẫu đưa vào mô hình: đặc trưng chỉ lấy từ quá khứ, target là giá trị cần dự báo. Đây là dữ liệu duy nhất bước train đọc.
 
 - **Tạo bởi:** `sky-ml build-features vitals_sbp`
-- **README cập nhật (UTC):** 2026-11-14T14:15:10+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:20+00:00
 - **Cohort:** UTMB bed rest CRF Daily Vitals — TRAIN: Campaign 3 (23 người); NGOÀI cohort: CFT70 (5160, 8072, 8936) + Campaign 1 (C1G0001–3) = 6 persona
 - **Nguồn:** data/1_source/raw/nlsp/CRF.zip › */Daily_Vitals/*.csv, CFT70_VITALS/*.csv (kiểm SHA-256 + MD5)
 

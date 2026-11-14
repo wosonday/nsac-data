@@ -1,15 +1,16 @@
 # Báo cáo dữ liệu và mô hình sky-ml × nsac
 
-> Cập nhật 14/11/2026, 21:20 · Thư mục: `D:\Project\nasa-hackathon` · Bảng chi tiết: [`docs/Tong_hop_du_lieu_mo_hinh.xlsx`](Tong_hop_du_lieu_mo_hinh.xlsx)
+> Cập nhật 14/11/2026, 21:35 · Thư mục: `D:\Project\nasa-hackathon` · Bảng chi tiết: [`docs/Tong_hop_du_lieu_mo_hinh.xlsx`](Tong_hop_du_lieu_mo_hinh.xlsx)
 >
 > ⚠️ Báo cáo có dùng **DỮ LIỆU GIẢ ĐỊNH** (mục 5) cho phần persona không có dữ liệu thật. BTC cho phép việc này; mọi chỗ dùng đều được ghi rõ.
 
 ## 1. Tóm tắt
 
-- **21 task đã chạy**, mỗi task có đủ (1) đặc trưng, (3) mô hình, (2) dự đoán hoặc OOF:
+- **29 task**: 26 task dự báo có đủ đặc trưng, mô hình và dự đoán/OOF; 3 task là bảng mô tả.
   - nhóm cũ: `hr`, `dose`, `dose_orbit`, `cpet`, `cpet_physio`, `sleep`, `sleep_act`;
   - nhóm 20:45: `vitals_sbp`, `vitals_dbp`, `vitals_temp`, `vitals_pulse`, `mood`, `glucose`;
-  - **nhóm 21:15 (ưu tiên dữ liệu thật chưa dùng trong NASA-cl):** `vitals_resp`, `vitals_weight`, `sleep_act_duration`, `fatigue`, `lean_mass_legs`, `bone_mineral`, `lv_mass`, `lv_diastolic_volume`.
+  - **nhóm 21:15 (ưu tiên dữ liệu thật chưa dùng trong NASA-cl):** `vitals_resp`, `vitals_weight`, `sleep_act_duration`, `fatigue`, `lean_mass_legs`, `bone_mineral`, `lv_mass`, `lv_diastolic_volume`;
+  - **nhóm 21:30 (mục 8b):** `muscle_quadriceps`, `muscle_soleus`, `lipid_ldl`, `cognition_cpt_rt`, `cognition_math_acc`, cùng 3 bảng mô tả `dxa_regional`, `cortisol`, `inspiration4_labs`.
 - **Đủ 6 chỉ số web × 6 persona.** Phần lớn là dữ liệu thật; ba khoảng trống được lấp bằng dữ liệu giả định:
   - tâm trạng của 3 persona Campaign 1;
   - giấc ngủ theo đêm của 3 persona CFT70;
@@ -92,6 +93,9 @@ Kết quả là dự đoán ngoài tập huấn luyện (OOF), CI95 tính bằng
 | Thời lượng ngủ | ⚠️ **Giả định** | Thật |
 | Mệt mỏi | Thật | Không có (UNKNOWN) |
 | Cơ, xương, tim (PRE → ngày 70) | Thật | Không có (UNKNOWN) |
+| Nhận thức (WinSCAT) | Không có (UNKNOWN) | Thật (test ngoài cohort) |
+| Thể tích cơ (MRI) | Thật cho dae-jung, lena; ayla UNKNOWN | Không có (UNKNOWN) |
+| LDL-cholesterol | Thật | Không có (UNKNOWN) |
 
 Nguồn của bảng này: `configs/crew_map.yaml`. Mỗi persona chỉ lấy dữ liệu của đúng một người analog.
 
@@ -155,7 +159,49 @@ Nguồn của bảng này: `configs/crew_map.yaml`. Mỗi persona chỉ lấy d�
 | Trung bình | Thay dữ liệu giả định bằng dữ liệu thật khi tìm được | POMS Campaign 1, actigraphy CFT70 trên NLSP |
 | Trung bình | Thẻ đường huyết mô tả từ OSD-575 (Inspiration4) | Bằng chứng từ chuyến bay thật; có cờ nghi vấn ở mốc R+45 |
 | Trung bình | Kiểm lại `dose_orbit` trên Lidal 2023; xác minh múi giờ RadLab | Tránh kết quả lạc quan |
-| Trung bình | DXA hông/cột sống (BRSMiDXA), MRI cơ (iRATS), WinSCAT (nhận thức C1 + C3), lipid, cortisol | Dữ liệu thật còn lại trong NASA-cl; dùng lại builder `prepost` / `mood`, chỉ cần khai báo YAML |
+| Cao | Đổi `deploy_model` của `cognition_cpt_rt` sang `last_value` (chốt trước, kiểm lại trên dữ liệu mới) | `personal_mean` kém nhất ngoài cohort (mục 8b) |
+| Thấp | Virus tiềm ẩn (BRSMLVR: VZV, EBV) | Dữ liệu thật cuối cùng chưa dùng |
+
+## 8b. Bổ sung 21:30 — dữ liệu thật còn lại (BRSMiDXA, iRATS, WinSCAT, lipid, cortisol, OSD-569/575)
+
+### 8b.1 Dữ liệu và mục tiêu
+
+| Task | Nguồn | Đối tượng | Mục tiêu | Persona |
+|---|---|---|---|---|
+| `muscle_quadriceps`, `muscle_soleus` | BEDREST_iRATS MRI | 27 người CFT70 | % thay đổi thể tích cơ PRE → ngày 69 | dae-jung-park, lena-fischer (ayla: UNKNOWN) |
+| `lipid_ldl` | NNX10AP86G LIPIDS | 24 người CFT70 | % thay đổi LDL ngày 14 → 70 | 3 persona CFT70 |
+| `cognition_cpt_rt`, `cognition_math_acc` | MR085G WinSCAT [Kane 2005] | Train 25 người Campaign 3; ngoài cohort 3 persona C1 | Thời gian phản ứng CPT (ms), độ chính xác toán (%) ở lần test tới | 3 persona C1 |
+| `dxa_regional` (mô tả) | BRSMiDXA | 5 người CFT70 | BMD hông và cột sống L1–L4 theo lần quét | Không |
+| `cortisol` (mô tả) | BRSMLVR | 14 người Campaign 3 | Cortisol nước bọt trung bình ngày | Không |
+| `inspiration4_labs` (mô tả) | OSD-569 CBC, OSD-575 CMP + Eve [Jones 2024] | 4 phi hành đoàn Inspiration4 THẬT | Giá trị xét nghiệm 7 mốc L-92…R+194 | Không (người thật, không phải analog) |
+
+Lý do chọn: đây là các dữ liệu thật có sẵn trong NASA-cl nhưng chưa dùng. Chúng bao phủ những hệ cơ quan mà vi trọng lực ảnh hưởng: cơ, xương, chuyển hóa, nhận thức và stress.
+Bảng có dưới 10 người (DXA vùng: 5, Inspiration4: 4) chỉ được dùng để MÔ TẢ. Với số người như vậy, CI theo người không có ý nghĩa.
+
+### 8b.2 Kết quả (OOF; CI95 bootstrap theo người)
+
+| Task | Triển khai (chốt trước) | Kết quả | Baseline | Kết luận |
+|---|---|---|---|---|
+| `muscle_quadriceps` | persistence | MAE 6,09 điểm % (4,48–7,80); TB thay đổi −0,8 % | — | Không mô hình nào tốt hơn baseline |
+| `muscle_soleus` | mean_delta | 8,16 (6,57–9,80); TB **−13,1 %** | persistence 13,10 | Tốt hơn: ΔMAE −4,94 (CI −8,2…−1,4) |
+| `lipid_ldl` | mean_delta | 10,55; ridge 9,13 (5,90–13,49) | persistence 10,11 | Chênh lệch CI chứa 0 |
+| `cognition_cpt_rt`, trong cohort | personal_mean | 30,97 ms; ridge 26,2 (21,1–31,9) | last_value 27,4 | Không khác biệt rõ |
+| `cognition_cpt_rt`, **ngoài cohort C1** | personal_mean | **59,1 ms (44,6–77,1)**, bao phủ 0,80 | last_value 43,6 | **Kém hơn baseline**; lightgbm 36,0 tốt nhất |
+| `cognition_math_acc`, ngoài cohort C1 | personal_mean | 6,83 điểm % (3,10–10,24), bao phủ 0,95 | last_value 8,57 | Tốt hơn, nhưng chỉ 3 người nên CI rộng |
+
+Mô tả:
+
+- `dxa_regional`: ở lần quét cuối, BMD hông giảm 2,4–2,6 %; cột sống tăng khoảng 0,5 %. Điều này phù hợp với việc mất xương tập trung ở vùng chịu lực.
+- `cortisol`: 399 ngày-người, từ ngày −10 đến ngày 103.
+- `inspiration4_labs`: 3.268 giá trị, trong đó 38 giá trị nằm ngoài khoảng tham chiếu của phòng xét nghiệm.
+
+### 8b.3 Cách hiểu và lưu ý
+
+1. **Nhận thức, CPT RT.** WinSCAT có hiệu ứng học: điểm cải thiện dần qua các lần test. Vì vậy trung bình cá nhân lệch về các lần đầu, kém hơn mặt bằng hiện tại, và personal_mean dự đoán kém ngoài cohort. Mô hình triển khai đã chốt trước khi đánh giá nên giữ nguyên trong run này. Đề xuất đổi sang `last_value` cho run sau.
+2. **Cơ dép giảm mạnh hơn cơ đùi trước.** Điều này phù hợp với vai trò chống trọng lực của cơ dép. Một phần người tham gia có tập luyện (iRATS) nên thay đổi trung bình nhỏ hơn mức teo khi không tập [Ploutz-Snyder 2018].
+3. **Dữ liệu nguồn ghi nhầm.** File `C3F … Saliva_Cortisol` thực chứa cột VZV, nên builder bỏ qua file này. Cortisol không có giờ lấy mẫu, vì vậy chỉ dùng trung bình ngày.
+4. **Glucose Inspiration4 ở R+45.** 3/4 người có giá trị 36–44 mg/dL, thấp hẳn so với mọi mốc khác. Nghi đây là lỗi tiền phân tích; web phải gắn cờ và không dùng làm cảnh báo.
+5. **Kiểm định hoán vị.** Với mô hình Dummy (persistence, mean_delta, personal_mean), kiểm định hoán vị không mang thông tin. Chỉ đọc p của ridge và lightgbm.
 
 ## 9. Tái lập
 
@@ -163,9 +209,11 @@ Nguồn của bảng này: `configs/crew_map.yaml`. Mỗi persona chỉ lấy d�
 uv run sky-ml load-data
 foreach ($t in "hr","dose","dose_orbit","cpet","cpet_physio","sleep","sleep_act","sleep_act_duration",
                "vitals_sbp","vitals_dbp","vitals_temp","vitals_pulse","vitals_resp","vitals_weight",
-               "mood","fatigue","glucose","lean_mass_legs","bone_mineral","lv_mass","lv_diastolic_volume") {
+               "mood","fatigue","glucose","lean_mass_legs","bone_mineral","lv_mass","lv_diastolic_volume",
+               "muscle_quadriceps","muscle_soleus","lipid_ldl","cognition_cpt_rt","cognition_math_acc") {
   uv run sky-ml build-features $t; uv run sky-ml train $t; uv run sky-ml evaluate $t
 }
+foreach ($t in "dxa_regional","cortisol","inspiration4_labs") { uv run sky-ml build-features $t }   # bảng MÔ TẢ
 uv run sky-ml make-synthetic                     # DỮ LIỆU GIẢ ĐỊNH → data/1_synthetic
 uv run sky-ml predict mood      --input data/1_synthetic/mood_c1_poms.csv
 uv run sky-ml predict sleep_act --input data/1_synthetic/sleep_cft70_actigraphy.csv
@@ -182,3 +230,7 @@ uv run sky-ml predict sleep_act --input data/1_synthetic/sleep_cft70_actigraphy.
 - Kemp B, et al. *IEEE Trans Biomed Eng* 2000;47(9):1185–1194; Sleep-EDF Expanded doi:10.13026/C2X676
 - NASA OSDR RadLab data API — https://visualization.osdr.nasa.gov/radlab/gui/data-api/
 - Pollard T, et al. PhysioNet as a global platform for biomedical research. *Nature Health* 2026. doi:10.1038/s44360-026-00096-z
+- Kane RL, Short P, Sipes W, Flynn CF. Development and validation of the Spaceflight Cognitive Assessment Tool for Windows (WinSCAT). *Aviat Space Environ Med* 2005;76(6 Suppl):B183–B191
+- Ploutz-Snyder LL, et al. Exercise training mitigates multisystem deconditioning during bed rest. *Med Sci Sports Exerc* 2018;50(9):1920–1928
+- Jones CW, et al. Molecular and physiological changes in the SpaceX Inspiration4 civilian crew. *Nature* 2024. doi:10.1038/s41586-024-07648-x
+- NASA OSDR — OSD-569, OSD-575 (Inspiration4 clinical) — https://osdr.nasa.gov/bio/repo/data/studies/OSD-575

@@ -2,7 +2,18 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Current state (updated 2026-11-14 12:10)
+## Current state (updated 2026-11-14 21:35)
+
+- 29 tasks in `configs/tasks.yaml`. The latest batch adds:
+  - `muscle_quadriceps`, `muscle_soleus` (iRATS MRI);
+  - `lipid_ldl` (NNX LIPIDS; baseline is in-bed-rest day 14);
+  - `cognition_cpt_rt`, `cognition_math_acc` (WinSCAT; train C3, external C1);
+  - descriptive tables `dxa_regional`, `cortisol`, `inspiration4_labs` (`kind: descriptive` → build-features only).
+- Results: `data/README.md` §2.7.
+- The user does all git commits and pushes; never commit.
+- Synthetic inputs live only in `data/1_synthetic` and are labelled "dữ liệu giả định".
+
+## History (2026-11-14 12:10)
 
 `sky-ml` is partly built and runs on the user's Windows machine:
 

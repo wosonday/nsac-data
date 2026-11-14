@@ -1,0 +1,17 @@
+{
+  "files": {
+    "raw/nlsp/BRSMiDXA.zip": "2855608fcc42f9d4792f17367afb446546b25c14a551a3d5cf81f7ae0d0d15b3",
+    "raw/nlsp/download_manifest.csv": "37e2e53555829b52bc45cc44a2d90e1ad8ed1289a81df3816a3171a91ca289c1"
+  },
+  "python": "3.12.15",
+  "libraries": {
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "pandas": "3.1.1",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "mne": "1.13.2",
+    "shap": "0.54.1"
+  },
+  "seed": 17
+}

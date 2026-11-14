@@ -3,7 +3,7 @@
 Kết quả dự báo của mô hình đã lưu (bước 5) cho một file đầu vào mới, kèm khoảng 90%, cờ từ chối dự báo (abstain) và cờ in_sample.
 
 - **Tạo bởi:** `sky-ml predict / evaluate mood`
-- **README cập nhật (UTC):** 2026-11-14T14:15:11+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:21+00:00
 - **Cohort:** UTMB CFT70 — NNX10AP86G POMS, 24 người, 13–16 lần đo/người (~hằng tuần)
 - **Nguồn:** data/1_source/raw/nlsp/NNX10AP86G.zip › NNX10AP86G_CFT70_POMS_TMD.csv
 

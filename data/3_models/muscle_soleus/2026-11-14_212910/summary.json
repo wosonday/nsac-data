@@ -1,0 +1,56 @@
+{
+  "task": "muscle_soleus",
+  "run_id": "2026-11-14_212910",
+  "samples": 27,
+  "units": 27,
+  "best_model_exploratory": "mean_delta",
+  "deploy_model": "mean_delta",
+  "metrics": [
+    {
+      "model": "mean_delta",
+      "units": 27,
+      "mae": 8.157727,
+      "ci95_low": 6.5688,
+      "ci95_high": 9.800101,
+      "diff_vs_baseline": -4.943086,
+      "diff_ci95_low": -8.222703,
+      "diff_ci95_high": -1.44006,
+      "rmse": 9.221016
+    },
+    {
+      "model": "ridge",
+      "units": 27,
+      "mae": 8.402588,
+      "ci95_low": 6.838669,
+      "ci95_high": 10.090202,
+      "diff_vs_baseline": -4.698225,
+      "diff_ci95_low": -7.87945,
+      "diff_ci95_high": -1.296157,
+      "rmse": 9.446431
+    },
+    {
+      "model": "persistence",
+      "units": 27,
+      "mae": 13.100813,
+      "ci95_low": 9.825066,
+      "ci95_high": 16.439669,
+      "diff_vs_baseline": 0.0,
+      "diff_ci95_low": 0.0,
+      "diff_ci95_high": 0.0,
+      "rmse": 15.792172
+    }
+  ],
+  "interval_coverage": {
+    "model": "mean_delta",
+    "target_coverage": 0.9,
+    "observed_coverage": 0.9259259259259259,
+    "median_half_width": 14.228159431632958
+  },
+  "permutation_test": {
+    "model": "mean_delta",
+    "real_score": 8.157726854719288,
+    "n_permutations": 200,
+    "shuffled_median": 8.157726854719288,
+    "p_value": 0.9900497512437811
+  }
+}

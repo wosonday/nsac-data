@@ -3,7 +3,7 @@
 Mô hình đã fit (joblib) + dự đoán ngoài tập huấn luyện (OOF) + kết quả đánh giá. `final` fit trên TOÀN BỘ người của bảng đặc trưng → chỉ dùng dự báo cho NGƯỜI MỚI. Điểm đánh giá luôn lấy từ OOF (mỗi người được dự đoán bởi mô hình chưa từng thấy họ).
 
 - **Tạo bởi:** `sky-ml train/evaluate cpet_physio`
-- **README cập nhật (UTC):** 2026-11-14T14:15:09+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:19+00:00
 - **Cohort:** UTMB CFT70 — như task cpet, 33 người
 - **Nguồn:** Như task cpet; chỉ dùng pre_vo2 và age
 

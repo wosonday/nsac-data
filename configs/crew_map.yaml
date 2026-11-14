@@ -26,3 +26,9 @@ indicators:
   bone_mineral:    {cft70: "real: bone_mineral (iDXA BMC, PRE → ngày 70)", campaign_1: "none"}
   lv_mass:         {cft70: "real: lv_mass (siêu âm tim 3D, PRE → ngày 70)", campaign_1: "none"}
   lv_volume:       {cft70: "real: lv_diastolic_volume (siêu âm tim 3D, PRE → ngày 70)", campaign_1: "none"}
+  # bổ sung 14/11 21:30 — BRSMiDXA, iRATS, WinSCAT, lipid, cortisol, OSD-569/575
+  cognition:       {cft70: "none", campaign_1: "real: cognition_cpt_rt / cognition_math_acc (WinSCAT, external; train Campaign 3)"}
+  muscle_volume:   {cft70: "real: muscle_quadriceps / muscle_soleus (MRI iRATS, PRE → ngày 69) — chỉ 8072, 8936; 5160 = none", campaign_1: "none"}
+  lipids:          {cft70: "real: lipid_ldl (ngày 14 → ngày 70)", campaign_1: "none"}
+  # Chỉ MÔ TẢ, không gắn persona: dxa_regional (5 người CFT70 khác), cortisol (Campaign 3),
+  # inspiration4_labs (4 phi hành đoàn Inspiration4 THẬT — không phải analog của persona)

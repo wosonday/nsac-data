@@ -47,8 +47,11 @@ Persona chỉ lấy dữ liệu của ĐÚNG một người analog (`configs/cre
 | Khối nạc chân, khoáng xương | Thật · `3_models/lean_mass_legs\|bone_mineral/<run>/oof.csv.gz` + `2_features/…/table.csv.gz` (% thay đổi PRE → ngày 70) | Không có → UNKNOWN |
 | Tim: khối lượng / thể tích thất trái | Thật · `3_models/lv_mass\|lv_diastolic_volume/<run>/oof.csv.gz` (% thay đổi PRE → ngày 70, siêu âm 3D) | Không có → UNKNOWN |
 | Đường huyết | Thật ở 5–6 mốc OGTT + ⚠️ giả định giữa các mốc · `1_synthetic/glucose_daily_personas.csv`; thay đổi PRE → ngày 66: `3_models/glucose/<run>/oof.csv.gz` | ⚠️ Giả định · `1_synthetic/glucose_daily_personas.csv` |
+| Nhận thức (WinSCAT: thời gian phản ứng CPT, độ chính xác toán) | Không có → UNKNOWN | Thật · `4_predictions/cognition_cpt_rt\|cognition_math_acc/<run>/external_backtest.csv` (10 lần test/người) |
+| Thể tích cơ (MRI đùi trước / dép) | Thật cho dae-jung-park, lena-fischer · `2_features/muscle_quadriceps\|muscle_soleus/<run>/table.csv.gz` + `3_models/…/oof.csv.gz`; ayla-reyes → UNKNOWN | Không có → UNKNOWN |
+| LDL-cholesterol | Thật · `3_models/lipid_ldl/<run>/oof.csv.gz` (% thay đổi ngày 14 → ngày 70) | Không có → UNKNOWN |
 
-Ngoài 6 chỉ số (dùng nếu web có thẻ môi trường/thể lực): `dose`, `dose_orbit` (bức xạ ISS), `cpet`, `cpet_physio` (VO2peak), `hr` (MMASH), `sleep` (giai đoạn ngủ EEG) — không gắn với persona.
+Ngoài 6 chỉ số (dùng nếu web có thẻ môi trường/thể lực): `dose`, `dose_orbit` (bức xạ ISS), `cpet`, `cpet_physio` (VO2peak), `hr` (MMASH), `sleep` (giai đoạn ngủ EEG) — không gắn với persona. Bảng MÔ TẢ (không có mô hình): `dxa_regional` (BMD hông/cột sống, 5 người), `cortisol` (cortisol nước bọt Campaign 3), `inspiration4_labs` (xét nghiệm máu 4 phi hành đoàn Inspiration4 thật — KHÔNG phải persona).
 
 ### 2.2 Thứ tự đọc
 
@@ -106,6 +109,10 @@ File `.json` cùng tên: `task, run_id, model, mode, input, half_width_90, n_row
 | `dose`, `dose_orbit` | hồi quy, 1 giờ tới | uGy/h | Một chuỗi thiết bị → `in_sample` luôn True (chuỗi đã học, giờ dự báo chưa xảy ra) |
 | `cpet`, `cpet_physio` | hồi quy, 1 hàng/người | REL VO2PK nguồn | Hiển thị như ước lượng nhóm (mean_delta) |
 | `sleep` | phân loại 5 lớp / epoch 30 s | W, N1, N2, N3, REM | Chấm điểm hồi cứu, không phải dự báo |
+| `muscle_quadriceps`, `muscle_soleus` | hồi quy, 1 hàng/người | % so với PRE | MRI thể tích cơ PRE → ngày nằm giường 69; 27 người |
+| `lipid_ldl` | hồi quy, 1 hàng/người | % so với ngày 14 | Baseline là ngày 14 TRONG nằm giường (không có PRE) |
+| `cognition_cpt_rt`, `cognition_math_acc` | hồi quy, lần test tới | ms · % | Train Campaign 3; 3 persona C1 là test NGOÀI cohort; có hiệu ứng học giữa các lần test |
+| `dxa_regional`, `cortisol`, `inspiration4_labs` | MÔ TẢ | g/cm² · theo nguồn · theo cột `unit` | Không train; chỉ hiển thị dữ liệu quan sát. Khoảng tham chiếu phòng xét nghiệm KHÔNG phải ngưỡng cảnh báo; glucose Inspiration4 R+45 cần gắn cờ nghi lỗi mẫu |
 
 ### 2.7 Trạng thái kết quả (OOF; CI95 theo đơn vị độc lập)
 
@@ -130,6 +137,11 @@ File `.json` cùng tên: `task, run_id, model, mode, input, half_width_90, n_row
 | `dose` / `dose_orbit` | lightgbm | 0,769 / 0,637 uGy/h, 9 tháng | — | 2,14 |
 | `cpet` / `cpet_physio` | mean_delta | ridge 2,84 (p = 0,005) / mean_delta 3,62 (p = 0,51) | — | 4,13 |
 | `sleep` | lightgbm | macro-F1 0,784 (0,760–0,807); kappa 0,777 | — | 0,119 |
+| `muscle_quadriceps` | persistence | 6,09 điểm % (4,48–7,80), 27 người; TB −0,8 % | — | mean_delta 6,41 — **không mô hình nào tốt hơn baseline** |
+| `muscle_soleus` | mean_delta | 8,16 điểm % (6,57–9,80); TB **−13,1 %**; tốt hơn persistence (ΔMAE −4,94; CI −8,2…−1,4) | — | persistence 13,10 |
+| `lipid_ldl` | mean_delta | ridge 9,13 (5,90–13,49), 24 người; chênh lệch CI chứa 0 | — | persistence 10,11 |
+| `cognition_cpt_rt` | personal_mean | ridge 26,2 ms (21,1–31,9), 25 người | personal_mean **59,1 (44,6–77,1)**, bao phủ 0,80 — kém hơn last_value 43,6 và lightgbm 36,0 | 27,4 / 43,6 |
+| `cognition_math_acc` | personal_mean | ridge 7,72 điểm % (6,37–9,33) | **6,83 (3,10–10,24)**, bao phủ 0,95 | 8,34 / 8,57 |
 
 `hr`, `dose`, `cpet`, `sleep` tái lập đúng run NASA-cl 11/11 (sai lệch ≤ 1e-15).
 
@@ -161,17 +173,25 @@ _Tự sinh bởi `sky-ml` từ `CATALOG.csv` — không sửa tay phần này._
 | Task | Run mới nhất | Dự đoán mới nhất |
 |---|---|---|
 | `bone_mineral` | `2026-11-14_211319` | — |
+| `cognition_cpt_rt` | `2026-11-14_212956` | [`4_predictions/cognition_cpt_rt/2026-11-14_212956/external_backtest.csv`](4_predictions/cognition_cpt_rt/2026-11-14_212956/external_backtest.csv) |
+| `cognition_math_acc` | `2026-11-14_213004` | [`4_predictions/cognition_math_acc/2026-11-14_213004/external_backtest.csv`](4_predictions/cognition_math_acc/2026-11-14_213004/external_backtest.csv) |
+| `cortisol` | `2026-11-14_213014` | — |
 | `cpet` | `2026-11-14_164613` | — |
 | `cpet_physio` | `2026-11-14_164654` | — |
 | `dose` | `2026-11-14_164606` | [`4_predictions/dose/2026-11-14_164606/2022-05-01_2023-01-01_latest_lightgbm_20261114_164835.csv`](4_predictions/dose/2026-11-14_164606/2022-05-01_2023-01-01_latest_lightgbm_20261114_164835.csv) |
 | `dose_orbit` | `2026-11-14_201827` | [`4_predictions/dose_orbit/2026-11-14_201827/2022-05-01_2023-01-01_latest_lightgbm_20261114_201912.csv`](4_predictions/dose_orbit/2026-11-14_201827/2022-05-01_2023-01-01_latest_lightgbm_20261114_201912.csv) |
+| `dxa_regional` | `2026-11-14_213012` | — |
 | `fatigue` | `2026-11-14_211255` | — |
 | `glucose` | `2026-11-14_204458` | — |
 | `hr` | `2026-11-14_145321` | [`4_predictions/hr/2026-11-14_145321/mmash_minutes_latest_ridge_20261114_145412.csv`](4_predictions/hr/2026-11-14_145321/mmash_minutes_latest_ridge_20261114_145412.csv) |
+| `inspiration4_labs` | `2026-11-14_213016` | — |
 | `lean_mass_legs` | `2026-11-14_211306` | — |
+| `lipid_ldl` | `2026-11-14_212926` | — |
 | `lv_diastolic_volume` | `2026-11-14_211412` | — |
 | `lv_mass` | `2026-11-14_211332` | — |
 | `mood` | `2026-11-14_204452` | [`4_predictions/mood/2026-11-14_204452/mood_c1_poms_latest_personal_mean_SYNTHETIC-INPUT_20261114_204535.csv`](4_predictions/mood/2026-11-14_204452/mood_c1_poms_latest_personal_mean_SYNTHETIC-INPUT_20261114_204535.csv) |
+| `muscle_quadriceps` | `2026-11-14_212853` | — |
+| `muscle_soleus` | `2026-11-14_212910` | — |
 | `sleep` | `2026-11-14_164909` | — |
 | `sleep_act` | `2026-11-14_201853` | [`4_predictions/sleep_act/2026-11-14_201853/sleep_cft70_actigraphy_latest_personal_mean_SYNTHETIC-INPUT_20261114_204537.csv`](4_predictions/sleep_act/2026-11-14_201853/sleep_cft70_actigraphy_latest_personal_mean_SYNTHETIC-INPUT_20261114_204537.csv) |
 | `sleep_act_duration` | `2026-11-14_211249` | [`4_predictions/sleep_act_duration/2026-11-14_211249/sleep_cft70_actigraphy_latest_personal_mean_SYNTHETIC-INPUT_20261114_211431.csv`](4_predictions/sleep_act_duration/2026-11-14_211249/sleep_cft70_actigraphy_latest_personal_mean_SYNTHETIC-INPUT_20261114_211431.csv) |
@@ -318,6 +338,28 @@ _Tự sinh bởi `sky-ml` từ `CATALOG.csv` — không sửa tay phần này._
 | ⚠️ GIẢ ĐỊNH | `persona` | `seed17` | [`1_synthetic/glucose_daily_personas.params.json`](1_synthetic/glucose_daily_personas.params.json) |  | 637 | `a3a240f4bbcc` | `sky-ml make-synthetic` |
 | ⚠️ GIẢ ĐỊNH | `persona` | `seed17` | [`1_synthetic/glucose_daily_personas.csv`](1_synthetic/glucose_daily_personas.csv) |  | 31201 | `35a6e9b055fb` | `sky-ml make-synthetic` |
 | ⚠️ GIẢ ĐỊNH | `persona` | `seed17` | [`1_synthetic/README.md`](1_synthetic/README.md) |  | 4040 | `9cce9453ad2e` | `sky-ml make-synthetic` |
+| (3) mô hình | `muscle_soleus` | `2026-11-14_212910` | [`3_models/muscle_soleus/2026-11-14_212910/summary.json`](3_models/muscle_soleus/2026-11-14_212910/summary.json) |  | 1345 | `ac1e2e02be6b` | `sky-ml evaluate muscle_soleus` |
+| (3) mô hình | `muscle_soleus` | `2026-11-14_212910` | [`3_models/muscle_soleus/2026-11-14_212910/ridge/final.joblib`](3_models/muscle_soleus/2026-11-14_212910/ridge/final.joblib) |  | 754 | `d18269256062` | `sky-ml train muscle_soleus` |
+| (3) mô hình | `muscle_soleus` | `2026-11-14_212910` | [`3_models/muscle_soleus/2026-11-14_212910/persistence/final.joblib`](3_models/muscle_soleus/2026-11-14_212910/persistence/final.joblib) |  | 420 | `937d8f5c094f` | `sky-ml train muscle_soleus` |
+| (3) mô hình | `muscle_soleus` | `2026-11-14_212910` | [`3_models/muscle_soleus/2026-11-14_212910/oof.csv.gz`](3_models/muscle_soleus/2026-11-14_212910/oof.csv.gz) | 81 | 1576 | `e3ffc9d3f09a` | `sky-ml train muscle_soleus` |
+| (3) mô hình | `muscle_soleus` | `2026-11-14_212910` | [`3_models/muscle_soleus/2026-11-14_212910/metrics.csv`](3_models/muscle_soleus/2026-11-14_212910/metrics.csv) |  | 469 | `ac5985ce4a61` | `sky-ml evaluate muscle_soleus` |
+| (3) mô hình | `muscle_soleus` | `2026-11-14_212910` | [`3_models/muscle_soleus/2026-11-14_212910/mean_delta/final.joblib`](3_models/muscle_soleus/2026-11-14_212910/mean_delta/final.joblib) |  | 434 | `948f2a906cfc` | `sky-ml train muscle_soleus` |
+| (3) mô hình | `muscle_soleus` | `2026-11-14_212910` | [`3_models/muscle_soleus/2026-11-14_212910/manifest.json`](3_models/muscle_soleus/2026-11-14_212910/manifest.json) |  | 2384 | `16a33f94984b` | `sky-ml train muscle_soleus` |
+| (3) mô hình | `muscle_soleus` | `2026-11-14_212910` | [`3_models/muscle_soleus/2026-11-14_212910/folds.json`](3_models/muscle_soleus/2026-11-14_212910/folds.json) |  | 2027 | `0949dfa9fde1` | `sky-ml train muscle_soleus` |
+| (1) đã xử lý | `muscle_soleus` | `2026-11-14_212910` | [`2_features/muscle_soleus/2026-11-14_212910/table.csv.gz`](2_features/muscle_soleus/2026-11-14_212910/table.csv.gz) | 27 | 531 | `d7bd12c08233` | `sky-ml build-features muscle_soleus` |
+| (1) đã xử lý | `muscle_soleus` | `2026-11-14_212910` | [`2_features/muscle_soleus/2026-11-14_212910/snapshot.json`](2_features/muscle_soleus/2026-11-14_212910/snapshot.json) |  | 450 | `5cb96c123e54` | `sky-ml build-features muscle_soleus` |
+| (1) đã xử lý | `muscle_soleus` | `2026-11-14_212910` | [`2_features/muscle_soleus/2026-11-14_212910/features.json`](2_features/muscle_soleus/2026-11-14_212910/features.json) |  | 16 | `aafb3fb6505e` | `sky-ml build-features muscle_soleus` |
+| (3) mô hình | `muscle_quadriceps` | `2026-11-14_212853` | [`3_models/muscle_quadriceps/2026-11-14_212853/summary.json`](3_models/muscle_quadriceps/2026-11-14_212853/summary.json) |  | 1523 | `77777e327917` | `sky-ml evaluate muscle_quadriceps` |
+| (3) mô hình | `muscle_quadriceps` | `2026-11-14_212853` | [`3_models/muscle_quadriceps/2026-11-14_212853/ridge/final.joblib`](3_models/muscle_quadriceps/2026-11-14_212853/ridge/final.joblib) |  | 751 | `476c5181bfbd` | `sky-ml train muscle_quadriceps` |
+| (3) mô hình | `muscle_quadriceps` | `2026-11-14_212853` | [`3_models/muscle_quadriceps/2026-11-14_212853/persistence/final.joblib`](3_models/muscle_quadriceps/2026-11-14_212853/persistence/final.joblib) |  | 420 | `937d8f5c094f` | `sky-ml train muscle_quadriceps` |
+| (3) mô hình | `muscle_quadriceps` | `2026-11-14_212853` | [`3_models/muscle_quadriceps/2026-11-14_212853/oof.csv.gz`](3_models/muscle_quadriceps/2026-11-14_212853/oof.csv.gz) | 81 | 1598 | `d9a02ecd19a2` | `sky-ml train muscle_quadriceps` |
+| (3) mô hình | `muscle_quadriceps` | `2026-11-14_212853` | [`3_models/muscle_quadriceps/2026-11-14_212853/metrics.csv`](3_models/muscle_quadriceps/2026-11-14_212853/metrics.csv) |  | 468 | `8a180fdeb7f8` | `sky-ml evaluate muscle_quadriceps` |
+| (3) mô hình | `muscle_quadriceps` | `2026-11-14_212853` | [`3_models/muscle_quadriceps/2026-11-14_212853/mean_delta/final.joblib`](3_models/muscle_quadriceps/2026-11-14_212853/mean_delta/final.joblib) |  | 436 | `442fd4594acd` | `sky-ml train muscle_quadriceps` |
+| (3) mô hình | `muscle_quadriceps` | `2026-11-14_212853` | [`3_models/muscle_quadriceps/2026-11-14_212853/manifest.json`](3_models/muscle_quadriceps/2026-11-14_212853/manifest.json) |  | 2392 | `9ac639ca128d` | `sky-ml train muscle_quadriceps` |
+| (3) mô hình | `muscle_quadriceps` | `2026-11-14_212853` | [`3_models/muscle_quadriceps/2026-11-14_212853/folds.json`](3_models/muscle_quadriceps/2026-11-14_212853/folds.json) |  | 2027 | `0949dfa9fde1` | `sky-ml train muscle_quadriceps` |
+| (1) đã xử lý | `muscle_quadriceps` | `2026-11-14_212853` | [`2_features/muscle_quadriceps/2026-11-14_212853/table.csv.gz`](2_features/muscle_quadriceps/2026-11-14_212853/table.csv.gz) | 27 | 538 | `52ad502a8727` | `sky-ml build-features muscle_quadriceps` |
+| (1) đã xử lý | `muscle_quadriceps` | `2026-11-14_212853` | [`2_features/muscle_quadriceps/2026-11-14_212853/snapshot.json`](2_features/muscle_quadriceps/2026-11-14_212853/snapshot.json) |  | 450 | `5cb96c123e54` | `sky-ml build-features muscle_quadriceps` |
+| (1) đã xử lý | `muscle_quadriceps` | `2026-11-14_212853` | [`2_features/muscle_quadriceps/2026-11-14_212853/features.json`](2_features/muscle_quadriceps/2026-11-14_212853/features.json) |  | 16 | `aafb3fb6505e` | `sky-ml build-features muscle_quadriceps` |
 | (2) dự đoán | `mood` | `2026-11-14_204452` | [`4_predictions/mood/2026-11-14_204452/mood_c1_poms_latest_personal_mean_SYNTHETIC-INPUT_20261114_204535.json`](4_predictions/mood/2026-11-14_204452/mood_c1_poms_latest_personal_mean_SYNTHETIC-INPUT_20261114_204535.json) |  | 267 | `406f23dc347c` | `sky-ml predict mood --input mood_c1_poms.csv --mode latest` |
 | (2) dự đoán | `mood` | `2026-11-14_204452` | [`4_predictions/mood/2026-11-14_204452/mood_c1_poms_latest_personal_mean_SYNTHETIC-INPUT_20261114_204535.csv`](4_predictions/mood/2026-11-14_204452/mood_c1_poms_latest_personal_mean_SYNTHETIC-INPUT_20261114_204535.csv) | 3 | 429 | `53213cd3497e` | `sky-ml predict mood --input mood_c1_poms.csv --mode latest` |
 | (3) mô hình | `mood` | `2026-11-14_204452` | [`3_models/mood/2026-11-14_204452/summary.json`](3_models/mood/2026-11-14_204452/summary.json) |  | 1584 | `700c065d4ab0` | `sky-ml evaluate mood` |
@@ -354,6 +396,17 @@ _Tự sinh bởi `sky-ml` từ `CATALOG.csv` — không sửa tay phần này._
 | (1) đã xử lý | `lv_diastolic_volume` | `2026-11-14_211412` | [`2_features/lv_diastolic_volume/2026-11-14_211412/table.csv.gz`](2_features/lv_diastolic_volume/2026-11-14_211412/table.csv.gz) | 35 | 747 | `2ba88965cef9` | `sky-ml build-features lv_diastolic_volume` |
 | (1) đã xử lý | `lv_diastolic_volume` | `2026-11-14_211412` | [`2_features/lv_diastolic_volume/2026-11-14_211412/snapshot.json`](2_features/lv_diastolic_volume/2026-11-14_211412/snapshot.json) |  | 443 | `cd9040f0831b` | `sky-ml build-features lv_diastolic_volume` |
 | (1) đã xử lý | `lv_diastolic_volume` | `2026-11-14_211412` | [`2_features/lv_diastolic_volume/2026-11-14_211412/features.json`](2_features/lv_diastolic_volume/2026-11-14_211412/features.json) |  | 16 | `aafb3fb6505e` | `sky-ml build-features lv_diastolic_volume` |
+| (3) mô hình | `lipid_ldl` | `2026-11-14_212926` | [`3_models/lipid_ldl/2026-11-14_212926/summary.json`](3_models/lipid_ldl/2026-11-14_212926/summary.json) |  | 1512 | `98c3fb7aeae9` | `sky-ml evaluate lipid_ldl` |
+| (3) mô hình | `lipid_ldl` | `2026-11-14_212926` | [`3_models/lipid_ldl/2026-11-14_212926/ridge/final.joblib`](3_models/lipid_ldl/2026-11-14_212926/ridge/final.joblib) |  | 752 | `a32171e0b2bd` | `sky-ml train lipid_ldl` |
+| (3) mô hình | `lipid_ldl` | `2026-11-14_212926` | [`3_models/lipid_ldl/2026-11-14_212926/persistence/final.joblib`](3_models/lipid_ldl/2026-11-14_212926/persistence/final.joblib) |  | 420 | `937d8f5c094f` | `sky-ml train lipid_ldl` |
+| (3) mô hình | `lipid_ldl` | `2026-11-14_212926` | [`3_models/lipid_ldl/2026-11-14_212926/oof.csv.gz`](3_models/lipid_ldl/2026-11-14_212926/oof.csv.gz) | 72 | 1392 | `bf6c3260e98f` | `sky-ml train lipid_ldl` |
+| (3) mô hình | `lipid_ldl` | `2026-11-14_212926` | [`3_models/lipid_ldl/2026-11-14_212926/metrics.csv`](3_models/lipid_ldl/2026-11-14_212926/metrics.csv) |  | 474 | `401c257e6223` | `sky-ml evaluate lipid_ldl` |
+| (3) mô hình | `lipid_ldl` | `2026-11-14_212926` | [`3_models/lipid_ldl/2026-11-14_212926/mean_delta/final.joblib`](3_models/lipid_ldl/2026-11-14_212926/mean_delta/final.joblib) |  | 441 | `1572bb674054` | `sky-ml train lipid_ldl` |
+| (3) mô hình | `lipid_ldl` | `2026-11-14_212926` | [`3_models/lipid_ldl/2026-11-14_212926/manifest.json`](3_models/lipid_ldl/2026-11-14_212926/manifest.json) |  | 2373 | `feedde687df9` | `sky-ml train lipid_ldl` |
+| (3) mô hình | `lipid_ldl` | `2026-11-14_212926` | [`3_models/lipid_ldl/2026-11-14_212926/folds.json`](3_models/lipid_ldl/2026-11-14_212926/folds.json) |  | 1802 | `be6b4941b143` | `sky-ml train lipid_ldl` |
+| (1) đã xử lý | `lipid_ldl` | `2026-11-14_212926` | [`2_features/lipid_ldl/2026-11-14_212926/table.csv.gz`](2_features/lipid_ldl/2026-11-14_212926/table.csv.gz) | 24 | 426 | `77ef26d8b59a` | `sky-ml build-features lipid_ldl` |
+| (1) đã xử lý | `lipid_ldl` | `2026-11-14_212926` | [`2_features/lipid_ldl/2026-11-14_212926/snapshot.json`](2_features/lipid_ldl/2026-11-14_212926/snapshot.json) |  | 447 | `9f2f000cba4c` | `sky-ml build-features lipid_ldl` |
+| (1) đã xử lý | `lipid_ldl` | `2026-11-14_212926` | [`2_features/lipid_ldl/2026-11-14_212926/features.json`](2_features/lipid_ldl/2026-11-14_212926/features.json) |  | 16 | `aafb3fb6505e` | `sky-ml build-features lipid_ldl` |
 | (3) mô hình | `lean_mass_legs` | `2026-11-14_211306` | [`3_models/lean_mass_legs/2026-11-14_211306/summary.json`](3_models/lean_mass_legs/2026-11-14_211306/summary.json) |  | 1524 | `9c6fedee8c17` | `sky-ml evaluate lean_mass_legs` |
 | (3) mô hình | `lean_mass_legs` | `2026-11-14_211306` | [`3_models/lean_mass_legs/2026-11-14_211306/ridge/final.joblib`](3_models/lean_mass_legs/2026-11-14_211306/ridge/final.joblib) |  | 751 | `63f84fd67173` | `sky-ml train lean_mass_legs` |
 | (3) mô hình | `lean_mass_legs` | `2026-11-14_211306` | [`3_models/lean_mass_legs/2026-11-14_211306/persistence/final.joblib`](3_models/lean_mass_legs/2026-11-14_211306/persistence/final.joblib) |  | 420 | `937d8f5c094f` | `sky-ml train lean_mass_legs` |
@@ -365,6 +418,9 @@ _Tự sinh bởi `sky-ml` từ `CATALOG.csv` — không sửa tay phần này._
 | (1) đã xử lý | `lean_mass_legs` | `2026-11-14_211306` | [`2_features/lean_mass_legs/2026-11-14_211306/table.csv.gz`](2_features/lean_mass_legs/2026-11-14_211306/table.csv.gz) | 18 | 422 | `e652b7e2ecca` | `sky-ml build-features lean_mass_legs` |
 | (1) đã xử lý | `lean_mass_legs` | `2026-11-14_211306` | [`2_features/lean_mass_legs/2026-11-14_211306/snapshot.json`](2_features/lean_mass_legs/2026-11-14_211306/snapshot.json) |  | 447 | `9f2f000cba4c` | `sky-ml build-features lean_mass_legs` |
 | (1) đã xử lý | `lean_mass_legs` | `2026-11-14_211306` | [`2_features/lean_mass_legs/2026-11-14_211306/features.json`](2_features/lean_mass_legs/2026-11-14_211306/features.json) |  | 16 | `aafb3fb6505e` | `sky-ml build-features lean_mass_legs` |
+| (1) đã xử lý | `inspiration4_labs` | `2026-11-14_213016` | [`2_features/inspiration4_labs/2026-11-14_213016/table.csv.gz`](2_features/inspiration4_labs/2026-11-14_213016/table.csv.gz) | 3268 | 23394 | `35434721cbc2` | `sky-ml build-features inspiration4_labs` |
+| (1) đã xử lý | `inspiration4_labs` | `2026-11-14_213016` | [`2_features/inspiration4_labs/2026-11-14_213016/snapshot.json`](2_features/inspiration4_labs/2026-11-14_213016/snapshot.json) |  | 869 | `e712b0c5362b` | `sky-ml build-features inspiration4_labs` |
+| (1) đã xử lý | `inspiration4_labs` | `2026-11-14_213016` | [`2_features/inspiration4_labs/2026-11-14_213016/features.json`](2_features/inspiration4_labs/2026-11-14_213016/features.json) |  | 2 | `4f53cda18c2b` | `sky-ml build-features inspiration4_labs` |
 | (2) dự đoán | `hr` | `2026-11-14_145321` | [`4_predictions/hr/2026-11-14_145321/mmash_minutes_latest_ridge_20261114_145412.json`](4_predictions/hr/2026-11-14_145321/mmash_minutes_latest_ridge_20261114_145412.json) |  | 267 | `ec0dde115c05` | `sky-ml predict hr --input mmash_minutes.csv.gz --mode latest` |
 | (2) dự đoán | `hr` | `2026-11-14_145321` | [`4_predictions/hr/2026-11-14_145321/mmash_minutes_latest_ridge_20261114_145412.csv`](4_predictions/hr/2026-11-14_145321/mmash_minutes_latest_ridge_20261114_145412.csv) | 22 | 1880 | `75af977c9b5a` | `sky-ml predict hr --input mmash_minutes.csv.gz --mode latest` |
 | (3) mô hình | `hr` | `2026-11-14_145321` | [`3_models/hr/2026-11-14_145321/summary.json`](3_models/hr/2026-11-14_145321/summary.json) |  | 1167 | `e9d8a96980f5` | `sky-ml evaluate hr` |
@@ -401,6 +457,9 @@ _Tự sinh bởi `sky-ml` từ `CATALOG.csv` — không sửa tay phần này._
 | (1) đã xử lý | `fatigue` | `2026-11-14_211255` | [`2_features/fatigue/2026-11-14_211255/table.csv.gz`](2_features/fatigue/2026-11-14_211255/table.csv.gz) | 286 | 3857 | `10a4f4fa113a` | `sky-ml build-features fatigue` |
 | (1) đã xử lý | `fatigue` | `2026-11-14_211255` | [`2_features/fatigue/2026-11-14_211255/snapshot.json`](2_features/fatigue/2026-11-14_211255/snapshot.json) |  | 447 | `9f2f000cba4c` | `sky-ml build-features fatigue` |
 | (1) đã xử lý | `fatigue` | `2026-11-14_211255` | [`2_features/fatigue/2026-11-14_211255/features.json`](2_features/fatigue/2026-11-14_211255/features.json) |  | 71 | `da8d2b3f7a97` | `sky-ml build-features fatigue` |
+| (1) đã xử lý | `dxa_regional` | `2026-11-14_213012` | [`2_features/dxa_regional/2026-11-14_213012/table.csv.gz`](2_features/dxa_regional/2026-11-14_213012/table.csv.gz) | 90 | 1918 | `008c699f7f89` | `sky-ml build-features dxa_regional` |
+| (1) đã xử lý | `dxa_regional` | `2026-11-14_213012` | [`2_features/dxa_regional/2026-11-14_213012/snapshot.json`](2_features/dxa_regional/2026-11-14_213012/snapshot.json) |  | 445 | `2a0f9f8fed97` | `sky-ml build-features dxa_regional` |
+| (1) đã xử lý | `dxa_regional` | `2026-11-14_213012` | [`2_features/dxa_regional/2026-11-14_213012/features.json`](2_features/dxa_regional/2026-11-14_213012/features.json) |  | 2 | `4f53cda18c2b` | `sky-ml build-features dxa_regional` |
 | (2) dự đoán | `dose_orbit` | `2026-11-14_201827` | [`4_predictions/dose_orbit/2026-11-14_201827/2022-05-01_2023-01-01_latest_lightgbm_20261114_201912.json`](4_predictions/dose_orbit/2026-11-14_201827/2022-05-01_2023-01-01_latest_lightgbm_20261114_201912.json) |  | 277 | `a676d9af8f53` | `sky-ml predict dose_orbit --input 2022-05-01_2023-01-01.csv --mode latest` |
 | (2) dự đoán | `dose_orbit` | `2026-11-14_201827` | [`4_predictions/dose_orbit/2026-11-14_201827/2022-05-01_2023-01-01_latest_lightgbm_20261114_201912.csv`](4_predictions/dose_orbit/2026-11-14_201827/2022-05-01_2023-01-01_latest_lightgbm_20261114_201912.csv) | 1 | 200 | `d5ca1df293d8` | `sky-ml predict dose_orbit --input 2022-05-01_2023-01-01.csv --mode latest` |
 | (3) mô hình | `dose_orbit` | `2026-11-14_201827` | [`3_models/dose_orbit/2026-11-14_201827/summary.json`](3_models/dose_orbit/2026-11-14_201827/summary.json) |  | 1134 | `0fa7f3393974` | `sky-ml evaluate dose_orbit` |
@@ -451,6 +510,37 @@ _Tự sinh bởi `sky-ml` từ `CATALOG.csv` — không sửa tay phần này._
 | (1) đã xử lý | `cpet` | `2026-11-14_164613` | [`2_features/cpet/2026-11-14_164613/table.csv.gz`](2_features/cpet/2026-11-14_164613/table.csv.gz) | 33 | 623 | `18e3ee5a14b3` | `sky-ml build-features cpet` |
 | (1) đã xử lý | `cpet` | `2026-11-14_164613` | [`2_features/cpet/2026-11-14_164613/snapshot.json`](2_features/cpet/2026-11-14_164613/snapshot.json) |  | 637 | `65b686004c20` | `sky-ml build-features cpet` |
 | (1) đã xử lý | `cpet` | `2026-11-14_164613` | [`2_features/cpet/2026-11-14_164613/features.json`](2_features/cpet/2026-11-14_164613/features.json) |  | 78 | `290e1a0fe52a` | `sky-ml build-features cpet` |
+| (1) đã xử lý | `cortisol` | `2026-11-14_213014` | [`2_features/cortisol/2026-11-14_213014/table.csv.gz`](2_features/cortisol/2026-11-14_213014/table.csv.gz) | 399 | 1690 | `867142c5c87b` | `sky-ml build-features cortisol` |
+| (1) đã xử lý | `cortisol` | `2026-11-14_213014` | [`2_features/cortisol/2026-11-14_213014/snapshot.json`](2_features/cortisol/2026-11-14_213014/snapshot.json) |  | 444 | `3cf12e8cf3cf` | `sky-ml build-features cortisol` |
+| (1) đã xử lý | `cortisol` | `2026-11-14_213014` | [`2_features/cortisol/2026-11-14_213014/features.json`](2_features/cortisol/2026-11-14_213014/features.json) |  | 2 | `4f53cda18c2b` | `sky-ml build-features cortisol` |
+| (2) dự đoán | `cognition_math_acc` | `2026-11-14_213004` | [`4_predictions/cognition_math_acc/2026-11-14_213004/external_backtest.csv`](4_predictions/cognition_math_acc/2026-11-14_213004/external_backtest.csv) | 21 | 2713 | `9e37dc660472` | `sky-ml evaluate cognition_math_acc` |
+| (3) mô hình | `cognition_math_acc` | `2026-11-14_213004` | [`3_models/cognition_math_acc/2026-11-14_213004/summary.json`](3_models/cognition_math_acc/2026-11-14_213004/summary.json) |  | 2620 | `b8d24bc17da3` | `sky-ml evaluate cognition_math_acc` |
+| (3) mô hình | `cognition_math_acc` | `2026-11-14_213004` | [`3_models/cognition_math_acc/2026-11-14_213004/ridge/final.joblib`](3_models/cognition_math_acc/2026-11-14_213004/ridge/final.joblib) |  | 934 | `bc815741c369` | `sky-ml train cognition_math_acc` |
+| (3) mô hình | `cognition_math_acc` | `2026-11-14_213004` | [`3_models/cognition_math_acc/2026-11-14_213004/personal_mean/final.joblib`](3_models/cognition_math_acc/2026-11-14_213004/personal_mean/final.joblib) |  | 74 | `bb15f831b326` | `sky-ml train cognition_math_acc` |
+| (3) mô hình | `cognition_math_acc` | `2026-11-14_213004` | [`3_models/cognition_math_acc/2026-11-14_213004/oof.csv.gz`](3_models/cognition_math_acc/2026-11-14_213004/oof.csv.gz) | 780 | 7409 | `562d82f951ab` | `sky-ml train cognition_math_acc` |
+| (3) mô hình | `cognition_math_acc` | `2026-11-14_213004` | [`3_models/cognition_math_acc/2026-11-14_213004/metrics.csv`](3_models/cognition_math_acc/2026-11-14_213004/metrics.csv) |  | 617 | `dbeca2f35748` | `sky-ml evaluate cognition_math_acc` |
+| (3) mô hình | `cognition_math_acc` | `2026-11-14_213004` | [`3_models/cognition_math_acc/2026-11-14_213004/manifest.json`](3_models/cognition_math_acc/2026-11-14_213004/manifest.json) |  | 2960 | `dfc17dd9b172` | `sky-ml train cognition_math_acc` |
+| (3) mô hình | `cognition_math_acc` | `2026-11-14_213004` | [`3_models/cognition_math_acc/2026-11-14_213004/lightgbm/final.joblib`](3_models/cognition_math_acc/2026-11-14_213004/lightgbm/final.joblib) |  | 13079 | `c60de071f01a` | `sky-ml train cognition_math_acc` |
+| (3) mô hình | `cognition_math_acc` | `2026-11-14_213004` | [`3_models/cognition_math_acc/2026-11-14_213004/last_value/final.joblib`](3_models/cognition_math_acc/2026-11-14_213004/last_value/final.joblib) |  | 72 | `1bedcf00814c` | `sky-ml train cognition_math_acc` |
+| (3) mô hình | `cognition_math_acc` | `2026-11-14_213004` | [`3_models/cognition_math_acc/2026-11-14_213004/folds.json`](3_models/cognition_math_acc/2026-11-14_213004/folds.json) |  | 1825 | `bbbd0c7dd22a` | `sky-ml train cognition_math_acc` |
+| (1) đã xử lý | `cognition_math_acc` | `2026-11-14_213004` | [`2_features/cognition_math_acc/2026-11-14_213004/table.csv.gz`](2_features/cognition_math_acc/2026-11-14_213004/table.csv.gz) | 195 | 3026 | `00c5621b07b0` | `sky-ml build-features cognition_math_acc` |
+| (1) đã xử lý | `cognition_math_acc` | `2026-11-14_213004` | [`2_features/cognition_math_acc/2026-11-14_213004/snapshot.json`](2_features/cognition_math_acc/2026-11-14_213004/snapshot.json) |  | 443 | `076e2ef1a21f` | `sky-ml build-features cognition_math_acc` |
+| (1) đã xử lý | `cognition_math_acc` | `2026-11-14_213004` | [`2_features/cognition_math_acc/2026-11-14_213004/features.json`](2_features/cognition_math_acc/2026-11-14_213004/features.json) |  | 71 | `da8d2b3f7a97` | `sky-ml build-features cognition_math_acc` |
+| (1) đã xử lý | `cognition_math_acc` | `2026-11-14_213004` | [`2_features/cognition_math_acc/2026-11-14_213004/external.csv.gz`](2_features/cognition_math_acc/2026-11-14_213004/external.csv.gz) | 21 | 567 | `afee0fee3d8c` | `sky-ml build-features cognition_math_acc` |
+| (2) dự đoán | `cognition_cpt_rt` | `2026-11-14_212956` | [`4_predictions/cognition_cpt_rt/2026-11-14_212956/external_backtest.csv`](4_predictions/cognition_cpt_rt/2026-11-14_212956/external_backtest.csv) | 21 | 2815 | `6c13295d5484` | `sky-ml evaluate cognition_cpt_rt` |
+| (3) mô hình | `cognition_cpt_rt` | `2026-11-14_212956` | [`3_models/cognition_cpt_rt/2026-11-14_212956/summary.json`](3_models/cognition_cpt_rt/2026-11-14_212956/summary.json) |  | 2615 | `fe731ac021a0` | `sky-ml evaluate cognition_cpt_rt` |
+| (3) mô hình | `cognition_cpt_rt` | `2026-11-14_212956` | [`3_models/cognition_cpt_rt/2026-11-14_212956/ridge/final.joblib`](3_models/cognition_cpt_rt/2026-11-14_212956/ridge/final.joblib) |  | 930 | `7e3ab5a36381` | `sky-ml train cognition_cpt_rt` |
+| (3) mô hình | `cognition_cpt_rt` | `2026-11-14_212956` | [`3_models/cognition_cpt_rt/2026-11-14_212956/personal_mean/final.joblib`](3_models/cognition_cpt_rt/2026-11-14_212956/personal_mean/final.joblib) |  | 74 | `bb15f831b326` | `sky-ml train cognition_cpt_rt` |
+| (3) mô hình | `cognition_cpt_rt` | `2026-11-14_212956` | [`3_models/cognition_cpt_rt/2026-11-14_212956/oof.csv.gz`](3_models/cognition_cpt_rt/2026-11-14_212956/oof.csv.gz) | 780 | 9017 | `eea40cbbe684` | `sky-ml train cognition_cpt_rt` |
+| (3) mô hình | `cognition_cpt_rt` | `2026-11-14_212956` | [`3_models/cognition_cpt_rt/2026-11-14_212956/metrics.csv`](3_models/cognition_cpt_rt/2026-11-14_212956/metrics.csv) |  | 623 | `b01cb4989900` | `sky-ml evaluate cognition_cpt_rt` |
+| (3) mô hình | `cognition_cpt_rt` | `2026-11-14_212956` | [`3_models/cognition_cpt_rt/2026-11-14_212956/manifest.json`](3_models/cognition_cpt_rt/2026-11-14_212956/manifest.json) |  | 2954 | `bcd3d28c536b` | `sky-ml train cognition_cpt_rt` |
+| (3) mô hình | `cognition_cpt_rt` | `2026-11-14_212956` | [`3_models/cognition_cpt_rt/2026-11-14_212956/lightgbm/final.joblib`](3_models/cognition_cpt_rt/2026-11-14_212956/lightgbm/final.joblib) |  | 14218 | `20fd7cc0be71` | `sky-ml train cognition_cpt_rt` |
+| (3) mô hình | `cognition_cpt_rt` | `2026-11-14_212956` | [`3_models/cognition_cpt_rt/2026-11-14_212956/last_value/final.joblib`](3_models/cognition_cpt_rt/2026-11-14_212956/last_value/final.joblib) |  | 72 | `1bedcf00814c` | `sky-ml train cognition_cpt_rt` |
+| (3) mô hình | `cognition_cpt_rt` | `2026-11-14_212956` | [`3_models/cognition_cpt_rt/2026-11-14_212956/folds.json`](3_models/cognition_cpt_rt/2026-11-14_212956/folds.json) |  | 1825 | `bbbd0c7dd22a` | `sky-ml train cognition_cpt_rt` |
+| (1) đã xử lý | `cognition_cpt_rt` | `2026-11-14_212956` | [`2_features/cognition_cpt_rt/2026-11-14_212956/table.csv.gz`](2_features/cognition_cpt_rt/2026-11-14_212956/table.csv.gz) | 195 | 5223 | `438fc62cb850` | `sky-ml build-features cognition_cpt_rt` |
+| (1) đã xử lý | `cognition_cpt_rt` | `2026-11-14_212956` | [`2_features/cognition_cpt_rt/2026-11-14_212956/snapshot.json`](2_features/cognition_cpt_rt/2026-11-14_212956/snapshot.json) |  | 443 | `076e2ef1a21f` | `sky-ml build-features cognition_cpt_rt` |
+| (1) đã xử lý | `cognition_cpt_rt` | `2026-11-14_212956` | [`2_features/cognition_cpt_rt/2026-11-14_212956/features.json`](2_features/cognition_cpt_rt/2026-11-14_212956/features.json) |  | 71 | `da8d2b3f7a97` | `sky-ml build-features cognition_cpt_rt` |
+| (1) đã xử lý | `cognition_cpt_rt` | `2026-11-14_212956` | [`2_features/cognition_cpt_rt/2026-11-14_212956/external.csv.gz`](2_features/cognition_cpt_rt/2026-11-14_212956/external.csv.gz) | 21 | 728 | `7236cc82c050` | `sky-ml build-features cognition_cpt_rt` |
 | (3) mô hình | `bone_mineral` | `2026-11-14_211319` | [`3_models/bone_mineral/2026-11-14_211319/summary.json`](3_models/bone_mineral/2026-11-14_211319/summary.json) |  | 1508 | `c13fe5286c50` | `sky-ml evaluate bone_mineral` |
 | (3) mô hình | `bone_mineral` | `2026-11-14_211319` | [`3_models/bone_mineral/2026-11-14_211319/ridge/final.joblib`](3_models/bone_mineral/2026-11-14_211319/ridge/final.joblib) |  | 756 | `66873886a18b` | `sky-ml train bone_mineral` |
 | (3) mô hình | `bone_mineral` | `2026-11-14_211319` | [`3_models/bone_mineral/2026-11-14_211319/persistence/final.joblib`](3_models/bone_mineral/2026-11-14_211319/persistence/final.joblib) |  | 420 | `937d8f5c094f` | `sky-ml train bone_mineral` |

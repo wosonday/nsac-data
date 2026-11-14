@@ -1,0 +1,115 @@
+{
+  "versions": {
+    "python": "3.12.15",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "numpy": "2.5.4",
+    "joblib": "1.6.0"
+  },
+  "task": "cognition_cpt_rt",
+  "run_id": "2026-11-14_212956",
+  "features": [
+    "last_value",
+    "mean_all",
+    "std_all",
+    "min_all",
+    "max_all"
+  ],
+  "target": "cpt_rt_next",
+  "seed": 17,
+  "model_specs": {
+    "last_value": {
+      "class": "sky_ml._models.LastValue"
+    },
+    "personal_mean": {
+      "class": "sky_ml._models.LastValue",
+      "params": {
+        "column": "mean_all"
+      }
+    },
+    "ridge": {
+      "class": "sklearn.linear_model.Ridge",
+      "params": {
+        "alpha": 10.0
+      },
+      "scale": true
+    },
+    "lightgbm": {
+      "class": "lightgbm.LGBMRegressor",
+      "params": {
+        "n_estimators": 100,
+        "learning_rate": 0.05,
+        "max_depth": 2,
+        "num_leaves": 4,
+        "min_child_samples": 10,
+        "reg_lambda": 5.0,
+        "verbose": -1,
+        "n_jobs": 1
+      }
+    }
+  },
+  "split": {
+    "type": "leave_one_subject_out"
+  },
+  "features_table": "data/2_features/cognition_cpt_rt/2026-11-14_212956/table.csv.gz",
+  "data_snapshot": {
+    "files": {
+      "raw/nlsp/MR085G.zip": "39fbd616171cbef474ac20367a9c46c8f03c553b5923cce3e8b03abf9614957a",
+      "raw/nlsp/download_manifest.csv": "37e2e53555829b52bc45cc44a2d90e1ad8ed1289a81df3816a3171a91ca289c1"
+    },
+    "python": "3.12.15",
+    "libraries": {
+      "scikit-learn": "1.9.1",
+      "lightgbm": "4.7.0",
+      "pandas": "3.1.1",
+      "numpy": "2.5.4",
+      "scipy": "1.18.1",
+      "mne": "1.13.2",
+      "shap": "0.54.1"
+    },
+    "seed": 17
+  },
+  "note": "final = fit trên toàn bộ người trong table; chỉ dùng cho người mới. Đánh giá dùng oof.csv.gz.",
+  "models": [
+    {
+      "model": "last_value",
+      "kind": "final",
+      "path": "last_value/final.joblib",
+      "n_train_rows": 195,
+      "n_train_units": 25,
+      "file": "final.joblib",
+      "bytes": 72,
+      "sha256": "1bedcf00814c0388571be72d7324ca4bba39c3d0e042b8e6c6775f6e97606396"
+    },
+    {
+      "model": "personal_mean",
+      "kind": "final",
+      "path": "personal_mean/final.joblib",
+      "n_train_rows": 195,
+      "n_train_units": 25,
+      "file": "final.joblib",
+      "bytes": 74,
+      "sha256": "bb15f831b3264fc02a9665611307b2edd2834ec70d831b8b1dbd08809db4efb6"
+    },
+    {
+      "model": "ridge",
+      "kind": "final",
+      "path": "ridge/final.joblib",
+      "n_train_rows": 195,
+      "n_train_units": 25,
+      "file": "final.joblib",
+      "bytes": 930,
+      "sha256": "7e3ab5a36381293b430b55a82c172e35e67cf90c9fe1843d1a66fd2125fafa35"
+    },
+    {
+      "model": "lightgbm",
+      "kind": "final",
+      "path": "lightgbm/final.joblib",
+      "n_train_rows": 195,
+      "n_train_units": 25,
+      "file": "final.joblib",
+      "bytes": 14218,
+      "sha256": "20fd7cc0be716eee65ba6cca4ea459c4e9df64de8207ccd5c963607114133c4a"
+    }
+  ]
+}

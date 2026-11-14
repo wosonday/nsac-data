@@ -3,7 +3,7 @@
 Bảng mẫu sau khi chuẩn hóa và tạo đặc trưng (bước 2). Mỗi hàng là MỘT mẫu đưa vào mô hình: đặc trưng chỉ lấy từ quá khứ, target là giá trị cần dự báo. Đây là dữ liệu duy nhất bước train đọc.
 
 - **Tạo bởi:** `sky-ml build-features bone_mineral`
-- **README cập nhật (UTC):** 2026-11-14T14:15:13+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:24+00:00
 - **Cohort:** UTMB CFT70 (nằm giường 70 ngày) — người có đo PRE và ngày 70
 - **Nguồn:** data/1_source/raw/nlsp/NNX10AP86G.zip (iDXA) hoặc BRSMCF.zip (siêu âm tim 3D) — xem tasks.yaml › member, value_column
 

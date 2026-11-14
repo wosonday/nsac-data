@@ -3,7 +3,7 @@
 Mô hình đã fit (joblib) + dự đoán ngoài tập huấn luyện (OOF) + kết quả đánh giá. `final` fit trên TOÀN BỘ người của bảng đặc trưng → chỉ dùng dự báo cho NGƯỜI MỚI. Điểm đánh giá luôn lấy từ OOF (mỗi người được dự đoán bởi mô hình chưa từng thấy họ).
 
 - **Tạo bởi:** `sky-ml train/evaluate sleep`
-- **README cập nhật (UTC):** 2026-11-14T14:15:09+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:19+00:00
 - **Cohort:** Sleep-EDF Expanded 1.0.0 (PhysioNet, ODC-By 1.0) — 10 bản ghi Sleep Cassette, người khỏe mạnh mặt đất, 1 đêm/người
 - **Nguồn:** data/1_source/raw/sleep_edfx/1.0.0/sleep-cassette/SC4*-PSG.edf + *-Hypnogram.edf (kênh EEG Fpz-Cz, Pz-Oz, EOG ngang)
 

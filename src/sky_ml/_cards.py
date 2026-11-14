@@ -40,9 +40,13 @@ def features_card(settings, task: str, cfg: dict, rp) -> Path:
     files = {"table.csv.gz": "Bảng mẫu TRAIN: subject_id, cutoff_time, đặc trưng, target",
              "features.json": "Danh sách cột mô hình được phép dùng (theo `features` trong tasks.yaml)",
              "snapshot.json": "SHA-256 file nguồn + phiên bản thư viện + seed (tái lập)"}
-    facts = {"Số hàng (mẫu)": len(table), "Số người/chuỗi độc lập": table.subject_id.nunique(),
-             "Số đặc trưng": len(features), "Target": f"`{cfg['target']}` ({cfg.get('unit')})",
-             "Cửa sổ": cfg.get("window", "— (một hàng / người)")}
+    if cfg.get("kind") == "descriptive":
+        files["table.csv.gz"] = "Bảng MÔ TẢ dữ liệu thật (không có mô hình) — dùng hiển thị trực tiếp"
+        facts = {"Số hàng": len(table), "Số người": table.subject_id.nunique(), "Loại": "MÔ TẢ — không train/evaluate"}
+    else:
+        facts = {"Số hàng (mẫu)": len(table), "Số người/chuỗi độc lập": table.subject_id.nunique(),
+                 "Số đặc trưng": len(features), "Target": f"`{cfg['target']}` ({cfg.get('unit')})",
+                 "Cửa sổ": cfg.get("window", "— (một hàng / người)")}
     if (out / "external.csv.gz").exists():
         ext = pd.read_csv(out / "external.csv.gz")
         files["external.csv.gz"] = ("Bảng NGOÀI cohort (cùng quy tắc, KHÔNG dùng để train) — "

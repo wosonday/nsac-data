@@ -3,7 +3,7 @@
 Mô hình đã fit (joblib) + dự đoán ngoài tập huấn luyện (OOF) + kết quả đánh giá. `final` fit trên TOÀN BỘ người của bảng đặc trưng → chỉ dùng dự báo cho NGƯỜI MỚI. Điểm đánh giá luôn lấy từ OOF (mỗi người được dự đoán bởi mô hình chưa từng thấy họ).
 
 - **Tạo bởi:** `sky-ml train/evaluate glucose`
-- **README cập nhật (UTC):** 2026-11-14T14:15:11+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:22+00:00
 - **Cohort:** UTMB CFT70 — NNX10AP86G OGTT, 23 người đủ dữ liệu PRE + ngày nằm giường 66
 - **Nguồn:** data/1_source/raw/nlsp/NNX10AP86G.zip › NNX10AP86G_CFT70_OGTT.csv (phút 0 = lúc đói; 30–120 = sau uống glucose)
 

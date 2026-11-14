@@ -3,7 +3,7 @@
 Bảng mẫu sau khi chuẩn hóa và tạo đặc trưng (bước 2). Mỗi hàng là MỘT mẫu đưa vào mô hình: đặc trưng chỉ lấy từ quá khứ, target là giá trị cần dự báo. Đây là dữ liệu duy nhất bước train đọc.
 
 - **Tạo bởi:** `sky-ml build-features fatigue`
-- **README cập nhật (UTC):** 2026-11-14T14:15:12+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:23+00:00
 - **Cohort:** UTMB CFT70 — NNX10AP86G MFSI-SF (Multidimensional Fatigue Symptom Inventory – Short Form), 24 người, ~16 lần đo/người
 - **Nguồn:** data/1_source/raw/nlsp/NNX10AP86G.zip › NNX10AP86G_CFT70_MFSI-SF_Total_Scale.csv
 

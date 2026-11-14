@@ -3,7 +3,7 @@
 Kết quả dự báo của mô hình đã lưu (bước 5) cho một file đầu vào mới, kèm khoảng 90%, cờ từ chối dự báo (abstain) và cờ in_sample.
 
 - **Tạo bởi:** `sky-ml predict / evaluate vitals_pulse`
-- **README cập nhật (UTC):** 2026-11-14T14:15:11+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:22+00:00
 - **Cohort:** UTMB bed rest CRF Daily Vitals — TRAIN: Campaign 3 (23 người); NGOÀI cohort: CFT70 (5160, 8072, 8936) + Campaign 1 (C1G0001–3) = 6 persona
 - **Nguồn:** data/1_source/raw/nlsp/CRF.zip › */Daily_Vitals/*.csv, CFT70_VITALS/*.csv (kiểm SHA-256 + MD5)
 

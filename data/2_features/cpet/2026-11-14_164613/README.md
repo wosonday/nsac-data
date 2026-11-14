@@ -3,7 +3,7 @@
 Bảng mẫu sau khi chuẩn hóa và tạo đặc trưng (bước 2). Mỗi hàng là MỘT mẫu đưa vào mô hình: đặc trưng chỉ lấy từ quá khứ, target là giá trị cần dự báo. Đây là dữ liệu duy nhất bước train đọc.
 
 - **Tạo bởi:** `sky-ml build-features cpet`
-- **README cập nhật (UTC):** 2026-11-14T14:15:09+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:19+00:00
 - **Cohort:** UTMB CFT70 (NASA NLSP) — nằm giường đầu thấp 70 ngày, người khỏe mạnh mặt đất; 33/38 người đủ điều kiện
 - **Nguồn:** data/1_source/raw/nlsp/MR080G.zip (+ MR079G, BRSMImmune để đối chiếu GROUP), kiểm SHA-256 + MD5 theo download_manifest.csv
 

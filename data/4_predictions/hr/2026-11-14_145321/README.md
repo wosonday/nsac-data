@@ -3,7 +3,7 @@
 Kết quả dự báo của mô hình đã lưu (bước 5) cho một file đầu vào mới, kèm khoảng 90%, cờ từ chối dự báo (abstain) và cờ in_sample.
 
 - **Tạo bởi:** `sky-ml predict / evaluate hr`
-- **README cập nhật (UTC):** 2026-11-14T14:15:08+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:18+00:00
 - **Cohort:** MMASH 1.0.0 (PhysioNet, ODbL 1.0) — 22 nam khỏe mạnh, mặt đất, ~24 giờ/người
 - **Nguồn:** data/1_source/processed/sample-v2/mmash_minutes.csv.gz (bảng phút đã QA của NASA-cl)
 

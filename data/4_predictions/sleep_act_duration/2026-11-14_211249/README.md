@@ -3,7 +3,7 @@
 Kết quả dự báo của mô hình đã lưu (bước 5) cho một file đầu vào mới, kèm khoảng 90%, cờ từ chối dự báo (abstain) và cờ in_sample.
 
 - **Tạo bởi:** `sky-ml predict / evaluate sleep_act_duration`
-- **README cập nhật (UTC):** 2026-11-14T14:15:12+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:23+00:00
 - **Cohort:** UTMB Bed Rest Campaign 1 (BRSMAct) — 3 người C1G0001–3 (= tomas, yuki, noor)
 - **Nguồn:** data/1_source/raw/nlsp/BRSMAct.zip › BRSMACT_Campagin_1_Actigraphy.csv
 

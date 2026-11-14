@@ -3,7 +3,7 @@
 Mô hình đã fit (joblib) + dự đoán ngoài tập huấn luyện (OOF) + kết quả đánh giá. `final` fit trên TOÀN BỘ người của bảng đặc trưng → chỉ dùng dự báo cho NGƯỜI MỚI. Điểm đánh giá luôn lấy từ OOF (mỗi người được dự đoán bởi mô hình chưa từng thấy họ).
 
 - **Tạo bởi:** `sky-ml train/evaluate cpet`
-- **README cập nhật (UTC):** 2026-11-14T14:15:09+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:19+00:00
 - **Cohort:** UTMB CFT70 (NASA NLSP) — nằm giường đầu thấp 70 ngày, người khỏe mạnh mặt đất; 33/38 người đủ điều kiện
 - **Nguồn:** data/1_source/raw/nlsp/MR080G.zip (+ MR079G, BRSMImmune để đối chiếu GROUP), kiểm SHA-256 + MD5 theo download_manifest.csv
 

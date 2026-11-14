@@ -1,0 +1,62 @@
+{
+  "task": "lipid_ldl",
+  "run_id": "2026-11-14_212926",
+  "samples": 24,
+  "units": 24,
+  "best_model_exploratory": "ridge",
+  "deploy_model": "mean_delta",
+  "metrics": [
+    {
+      "model": "ridge",
+      "units": 24,
+      "mae": 9.134338,
+      "ci95_low": 5.898169,
+      "ci95_high": 13.492699,
+      "diff_vs_baseline": -0.973616,
+      "diff_ci95_low": -2.594288,
+      "diff_ci95_high": 0.46924,
+      "rmse": 13.131654
+    },
+    {
+      "model": "persistence",
+      "units": 24,
+      "mae": 10.107954,
+      "ci95_low": 6.812273,
+      "ci95_high": 14.319811,
+      "diff_vs_baseline": 0.0,
+      "diff_ci95_low": 0.0,
+      "diff_ci95_high": 0.0,
+      "rmse": 13.726617
+    },
+    {
+      "model": "mean_delta",
+      "units": 24,
+      "mae": 10.54743,
+      "ci95_low": 7.077025,
+      "ci95_high": 14.915607,
+      "diff_vs_baseline": 0.439476,
+      "diff_ci95_low": 0.094508,
+      "diff_ci95_high": 0.781483,
+      "rmse": 14.301663
+    }
+  ],
+  "interval_coverage": {
+    "model": "ridge",
+    "target_coverage": 0.9,
+    "observed_coverage": 0.9166666666666666,
+    "median_half_width": 28.973206475462117
+  },
+  "interval_coverage_deploy": {
+    "model": "mean_delta",
+    "target_coverage": 0.9,
+    "observed_coverage": 0.9166666666666666,
+    "median_half_width": 29.155693833679695
+  },
+  "permutation_test": {
+    "model": "ridge",
+    "real_score": 9.134338101083001,
+    "n_permutations": 200,
+    "shuffled_median": 10.809652255352397,
+    "p_value": 0.009950248756218905
+  }
+}

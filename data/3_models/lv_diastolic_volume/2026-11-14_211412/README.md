@@ -3,7 +3,7 @@
 Mô hình đã fit (joblib) + dự đoán ngoài tập huấn luyện (OOF) + kết quả đánh giá. `final` fit trên TOÀN BỘ người của bảng đặc trưng → chỉ dùng dự báo cho NGƯỜI MỚI. Điểm đánh giá luôn lấy từ OOF (mỗi người được dự đoán bởi mô hình chưa từng thấy họ).
 
 - **Tạo bởi:** `sky-ml train/evaluate lv_diastolic_volume`
-- **README cập nhật (UTC):** 2026-11-14T14:15:13+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:24+00:00
 - **Cohort:** UTMB CFT70 (nằm giường 70 ngày) — người có đo PRE và ngày 70
 - **Nguồn:** data/1_source/raw/nlsp/NNX10AP86G.zip (iDXA) hoặc BRSMCF.zip (siêu âm tim 3D) — xem tasks.yaml › member, value_column
 

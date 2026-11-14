@@ -3,7 +3,7 @@
 Mô hình đã fit (joblib) + dự đoán ngoài tập huấn luyện (OOF) + kết quả đánh giá. `final` fit trên TOÀN BỘ người của bảng đặc trưng → chỉ dùng dự báo cho NGƯỜI MỚI. Điểm đánh giá luôn lấy từ OOF (mỗi người được dự đoán bởi mô hình chưa từng thấy họ).
 
 - **Tạo bởi:** `sky-ml train/evaluate fatigue`
-- **README cập nhật (UTC):** 2026-11-14T14:15:12+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:23+00:00
 - **Cohort:** UTMB CFT70 — NNX10AP86G MFSI-SF (Multidimensional Fatigue Symptom Inventory – Short Form), 24 người, ~16 lần đo/người
 - **Nguồn:** data/1_source/raw/nlsp/NNX10AP86G.zip › NNX10AP86G_CFT70_MFSI-SF_Total_Scale.csv
 

@@ -3,7 +3,7 @@
 Mô hình đã fit (joblib) + dự đoán ngoài tập huấn luyện (OOF) + kết quả đánh giá. `final` fit trên TOÀN BỘ người của bảng đặc trưng → chỉ dùng dự báo cho NGƯỜI MỚI. Điểm đánh giá luôn lấy từ OOF (mỗi người được dự đoán bởi mô hình chưa từng thấy họ).
 
 - **Tạo bởi:** `sky-ml train/evaluate dose`
-- **README cập nhật (UTC):** 2026-11-14T14:15:08+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:18+00:00
 - **Cohort:** NASA OSDR RadLab — thiết bị Lidal, mô-đun Columbus, ISS, năm 2022 (một chuỗi thiết bị, không phải người)
 - **Nguồn:** data/1_source/raw/radlab/instruments/Lidal/*.csv (3 file, lưới 5 phút)
 

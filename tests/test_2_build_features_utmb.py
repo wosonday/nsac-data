@@ -77,3 +77,14 @@ def test_vitals_resp_and_weight_aliases():
                       "Resp Rate (rpm)": ["16"], "Weight (Kg)": ["70.5"]})
     n = vitals.normalize(a, "campaign_3")
     assert n.resp[0] == 16 and n.weight[0] == 70.5
+
+
+def test_osd_sample_names_and_out_of_range(tmp_path):
+    desc = importlib.import_module("sky_ml.2_build_features.descriptive")
+    pd.DataFrame({"Sample Name": ["C001_whole-blood_L-3_cbc", "C002_serum_R+45"],
+                  "glucose_value_milligram_per_deciliter": [80, 40],
+                  "glucose_range_min_milligram_per_deciliter": [65, 65],
+                  "glucose_range_max_milligram_per_deciliter": [99, 99]}).to_csv(tmp_path / "X_TRANSFORMED.csv", index=False)
+    t = desc.osd_labs(tmp_path, ["X_TRANSFORMED.csv"])
+    assert list(t.subject_id) == ["i4:C001", "i4:C002"] and list(t.relative_day) == [-3, 45]
+    assert list(t.out_of_range) == [False, True]

@@ -1,0 +1,109 @@
+{
+  "task": "cognition_math_acc",
+  "run_id": "2026-11-14_213004",
+  "samples": 195,
+  "units": 25,
+  "best_model_exploratory": "ridge",
+  "deploy_model": "personal_mean",
+  "metrics": [
+    {
+      "model": "ridge",
+      "units": 25,
+      "mae": 7.723755,
+      "ci95_low": 6.373615,
+      "ci95_high": 9.332824,
+      "diff_vs_baseline": -0.616979,
+      "diff_ci95_low": -1.595505,
+      "diff_ci95_high": 0.359458,
+      "rmse": 10.922015
+    },
+    {
+      "model": "personal_mean",
+      "units": 25,
+      "mae": 7.901606,
+      "ci95_low": 6.39864,
+      "ci95_high": 9.667537,
+      "diff_vs_baseline": -0.439127,
+      "diff_ci95_low": -1.486356,
+      "diff_ci95_high": 0.66016,
+      "rmse": 11.115755
+    },
+    {
+      "model": "lightgbm",
+      "units": 25,
+      "mae": 8.002351,
+      "ci95_low": 6.575418,
+      "ci95_high": 9.73434,
+      "diff_vs_baseline": -0.338382,
+      "diff_ci95_low": -1.520631,
+      "diff_ci95_high": 0.899528,
+      "rmse": 11.320522
+    },
+    {
+      "model": "last_value",
+      "units": 25,
+      "mae": 8.340733,
+      "ci95_low": 6.731462,
+      "ci95_high": 10.482236,
+      "diff_vs_baseline": 0.0,
+      "diff_ci95_low": 0.0,
+      "diff_ci95_high": 0.0,
+      "rmse": 11.835718
+    }
+  ],
+  "interval_coverage": {
+    "model": "ridge",
+    "target_coverage": 0.9,
+    "observed_coverage": 0.9025641025641026,
+    "median_half_width": 17.088496414716857
+  },
+  "interval_coverage_deploy": {
+    "model": "personal_mean",
+    "target_coverage": 0.9,
+    "observed_coverage": 0.8974358974358975,
+    "median_half_width": 18.33333333333333
+  },
+  "external": {
+    "metrics": [
+      {
+        "model": "last_value",
+        "units": 3,
+        "rows": 21,
+        "mae": 8.571428571428571,
+        "ci95_low": 4.285714285714286,
+        "ci95_high": 12.857142857142856
+      },
+      {
+        "model": "personal_mean",
+        "units": 3,
+        "rows": 21,
+        "mae": 6.825396825396826,
+        "ci95_low": 3.0952380952380962,
+        "ci95_high": 10.238095238095237
+      },
+      {
+        "model": "ridge",
+        "units": 3,
+        "rows": 21,
+        "mae": 6.77897039272325,
+        "ci95_low": 3.598686727246289,
+        "ci95_high": 9.694167568079797
+      },
+      {
+        "model": "lightgbm",
+        "units": 3,
+        "rows": 21,
+        "mae": 7.045860306974003,
+        "ci95_low": 3.996957159798382,
+        "ci95_high": 9.781829876370276
+      }
+    ],
+    "deploy_model": "personal_mean",
+    "coverage_deploy": 0.9523809523809523,
+    "subjects": [
+      "utmb_c1:C1G0001",
+      "utmb_c1:C1G0002",
+      "utmb_c1:C1G0003"
+    ]
+  }
+}

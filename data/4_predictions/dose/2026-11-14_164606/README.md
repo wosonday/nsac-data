@@ -3,7 +3,7 @@
 Kết quả dự báo của mô hình đã lưu (bước 5) cho một file đầu vào mới, kèm khoảng 90%, cờ từ chối dự báo (abstain) và cờ in_sample.
 
 - **Tạo bởi:** `sky-ml predict / evaluate dose`
-- **README cập nhật (UTC):** 2026-11-14T14:15:08+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:19+00:00
 - **Cohort:** NASA OSDR RadLab — thiết bị Lidal, mô-đun Columbus, ISS, năm 2022 (một chuỗi thiết bị, không phải người)
 - **Nguồn:** data/1_source/raw/radlab/instruments/Lidal/*.csv (3 file, lưới 5 phút)
 

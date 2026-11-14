@@ -474,3 +474,110 @@ lv_diastolic_volume:
   member: cft70/BRSMCF_CFT70/BRSMCF_CFT70_3D_Echo_All.csv
   value_column: LVDV
   day_column: BR_Day
+
+# ---------------------------------------------------------------------------------------------
+# 14/11 21:30 — phần dữ liệu THẬT còn lại trong NASA-cl.
+muscle_quadriceps:
+  <<: *prepost
+  description: "UTMB CFT70 iRATS MRI: % thay đổi thể tích cơ tứ đầu đùi từ PRE đến ngày nằm giường 69"
+  inputs: [raw/nlsp/BEDREST_iRATS.zip, raw/nlsp/download_manifest.csv]
+  archive: BEDREST_iRATS.zip
+  member: cft70/BEDREST_IRATS_MRI_ULTRASOUND_CFT70/BEDREST_IRATS_MRI_ULTRASOUND_CFT70_MRI_Quadriceps.csv
+  value_column: Quadriceps
+  day_column: BR_Day
+  target_day: 69
+  target: pct_change_day69
+
+muscle_soleus:
+  <<: *prepost
+  description: "UTMB CFT70 iRATS MRI: % thay đổi thể tích cơ dép (bắp chân) từ PRE đến ngày nằm giường 69"
+  inputs: [raw/nlsp/BEDREST_iRATS.zip, raw/nlsp/download_manifest.csv]
+  archive: BEDREST_iRATS.zip
+  member: cft70/BEDREST_IRATS_MRI_ULTRASOUND_CFT70/BEDREST_IRATS_MRI_ULTRASOUND_CFT70_MRI_Soleus.csv
+  value_column: Soleus
+  day_column: BR_Day
+  target_day: 69
+  target: pct_change_day69
+
+lipid_ldl:
+  <<: *prepost
+  description: "UTMB CFT70 lipid: % thay đổi LDL-cholesterol từ ngày nằm giường 14 đến ngày 70 (không có mẫu PRE)"
+  member: cft70/NNX10AP86G_CFT70/NNX10AP86G_CFT70_LIPIDS.csv
+  value_column: LDL Chol
+  phase_column: Test Phase
+  day_column: BR Day
+  baseline_phase: IN_TEST
+  baseline_day: 14
+
+cognition_cpt_rt:
+  builder: winscat
+  description: "UTMB WinSCAT: thời gian phản ứng test hiệu suất liên tục (CPT) của lần test tới từ 3 lần trước; train Campaign 3, test ngoài cohort trên 3 persona Campaign 1"
+  inputs: [raw/nlsp/MR085G.zip, raw/nlsp/download_manifest.csv]
+  kind: regression
+  measure: CPTRT
+  target: cpt_rt_next
+  unit: ms
+  train_cohort: campaign_3
+  external_cohorts: [campaign_1]
+  window: {past: 3, future: 1, step: 1}   # đơn vị: lần test
+  features: [last_value, mean_all, std_all, min_all, max_all]
+  split: {type: leave_one_subject_out}
+  baseline: last_value
+  deploy_model: personal_mean
+  seed: 17
+  interval_alpha: 0.10
+  bootstrap_samples: 10000
+  permutation_tests: 0
+  save_models: {final: true, folds: false}
+  models: *small_series_models
+
+cognition_math_acc:
+  builder: winscat
+  description: "UTMB WinSCAT: độ chính xác test toán (%) lần test tới từ 3 lần trước"
+  inputs: [raw/nlsp/MR085G.zip, raw/nlsp/download_manifest.csv]
+  kind: regression
+  measure: MTHA
+  target: math_acc_next
+  unit: "%"
+  train_cohort: campaign_3
+  external_cohorts: [campaign_1]
+  window: {past: 3, future: 1, step: 1}
+  features: [last_value, mean_all, std_all, min_all, max_all]
+  split: {type: leave_one_subject_out}
+  baseline: last_value
+  deploy_model: personal_mean
+  seed: 17
+  interval_alpha: 0.10
+  bootstrap_samples: 10000
+  permutation_tests: 0
+  save_models: {final: true, folds: false}
+  models: *small_series_models
+
+# Bảng MÔ TẢ (kind: descriptive) — dữ liệu thật quá ít người / không có persona → không train, chỉ hiển thị
+dxa_regional:
+  builder: descriptive
+  table: dxa_regional
+  kind: descriptive
+  description: "UTMB CFT70 BRSMiDXA: BMD hông (toàn bộ) và cột sống L1–L4 theo ngày quét, % so với lần quét đầu (5 người, không có persona)"
+  inputs: [raw/nlsp/BRSMiDXA.zip, raw/nlsp/download_manifest.csv]
+  unit: "g/cm²"
+
+cortisol:
+  builder: descriptive
+  table: cortisol
+  kind: descriptive
+  description: "UTMB Campaign 3 BRSMLVR: cortisol nước bọt trung bình theo người × ngày nghiên cứu"
+  inputs: [raw/nlsp/BRSMLVR.zip, raw/nlsp/download_manifest.csv]
+  unit: "theo nguồn (chưa có codebook)"
+
+inspiration4_labs:
+  builder: descriptive
+  table: osd_labs
+  kind: descriptive
+  description: "Inspiration4 (4 phi hành đoàn THẬT, bay 3 ngày): CBC (OSD-569), CMP + panel tim mạch/miễn dịch Eve (OSD-575) ở 7 mốc L-92 … R+194"
+  inputs:
+    - raw/osdr/clinical/OSD-569/LSDS-7_Complete_Blood_Count_CBC_TRANSFORMED.csv
+    - raw/osdr/clinical/OSD-575/LSDS-8_Comprehensive_Metabolic_Panel_CMP_TRANSFORMED.csv
+    - raw/osdr/clinical/OSD-575/LSDS-8_Multiplex_serum_cardiovascular_EvePanel_TRANSFORMED.csv
+    - raw/osdr/clinical/OSD-575/LSDS-8_Multiplex_serum_immune_EvePanel_TRANSFORMED.csv
+  unit: "theo từng analyte (cột unit)"

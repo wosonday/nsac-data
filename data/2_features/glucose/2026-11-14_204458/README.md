@@ -3,7 +3,7 @@
 Bảng mẫu sau khi chuẩn hóa và tạo đặc trưng (bước 2). Mỗi hàng là MỘT mẫu đưa vào mô hình: đặc trưng chỉ lấy từ quá khứ, target là giá trị cần dự báo. Đây là dữ liệu duy nhất bước train đọc.
 
 - **Tạo bởi:** `sky-ml build-features glucose`
-- **README cập nhật (UTC):** 2026-11-14T14:15:11+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:21+00:00
 - **Cohort:** UTMB CFT70 — NNX10AP86G OGTT, 23 người đủ dữ liệu PRE + ngày nằm giường 66
 - **Nguồn:** data/1_source/raw/nlsp/NNX10AP86G.zip › NNX10AP86G_CFT70_OGTT.csv (phút 0 = lúc đói; 30–120 = sau uống glucose)
 

@@ -3,7 +3,7 @@
 Bảng mẫu sau khi chuẩn hóa và tạo đặc trưng (bước 2). Mỗi hàng là MỘT mẫu đưa vào mô hình: đặc trưng chỉ lấy từ quá khứ, target là giá trị cần dự báo. Đây là dữ liệu duy nhất bước train đọc.
 
 - **Tạo bởi:** `sky-ml build-features dose_orbit`
-- **README cập nhật (UTC):** 2026-11-14T14:15:09+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:19+00:00
 - **Cohort:** Như task dose (RadLab Lidal, ISS Columbus, 2022)
 - **Nguồn:** data/1_source/raw/radlab/instruments/Lidal/*.csv — thêm cột latitude, longitude, altitude của chính file
 

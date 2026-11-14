@@ -3,7 +3,7 @@
 Kết quả dự báo của mô hình đã lưu (bước 5) cho một file đầu vào mới, kèm khoảng 90%, cờ từ chối dự báo (abstain) và cờ in_sample.
 
 - **Tạo bởi:** `sky-ml predict / evaluate dose_orbit`
-- **README cập nhật (UTC):** 2026-11-14T14:15:09+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:30:20+00:00
 - **Cohort:** Như task dose (RadLab Lidal, ISS Columbus, 2022)
 - **Nguồn:** data/1_source/raw/radlab/instruments/Lidal/*.csv — thêm cột latitude, longitude, altitude của chính file
 
