@@ -4,14 +4,15 @@ Thư mục này chứa **dữ liệu đầu vào của mô hình, mô hình đã
 Phần **Danh mục dữ liệu** ở cuối file do `sky-ml` tự sinh từ `CATALOG.csv`; phần còn lại viết tay.
 
 - Hướng dẫn chi tiết cho người: [`../docs/3_HUONG_DAN_DU_LIEU.md`](../docs/3_HUONG_DAN_DU_LIEU.md)
-- Nguồn dữ liệu và trích dẫn: [`../docs/Du_lieu_nguon_mo_hinh.xlsx`](../docs/Du_lieu_nguon_mo_hinh.xlsx)
+- Báo cáo tổng hợp: [`../docs/BAO_CAO_DU_LIEU_VA_MO_HINH_2026-11-14.md`](../docs/BAO_CAO_DU_LIEU_VA_MO_HINH_2026-11-14.md)
+- Nguồn dữ liệu và trích dẫn: [`../docs/Tong_hop_du_lieu_mo_hinh.xlsx`](../docs/Tong_hop_du_lieu_mo_hinh.xlsx)
 - Logic ra quyết định: [`../docs/LOGIC_RA_QUYET_DINH_SKY_2026-11-14.md`](../docs/LOGIC_RA_QUYET_DINH_SKY_2026-11-14.md)
 
 ## 1. Cấu trúc
 
 | Thư mục | Nhóm | Bước tạo | Nội dung |
 |---|---|---|---|
-| `1_source/` | Bản copy nguồn (chỉ đọc) | 1 `load-data` | Đẩy lên git mọi file các mô hình dùng: MMASH `processed/sample-v2/` (hr), `raw/radlab/instruments/Lidal/` (dose), `raw/nlsp/{MR080G,MR079G,BRSMImmune}.zip` + `download_manifest.csv` (cpet), giấy phép/manifest Sleep-EDF, `COPY_MANIFEST.csv`. **Không đẩy** 20 file EDF Sleep-EDF (~480 MB) — tạo lại bằng `sky-ml load-data`. |
+| `1_source/` | Bản copy nguồn (chỉ đọc) | 1 `load-data` | Đẩy lên git mọi file các mô hình dùng: MMASH `processed/sample-v2/` (hr), `raw/radlab/instruments/Lidal/` (dose), `raw/nlsp/{MR080G,MR079G,BRSMImmune}.zip` + `download_manifest.csv` (cpet), `raw/nlsp/BRSMAct.zip` (sleep_act), giấy phép/manifest Sleep-EDF, `COPY_MANIFEST.csv`. **Không đẩy** 20 file EDF Sleep-EDF (~480 MB) — tạo lại bằng `sky-ml load-data`. |
 | `2_features/<task>/<run_id>/` | **(1) Dữ liệu đã xử lý = đầu vào mô hình** | 2 `build-features` | `table.csv.gz`, `features.json`, `snapshot.json`, `README.md` |
 | `3_models/<task>/<run_id>/` | **(3) Mô hình đã huấn luyện** | 3 `train`, 4 `evaluate` | `<model>/final.joblib`, `manifest.json`, `oof.csv.gz`, `folds.json`, `metrics.csv`, `summary.json`, `README.md` |
 | `4_predictions/<task>/<run_id>/` | **(2) Dữ liệu dự đoán** | 5 `predict` | `<input>_<mode>_<model>_<YYYYmmdd_HHMMSS>.csv` + `.json`, `README.md` |
@@ -73,6 +74,8 @@ File `.json` cùng tên: `task, run_id, model, mode, input, half_width_90, n_row
 | `dose` | hồi quy, dự báo 1 giờ | uGy/h | `4_predictions` (latest): liều 1 giờ tới sau điểm đo cuối | Một chuỗi thiết bị (`radlab:Lidal`) nên `in_sample` luôn True — nghĩa là chuỗi đã được học, KHÔNG có nghĩa giờ dự báo đã được thấy. `cutoff_time` giữ như nguồn, chưa xác minh UTC. |
 | `cpet` | hồi quy, 1 hàng/người | `source_REL_VO2PK` (≈ mL/kg/min) | `3_models/cpet/<run>/oof.csv.gz`, lọc `model == deploy_model` | Chưa có dự đoán cho người mới; OOF = dự đoán khi người đó bị giữ ra. Có đặc trưng nhóm can thiệp (GROUP) — phi hành gia không có. |
 | `cpet_physio` | như cpet, chỉ `pre_vo2` + `age` | như cpet | như cpet | Contract dùng được cho phi hành gia. Ridge không tốt hơn `mean_delta` khi bỏ GROUP. |
+| `dose_orbit` | như dose + vị trí ISS lúc dự báo | uGy/h | `4_predictions/dose_orbit` (latest) | Khoảng 90% hẹp hơn dose. Chỉ dùng vị trí hiện tại, không dùng quỹ đạo tương lai. |
+| `sleep_act` | hồi quy, đêm tới | % hiệu suất ngủ | `3_models/sleep_act/<run>/oof.csv.gz`, lọc `model == personal_mean` | 3 người `utmb_c1:C1G000x` = persona tomas-ortega / yuki-tanaka / noor-abbasi. `cutoff_time` là ngày thật năm 2004 → chỉ hiển thị ngày tương đối. |
 | `sleep` | phân loại 5 lớp / epoch 30 s | W, N1, N2, N3, REM | `3_models/sleep/<run>/oof.csv.gz` (`y_pred`, `p_W`…`p_REM`) và `confusion.csv` | Chấm điểm hồi cứu cả đêm, không phải dự báo. Dự đoán mới cần bảng đặc trưng (`--mode table`). |
 
 Với task phân loại, file dự đoán có `prediction` là nhãn và `p_<lớp>` là xác suất; không có `low90/high90`. Độ chính xác hiển thị dùng `macro_f1` (CI95 theo người) trong `summary.json`.
@@ -86,11 +89,13 @@ Với task phân loại, file dự đoán có `prediction` là nhãn và `p_<l�
 | `cpet` | mean_delta | ridge MAE 2,84 (2,12–3,64), 33 người, hoán vị p = 0,005; mean_delta 3,62 | persistence 4,13 |
 | `cpet_physio` | mean_delta | mean_delta MAE 3,62 (2,66–4,75); ridge 3,67 | persistence 4,13 |
 | `sleep` | lightgbm | macro-F1 0,784 (0,760–0,807), 10 người; kappa 0,777 | majority 0,119 |
+| `dose_orbit` | lightgbm | MAE 0,637 uGy/h (0,559–0,731), 9 tháng; bao phủ 90% = 0,897 | last_value 2,14 |
+| `sleep_act` | personal_mean | MAE 5,40 điểm % (4,65–5,86), 3 người — pilot | last_value 5,63 |
 
 | Chỉ số nsac | Task sky-ml | Có dữ liệu? |
 |---|---|---|
 | Nhịp tim | `hr` | Có |
-| Hoạt động và giấc ngủ | `sleep` (giai đoạn ngủ, Sleep-EDF) | Có một phần — chưa có actigraphy/hoạt động (`sleep_act`, UTMB) |
+| Hoạt động và giấc ngủ | `sleep` (giai đoạn ngủ), `sleep_act` (hiệu suất ngủ theo đêm, 3 persona) | Có — `sleep_act` là pilot 3 người; chưa có số bước/hoạt động |
 | Huyết áp, nhiệt độ cơ thể | `vitals` (UTMB CRF) | Chưa |
 | Tâm trạng | `mood` (POMS) | Chưa |
 | Đường huyết | `glucose` | Chưa |
@@ -100,7 +105,7 @@ Với task phân loại, file dự đoán có `prediction` là nhãn và `p_<l�
 
 ```powershell
 uv run sky-ml load-data
-foreach ($t in "hr","dose","cpet","cpet_physio","sleep") {
+foreach ($t in "hr","dose","dose_orbit","cpet","cpet_physio","sleep","sleep_act") {
   uv run sky-ml build-features $t; uv run sky-ml train $t; uv run sky-ml evaluate $t
 }
 uv run sky-ml predict hr   --input data/1_source/processed/sample-v2/mmash_minutes.csv.gz
@@ -119,11 +124,25 @@ _Tự sinh bởi `sky-ml` từ `CATALOG.csv` — không sửa tay phần này._
 | `cpet` | `2026-11-14_164613` | — |
 | `cpet_physio` | `2026-11-14_164654` | — |
 | `dose` | `2026-11-14_164606` | [`4_predictions/dose/2026-11-14_164606/2022-05-01_2023-01-01_latest_lightgbm_20261114_164835.csv`](4_predictions/dose/2026-11-14_164606/2022-05-01_2023-01-01_latest_lightgbm_20261114_164835.csv) |
+| `dose_orbit` | `2026-11-14_201827` | [`4_predictions/dose_orbit/2026-11-14_201827/2022-05-01_2023-01-01_latest_lightgbm_20261114_201912.csv`](4_predictions/dose_orbit/2026-11-14_201827/2022-05-01_2023-01-01_latest_lightgbm_20261114_201912.csv) |
 | `hr` | `2026-11-14_145321` | [`4_predictions/hr/2026-11-14_145321/mmash_minutes_latest_ridge_20261114_145412.csv`](4_predictions/hr/2026-11-14_145321/mmash_minutes_latest_ridge_20261114_145412.csv) |
 | `sleep` | `2026-11-14_164909` | — |
+| `sleep_act` | `2026-11-14_201853` | — |
 
 | Nhóm | Task | Run | File | Số hàng | Byte | SHA-256 (12 ký tự đầu) | Lệnh tạo |
 |---|---|---|---|---|---|---|---|
+| (3) mô hình | `sleep_act` | `2026-11-14_201853` | [`3_models/sleep_act/2026-11-14_201853/summary.json`](3_models/sleep_act/2026-11-14_201853/summary.json) |  | 1411 | `ac6d379c88ee` | `sky-ml evaluate sleep_act` |
+| (3) mô hình | `sleep_act` | `2026-11-14_201853` | [`3_models/sleep_act/2026-11-14_201853/ridge/final.joblib`](3_models/sleep_act/2026-11-14_201853/ridge/final.joblib) |  | 984 | `79b7e1248d46` | `sky-ml train sleep_act` |
+| (3) mô hình | `sleep_act` | `2026-11-14_201853` | [`3_models/sleep_act/2026-11-14_201853/personal_mean/final.joblib`](3_models/sleep_act/2026-11-14_201853/personal_mean/final.joblib) |  | 74 | `bb15f831b326` | `sky-ml train sleep_act` |
+| (3) mô hình | `sleep_act` | `2026-11-14_201853` | [`3_models/sleep_act/2026-11-14_201853/oof.csv.gz`](3_models/sleep_act/2026-11-14_201853/oof.csv.gz) | 648 | 6885 | `889f3dbe4ea3` | `sky-ml train sleep_act` |
+| (3) mô hình | `sleep_act` | `2026-11-14_201853` | [`3_models/sleep_act/2026-11-14_201853/metrics.csv`](3_models/sleep_act/2026-11-14_201853/metrics.csv) |  | 606 | `c484a440294e` | `sky-ml evaluate sleep_act` |
+| (3) mô hình | `sleep_act` | `2026-11-14_201853` | [`3_models/sleep_act/2026-11-14_201853/manifest.json`](3_models/sleep_act/2026-11-14_201853/manifest.json) |  | 2972 | `9d23d4369ba8` | `sky-ml train sleep_act` |
+| (3) mô hình | `sleep_act` | `2026-11-14_201853` | [`3_models/sleep_act/2026-11-14_201853/lightgbm/final.joblib`](3_models/sleep_act/2026-11-14_201853/lightgbm/final.joblib) |  | 12667 | `d02e47d7e837` | `sky-ml train sleep_act` |
+| (3) mô hình | `sleep_act` | `2026-11-14_201853` | [`3_models/sleep_act/2026-11-14_201853/last_value/final.joblib`](3_models/sleep_act/2026-11-14_201853/last_value/final.joblib) |  | 72 | `1bedcf00814c` | `sky-ml train sleep_act` |
+| (3) mô hình | `sleep_act` | `2026-11-14_201853` | [`3_models/sleep_act/2026-11-14_201853/folds.json`](3_models/sleep_act/2026-11-14_201853/folds.json) |  | 233 | `da8937441667` | `sky-ml train sleep_act` |
+| (1) đã xử lý | `sleep_act` | `2026-11-14_201853` | [`2_features/sleep_act/2026-11-14_201853/table.csv.gz`](2_features/sleep_act/2026-11-14_201853/table.csv.gz) | 162 | 4290 | `3d4113b2ec1b` | `sky-ml build-features sleep_act` |
+| (1) đã xử lý | `sleep_act` | `2026-11-14_201853` | [`2_features/sleep_act/2026-11-14_201853/snapshot.json`](2_features/sleep_act/2026-11-14_201853/snapshot.json) |  | 444 | `b3eba27d31a1` | `sky-ml build-features sleep_act` |
+| (1) đã xử lý | `sleep_act` | `2026-11-14_201853` | [`2_features/sleep_act/2026-11-14_201853/features.json`](2_features/sleep_act/2026-11-14_201853/features.json) |  | 88 | `c8c920d3a47e` | `sky-ml build-features sleep_act` |
 | (3) mô hình | `sleep` | `2026-11-14_164909` | [`3_models/sleep/2026-11-14_164909/summary.json`](3_models/sleep/2026-11-14_164909/summary.json) |  | 1167 | `a58c686628f7` | `sky-ml evaluate sleep` |
 | (3) mô hình | `sleep` | `2026-11-14_164909` | [`3_models/sleep/2026-11-14_164909/oof.csv.gz`](3_models/sleep/2026-11-14_164909/oof.csv.gz) | 29739 | 1098114 | `85413f8c49ef` | `sky-ml train sleep` |
 | (3) mô hình | `sleep` | `2026-11-14_164909` | [`3_models/sleep/2026-11-14_164909/metrics.csv`](3_models/sleep/2026-11-14_164909/metrics.csv) |  | 597 | `af1dbe43dd82` | `sky-ml evaluate sleep` |
@@ -148,6 +167,19 @@ _Tự sinh bởi `sky-ml` từ `CATALOG.csv` — không sửa tay phần này._
 | (1) đã xử lý | `hr` | `2026-11-14_145321` | [`2_features/hr/2026-11-14_145321/table.csv.gz`](2_features/hr/2026-11-14_145321/table.csv.gz) | 5301 | 284536 | `d695ec43546e` | `sky-ml build-features hr` |
 | (1) đã xử lý | `hr` | `2026-11-14_145321` | [`2_features/hr/2026-11-14_145321/snapshot.json`](2_features/hr/2026-11-14_145321/snapshot.json) |  | 373 | `bcab76d5fb2e` | `sky-ml build-features hr` |
 | (1) đã xử lý | `hr` | `2026-11-14_145321` | [`2_features/hr/2026-11-14_145321/features.json`](2_features/hr/2026-11-14_145321/features.json) |  | 116 | `64943d993dfa` | `sky-ml build-features hr` |
+| (2) dự đoán | `dose_orbit` | `2026-11-14_201827` | [`4_predictions/dose_orbit/2026-11-14_201827/2022-05-01_2023-01-01_latest_lightgbm_20261114_201912.json`](4_predictions/dose_orbit/2026-11-14_201827/2022-05-01_2023-01-01_latest_lightgbm_20261114_201912.json) |  | 277 | `a676d9af8f53` | `sky-ml predict dose_orbit --input 2022-05-01_2023-01-01.csv --mode latest` |
+| (2) dự đoán | `dose_orbit` | `2026-11-14_201827` | [`4_predictions/dose_orbit/2026-11-14_201827/2022-05-01_2023-01-01_latest_lightgbm_20261114_201912.csv`](4_predictions/dose_orbit/2026-11-14_201827/2022-05-01_2023-01-01_latest_lightgbm_20261114_201912.csv) | 1 | 200 | `d5ca1df293d8` | `sky-ml predict dose_orbit --input 2022-05-01_2023-01-01.csv --mode latest` |
+| (3) mô hình | `dose_orbit` | `2026-11-14_201827` | [`3_models/dose_orbit/2026-11-14_201827/summary.json`](3_models/dose_orbit/2026-11-14_201827/summary.json) |  | 1134 | `0fa7f3393974` | `sky-ml evaluate dose_orbit` |
+| (3) mô hình | `dose_orbit` | `2026-11-14_201827` | [`3_models/dose_orbit/2026-11-14_201827/ridge/final.joblib`](3_models/dose_orbit/2026-11-14_201827/ridge/final.joblib) |  | 1167 | `ee8408062448` | `sky-ml train dose_orbit` |
+| (3) mô hình | `dose_orbit` | `2026-11-14_201827` | [`3_models/dose_orbit/2026-11-14_201827/oof.csv.gz`](3_models/dose_orbit/2026-11-14_201827/oof.csv.gz) | 18771 | 405811 | `417ef8b87f30` | `sky-ml train dose_orbit` |
+| (3) mô hình | `dose_orbit` | `2026-11-14_201827` | [`3_models/dose_orbit/2026-11-14_201827/metrics.csv`](3_models/dose_orbit/2026-11-14_201827/metrics.csv) |  | 474 | `3f21e0acf9a9` | `sky-ml evaluate dose_orbit` |
+| (3) mô hình | `dose_orbit` | `2026-11-14_201827` | [`3_models/dose_orbit/2026-11-14_201827/manifest.json`](3_models/dose_orbit/2026-11-14_201827/manifest.json) |  | 2934 | `595dad11b904` | `sky-ml train dose_orbit` |
+| (3) mô hình | `dose_orbit` | `2026-11-14_201827` | [`3_models/dose_orbit/2026-11-14_201827/lightgbm/final.joblib`](3_models/dose_orbit/2026-11-14_201827/lightgbm/final.joblib) |  | 133595 | `7d290e5dfb10` | `sky-ml train dose_orbit` |
+| (3) mô hình | `dose_orbit` | `2026-11-14_201827` | [`3_models/dose_orbit/2026-11-14_201827/last_value/final.joblib`](3_models/dose_orbit/2026-11-14_201827/last_value/final.joblib) |  | 72 | `1bedcf00814c` | `sky-ml train dose_orbit` |
+| (3) mô hình | `dose_orbit` | `2026-11-14_201827` | [`3_models/dose_orbit/2026-11-14_201827/folds.json`](3_models/dose_orbit/2026-11-14_201827/folds.json) |  | 650 | `1d7bbc77a889` | `sky-ml train dose_orbit` |
+| (1) đã xử lý | `dose_orbit` | `2026-11-14_201827` | [`2_features/dose_orbit/2026-11-14_201827/table.csv.gz`](2_features/dose_orbit/2026-11-14_201827/table.csv.gz) | 8366 | 679388 | `23220b09c681` | `sky-ml build-features dose_orbit` |
+| (1) đã xử lý | `dose_orbit` | `2026-11-14_201827` | [`2_features/dose_orbit/2026-11-14_201827/snapshot.json`](2_features/dose_orbit/2026-11-14_201827/snapshot.json) |  | 632 | `4c4088fd10df` | `sky-ml build-features dose_orbit` |
+| (1) đã xử lý | `dose_orbit` | `2026-11-14_201827` | [`2_features/dose_orbit/2026-11-14_201827/features.json`](2_features/dose_orbit/2026-11-14_201827/features.json) |  | 163 | `b4d8dfc63dca` | `sky-ml build-features dose_orbit` |
 | (2) dự đoán | `dose` | `2026-11-14_164606` | [`4_predictions/dose/2026-11-14_164606/2022-05-01_2023-01-01_latest_lightgbm_20261114_164835.json`](4_predictions/dose/2026-11-14_164606/2022-05-01_2023-01-01_latest_lightgbm_20261114_164835.json) |  | 271 | `7a120e21c3a6` | `sky-ml predict dose --input 2022-05-01_2023-01-01.csv --mode latest` |
 | (2) dự đoán | `dose` | `2026-11-14_164606` | [`4_predictions/dose/2026-11-14_164606/2022-05-01_2023-01-01_latest_lightgbm_20261114_164835.csv`](4_predictions/dose/2026-11-14_164606/2022-05-01_2023-01-01_latest_lightgbm_20261114_164835.csv) | 1 | 198 | `b83333431afc` | `sky-ml predict dose --input 2022-05-01_2023-01-01.csv --mode latest` |
 | (3) mô hình | `dose` | `2026-11-14_164606` | [`3_models/dose/2026-11-14_164606/summary.json`](3_models/dose/2026-11-14_164606/summary.json) |  | 1128 | `0f9b5b1b2aa7` | `sky-ml evaluate dose` |

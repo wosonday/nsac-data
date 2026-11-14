@@ -61,3 +61,28 @@ def test_sleep_band_powers_shape_and_dominant_band():
     p = sleep.band_powers(segments, fs)
     assert set(p) == {"logpow", *sleep.BANDS}
     assert p["delta"][0] > p["alpha"][0] and p["alpha"][1] > p["delta"][1]
+
+
+def test_dose_context_is_value_at_cutoff():
+    raw = _lidal().assign(latitude=lambda d: d.absorbed_dose_rate * 2)
+    table = dose.dose_windows(raw, {**DOSE_CFG, "context": ["latitude"]})
+    assert (table.latitude_now == table.last_value * 2).all()          # vị trí TẠI cutoff, không phải tương lai
+    with pytest.raises(ValueError, match="context"):
+        dose.build_dose(None, {**DOSE_CFG, "context": ["b"], "inputs": []})
+
+
+sleep_act = importlib.import_module("sky_ml.2_build_features.sleep_act")
+
+
+def test_sleep_act_parsing_and_missing_nights():
+    raw = pd.DataFrame({"Subject": ["C1G0001"] * 4, "Date": ["9/7/2004", "9/8/2004", "9/10/2004", "9/11/2004"],
+                        "Test_Phase": "IN_TEST", "Sleep Latency (hours)": ["0:14", "0", "NA", "0:30"],
+                        "Sleep Duration (hours)": ["7:44:00", "7:30", "NA", "8:00:00"],
+                        "Sleep Efficiency (%)": ["92.1", "90", "NA", "88"], "Notes": ["NA", "Ambien 5mg", "No Data", ""]})
+    n = sleep_act.nights(raw)
+    assert n.duration[0] == pytest.approx(7 + 44 / 60) and n.latency[1] == 0.0 and np.isnan(n.efficiency[2])
+    assert list(n.sedative) == [False, True, False, False]
+    cfg = {"measure": "efficiency", "window": {"past": 1, "future": 1, "step": 1}, "features": ["last_value"],
+           "target": "y"}
+    t = sleep_act.sleep_act_windows(n, cfg)
+    assert list(t.y) == [90.0]            # đêm 9/9 vắng mặt, đêm 9/10 NA → mọi cửa sổ chạm chúng bị bỏ

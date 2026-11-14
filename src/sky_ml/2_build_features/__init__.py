@@ -10,10 +10,15 @@ from .dose import build_dose, dose_latest, dose_windows
 from .hr import COLUMNS as HR_COLUMNS
 from .hr import build_hr, hr_latest, hr_windows
 from .sleep import build_sleep
+from .sleep_act import build_sleep_act, from_csv
 from .windows import FEATURES
 
-BUILD = {"hr": build_hr, "dose": build_dose, "cpet": build_cpet, "sleep": build_sleep}
+BUILD = {"hr": build_hr, "dose": build_dose, "cpet": build_cpet, "sleep": build_sleep, "sleep_act": build_sleep_act}
 FOR_PREDICT = {"hr": {"columns": HR_COLUMNS, "latest": hr_latest, "backtest": hr_windows},
                "dose": {"columns": DOSE_COLUMNS, "latest": dose_latest, "backtest": dose_windows},
+               "sleep_act": {"columns": ["Subject", "Date", "Test_Phase", "Sleep Latency (hours)",
+                                         "Sleep Duration (hours)", "Sleep Efficiency (%)", "Notes"],
+                             "latest": lambda raw, cfg: from_csv(raw, cfg, "latest"),
+                             "backtest": lambda raw, cfg: from_csv(raw, cfg, "backtest")},
                "cpet": {}, "sleep": {}}
 __all__ = ["BUILD", "FEATURES", "FOR_PREDICT"]

@@ -162,3 +162,70 @@ sleep:
       class: lightgbm.LGBMClassifier
       params: {n_estimators: 300, learning_rate: 0.05, max_depth: 4, num_leaves: 15,
                min_child_samples: 40, reg_lambda: 5.0, class_weight: balanced, verbose: -1, n_jobs: 2}
+
+# ---------------------------------------------------------------------------------------------
+# Bổ sung 14/11 tối (sau khi đánh giá NSAC_Data_Supplement): chốt cấu hình TRƯỚC khi chạy.
+dose_orbit:                   # như dose + vị trí ISS TẠI cutoff (đã có sẵn trong file Lidal)
+  builder: dose
+  description: "RadLab Lidal: liều 1 giờ tới từ 6 giờ trước + vị trí ISS lúc dự báo (vĩ độ, kinh độ, độ cao)"
+  inputs:
+    - raw/radlab/instruments/Lidal/*.csv
+  kind: regression
+  target: dose_rate_next_1h
+  unit: uGy/h
+  window: {past: 72, future: 12, step: 12}
+  features: [last_value, mean_last_5, mean_all, std_all, change_last_10, min_all, max_all]
+  context: [latitude, longitude, altitude]   # → latitude_now, longitude_now, altitude_now
+  split: {type: by_month, test_months: [4, 5, 6, 7, 8, 9, 10, 11, 12], gap_days: 1}
+  baseline: last_value
+  deploy_model: lightgbm      # chốt trước; so sánh trung thực với task dose cùng cách chia
+  seed: 17
+  interval_alpha: 0.10
+  bootstrap_samples: 10000
+  permutation_tests: 0
+  save_models: {final: true, folds: false}
+  models:
+    last_value:
+      class: sky_ml._models.LastValue
+    ridge:
+      class: sklearn.linear_model.Ridge
+      params: {alpha: 1.0}
+      scale: true
+    lightgbm:
+      class: lightgbm.LGBMRegressor
+      params: {n_estimators: 300, learning_rate: 0.05, max_depth: 4, num_leaves: 15,
+               min_child_samples: 50, reg_lambda: 5.0, verbose: -1, n_jobs: 2}
+
+sleep_act:
+  description: "UTMB Bed Rest Campaign 1 actigraphy: hiệu suất ngủ đêm tới từ 7 đêm trước (3 người, ~60 đêm nằm giường)"
+  inputs:
+    - raw/nlsp/BRSMAct.zip
+    - raw/nlsp/download_manifest.csv
+  kind: regression
+  measure: efficiency         # efficiency (%) | duration (h) | latency (h)
+  target: sleep_efficiency_next_night
+  unit: "%"
+  window: {past: 7, future: 1, step: 1}      # đơn vị: đêm
+  features: [last_value, mean_last_5, mean_all, std_all, min_all, max_all]
+  split: {type: leave_one_subject_out}
+  baseline: last_value
+  deploy_model: personal_mean # chốt trước: 3 người → mô hình đơn giản nhất có lý
+  seed: 17
+  interval_alpha: 0.10
+  bootstrap_samples: 10000
+  permutation_tests: 0
+  save_models: {final: true, folds: false}
+  models:
+    last_value:               # đêm tới = đêm vừa rồi
+      class: sky_ml._models.LastValue
+    personal_mean:            # đêm tới = trung bình 7 đêm gần nhất của chính người đó
+      class: sky_ml._models.LastValue
+      params: {column: mean_all}
+    ridge:
+      class: sklearn.linear_model.Ridge
+      params: {alpha: 10.0}
+      scale: true
+    lightgbm:
+      class: lightgbm.LGBMRegressor
+      params: {n_estimators: 100, learning_rate: 0.05, max_depth: 2, num_leaves: 4,
+               min_child_samples: 10, reg_lambda: 5.0, verbose: -1, n_jobs: 1}

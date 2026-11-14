@@ -116,3 +116,29 @@ tasks:
       - "Chấm điểm HỒI CỨU (dùng cả epoch sau) — không phải dự báo thời gian thực."
       - "Bỏ epoch '?' và movement; giữ 30 phút thức trước/sau giấc ngủ."
       - "Đánh giá theo 10 người; macro-F1 nhạy với lớp hiếm N1."
+  dose_orbit:
+    cohort: "Như task dose (RadLab Lidal, ISS Columbus, 2022)"
+    source: "data/1_source/raw/radlab/instruments/Lidal/*.csv — thêm cột latitude, longitude, altitude của chính file"
+    columns:
+      subject_id: {unit: "", description: "Luôn là radlab:Lidal (một chuỗi thiết bị)."}
+      cutoff_time: {unit: "thời điểm nguồn", description: "Điểm cuối cửa sổ 6 giờ; chưa xác minh là UTC."}
+      fold: {unit: "", description: "Tháng được giữ làm test."}
+      latitude_now: {unit: "độ", description: "Vĩ độ ISS tại cutoff (biết được lúc dự báo)."}
+      longitude_now: {unit: "độ", description: "Kinh độ ISS tại cutoff."}
+      altitude_now: {unit: "km", description: "Độ cao ISS tại cutoff."}
+    caveats:
+      - "Chỉ dùng vị trí TẠI cutoff, không dùng vị trí 1 giờ tới (chưa có quỹ đạo dự báo)."
+      - "Cấu hình chốt sau một thí nghiệm thăm dò trên cùng các tháng test (14/11) → kết quả có thể hơi lạc quan; cần kiểm lại trên năm khác."
+      - "9 đơn vị độc lập (tháng)."
+  sleep_act:
+    cohort: "UTMB Bed Rest Campaign 1 (NASA NLSP, BRSMAct) — 3 người C1G0001–3, 2 đêm trước, ~60 đêm nằm giường, 7 đêm sau"
+    source: "data/1_source/raw/nlsp/BRSMAct.zip › BRSMACT_Campagin_1_Actigraphy.csv (kiểm SHA-256 + MD5 theo download_manifest.csv)"
+    columns:
+      subject_id: {unit: "", description: "utmb_c1:C1G000x — tương ứng persona tomas-ortega / yuki-tanaka / noor-abbasi."}
+      cutoff_time: {unit: "ngày", description: "Đêm cuối của cửa sổ 7 đêm quá khứ (ngày gốc của nghiên cứu 2004 — KHÔNG đưa lên web, chỉ dùng ngày tương đối)."}
+      sleep_efficiency_next_night: {unit: "%", description: "TARGET: hiệu suất ngủ (actigraphy) của đêm ngay sau cutoff."}
+    caveats:
+      - "Chỉ 3 người → CI95 theo người gần như vô nghĩa; đây là pilot minh họa, không phải bằng chứng hiệu năng."
+      - "Một số đêm có dùng thuốc ngủ (Ambien) — chưa loại, ghi nhận như yếu tố gây nhiễu."
+      - "Actigraphy đo ngủ/thức theo cử động, không phải giai đoạn ngủ EEG (khác task sleep)."
+      - "Analog nằm giường mặt đất, không phải dữ liệu chuyến bay."

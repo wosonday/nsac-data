@@ -218,7 +218,8 @@ def _predict(settings, args):
     model_name = args.model or cfg.get("deploy_model") or cfg["baseline"]
     model = load_model(rp.models, model_name)                       # kiểm SHA-256 trước khi nạp
     features = read_json(require(rp.features, "features.json", f"build-features {args.task}"))
-    if cfg["features"] != "all" and features != cfg["features"]:
+    expected = cfg["features"] + [f"{c}_now" for c in cfg.get("context", [])] if cfg["features"] != "all" else features
+    if features != expected:
         raise ValueError("configs/tasks.yaml `features` đã đổi so với lúc train run này; "
                          "chạy lại build-features + train trước khi predict.")
     train_table = pd.read_csv(require(rp.features, "table.csv.gz", f"build-features {args.task}"))
@@ -230,7 +231,7 @@ def _predict(settings, args):
     if args.mode == "table":
         rows = predict.table_rows(pd.read_csv(source), cfg)
     elif args.mode in spec:
-        rows = spec[args.mode](pd.read_csv(source, usecols=spec["columns"]), cfg)
+        rows = spec[args.mode](pd.read_csv(source, usecols=spec["columns"] + cfg.get("context", [])), cfg)
     else:
         raise ValueError(f"Task {args.task} không hỗ trợ --mode {args.mode}; dùng: {['table', *spec.keys() - {'columns'}]}")
     result = predict.predict_rows(model, rows, features, half_width, train_table, cfg, model_name)

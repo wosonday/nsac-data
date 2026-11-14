@@ -5,7 +5,11 @@
   "python_version": "3.12.3",
   "input_root": "/mnt/d/Project/NASA-cl/data/raw",
   "configuration": {
-    "sources": ["mmash", "radlab", "noaa"],
+    "sources": [
+      "mmash",
+      "radlab",
+      "noaa"
+    ],
     "mmash_bin_seconds": 60,
     "radlab_timezone": null,
     "imputation": "none"
@@ -46,7 +50,13 @@
       "issue_counts": {
         "invalid_time": 1
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -57,7 +67,12 @@
       "rows_read": 91858,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -100,7 +115,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -145,7 +165,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -183,7 +209,13 @@
       "issue_counts": {
         "unknown_activity_code": 2
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -194,7 +226,12 @@
       "rows_read": 68118,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -237,7 +274,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -282,7 +324,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -320,7 +368,13 @@
       "issue_counts": {
         "unknown_activity_code": 2
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -331,7 +385,12 @@
       "rows_read": 76803,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -374,7 +433,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -419,7 +483,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -457,7 +527,13 @@
       "issue_counts": {
         "unknown_activity_code": 1
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -468,7 +544,12 @@
       "rows_read": 81214,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -511,7 +592,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -556,7 +642,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -594,7 +686,13 @@
       "issue_counts": {
         "unknown_activity_code": 1
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -605,7 +703,12 @@
       "rows_read": 81267,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -650,7 +753,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -697,7 +805,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -735,7 +849,13 @@
       "issue_counts": {
         "unknown_activity_code": 1
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -746,7 +866,12 @@
       "rows_read": 78527,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -789,7 +914,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -834,7 +964,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -872,7 +1008,13 @@
       "issue_counts": {
         "unknown_activity_code": 1
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -883,7 +1025,12 @@
       "rows_read": 102340,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -926,7 +1073,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -971,7 +1123,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1009,7 +1167,13 @@
       "issue_counts": {
         "unknown_activity_code": 1
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1020,7 +1184,12 @@
       "rows_read": 78181,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1063,7 +1232,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1108,7 +1282,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1146,7 +1326,13 @@
       "issue_counts": {
         "unknown_activity_code": 1
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1157,7 +1343,12 @@
       "rows_read": 92951,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1200,7 +1391,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1245,7 +1441,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1283,7 +1485,13 @@
       "issue_counts": {
         "unknown_activity_code": 3
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1294,7 +1502,12 @@
       "rows_read": 74296,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1337,7 +1550,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1384,7 +1602,13 @@
       "issue_counts": {
         "nonpositive_value": 1
       },
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1422,7 +1646,13 @@
       "issue_counts": {
         "unknown_activity_code": 1
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1433,7 +1663,12 @@
       "rows_read": 80239,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1476,7 +1711,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1523,7 +1763,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1562,7 +1808,13 @@
         "unknown_activity_code": 1,
         "invalid_time": 1
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1573,7 +1825,12 @@
       "rows_read": 71646,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1616,7 +1873,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1661,7 +1923,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1699,7 +1967,13 @@
       "issue_counts": {
         "unknown_activity_code": 1
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1710,7 +1984,12 @@
       "rows_read": 72209,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1753,7 +2032,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1798,7 +2082,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1836,7 +2126,13 @@
       "issue_counts": {
         "unknown_activity_code": 2
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1847,7 +2143,12 @@
       "rows_read": 81677,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1924,7 +2225,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1962,7 +2269,13 @@
       "issue_counts": {
         "unknown_activity_code": 1
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -1973,7 +2286,12 @@
       "rows_read": 70941,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2016,7 +2334,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2061,7 +2384,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2099,7 +2428,13 @@
       "issue_counts": {
         "unknown_activity_code": 1
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2110,7 +2445,12 @@
       "rows_read": 83965,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2153,7 +2493,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2200,7 +2545,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2238,7 +2589,13 @@
       "issue_counts": {
         "unknown_activity_code": 1
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2249,7 +2606,12 @@
       "rows_read": 62669,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2292,7 +2654,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2337,7 +2704,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2375,7 +2748,13 @@
       "issue_counts": {
         "unknown_activity_code": 3
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2386,7 +2765,12 @@
       "rows_read": 77782,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2429,7 +2813,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2476,7 +2865,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2514,7 +2909,13 @@
       "issue_counts": {
         "unknown_activity_code": 1
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2525,7 +2926,12 @@
       "rows_read": 92357,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2568,7 +2974,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2613,7 +3024,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2651,7 +3068,13 @@
       "issue_counts": {
         "unknown_activity_code": 1
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2662,7 +3085,12 @@
       "rows_read": 83507,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2705,7 +3133,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2750,7 +3183,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2790,7 +3229,13 @@
       "issue_counts": {
         "unknown_activity_code": 3
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2803,7 +3248,12 @@
       "issue_counts": {
         "invalid_day": 23434
       },
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2846,7 +3296,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2891,7 +3346,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2931,7 +3392,13 @@
       "issue_counts": {
         "unknown_activity_code": 3
       },
-      "columns": ["", "Activity", "Start", "End", "Day"],
+      "columns": [
+        "",
+        "Activity",
+        "Start",
+        "End",
+        "Day"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2944,7 +3411,12 @@
       "issue_counts": {
         "invalid_day": 24165
       },
-      "columns": ["", "ibi_s", "day", "time"],
+      "columns": [
+        "",
+        "ibi_s",
+        "day",
+        "time"
+      ],
       "unmapped_columns": []
     },
     {
@@ -2987,7 +3459,12 @@
       "rows_read": 2,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "SAMPLES", "Cortisol NORM", "Melatonin NORM"],
+      "columns": [
+        "",
+        "SAMPLES",
+        "Cortisol NORM",
+        "Melatonin NORM"
+      ],
       "unmapped_columns": []
     },
     {
@@ -3032,7 +3509,13 @@
       "rows_read": 1,
       "rows_rejected": 0,
       "issue_counts": {},
-      "columns": ["", "Gender", "Weight", "Height", "Age"],
+      "columns": [
+        "",
+        "Gender",
+        "Weight",
+        "Height",
+        "Age"
+      ],
       "unmapped_columns": []
     },
     {

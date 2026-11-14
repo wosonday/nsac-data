@@ -1,0 +1,49 @@
+{
+  "task": "dose_orbit",
+  "run_id": "2026-11-14_201827",
+  "samples": 6257,
+  "units": 9,
+  "best_model_exploratory": "lightgbm",
+  "deploy_model": "lightgbm",
+  "metrics": [
+    {
+      "model": "lightgbm",
+      "units": 9,
+      "mae": 0.637302,
+      "ci95_low": 0.559448,
+      "ci95_high": 0.730608,
+      "diff_vs_baseline": -1.499351,
+      "diff_ci95_low": -1.749117,
+      "diff_ci95_high": -1.267293,
+      "rmse": 0.989377
+    },
+    {
+      "model": "ridge",
+      "units": 9,
+      "mae": 0.97445,
+      "ci95_low": 0.900811,
+      "ci95_high": 1.059514,
+      "diff_vs_baseline": -1.162203,
+      "diff_ci95_low": -1.420313,
+      "diff_ci95_high": -0.922768,
+      "rmse": 1.316118
+    },
+    {
+      "model": "last_value",
+      "units": 9,
+      "mae": 2.136653,
+      "ci95_low": 1.850147,
+      "ci95_high": 2.436119,
+      "diff_vs_baseline": 0.0,
+      "diff_ci95_low": 0.0,
+      "diff_ci95_high": 0.0,
+      "rmse": 4.697491
+    }
+  ],
+  "interval_coverage": {
+    "model": "lightgbm",
+    "target_coverage": 0.9,
+    "observed_coverage": 0.8973949176921847,
+    "median_half_width": 1.5011256962020423
+  }
+}

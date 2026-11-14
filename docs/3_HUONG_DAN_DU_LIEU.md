@@ -1,6 +1,6 @@
 # 3. Hướng dẫn dữ liệu: phân loại, tài liệu kèm, truy vết
 
-> Cập nhật 14/11/2026 (16:50). Áp dụng cho 5 task: `hr`, `dose`, `cpet`, `cpet_physio`, `sleep` — cả 5 tái lập đúng run NASA-cl 11/11. Bảng nguồn: `docs/Du_lieu_nguon_mo_hinh.xlsx`.
+> Cập nhật 14/11/2026 (16:50). Áp dụng cho 5 task: `hr`, `dose`, `cpet`, `cpet_physio`, `sleep` — cả 5 tái lập đúng run NASA-cl 11/11. Bảng nguồn: `docs/Tong_hop_du_lieu_mo_hinh.xlsx`.
 
 ## 1. Mục tiêu
 
@@ -60,7 +60,7 @@ Thêm task mới: khai báo `tasks.<task>` (cohort, source, caveats) và cột m
 1. `data/4_predictions/hr/2026-11-14_144709/README.md` → mục *Truy vết* chỉ tới `data/3_models/hr/2026-11-14_144709/ridge/final.joblib`.
 2. `manifest.json` của mô hình → `features_table` = `data/2_features/hr/2026-11-14_144709/table.csv.gz`.
 3. `snapshot.json` của bảng đặc trưng → SHA-256 của `data/1_source/processed/sample-v2/mmash_minutes.csv.gz`.
-4. Đối chiếu SHA-256 đó với sheet `Tep_dau_vao` trong `docs/Du_lieu_nguon_mo_hinh.xlsx` và nguồn gốc ở sheet `Trich_dan`.
+4. Đối chiếu SHA-256 đó với sheet `Tep_dau_vao` trong `docs/Tong_hop_du_lieu_mo_hinh.xlsx` và nguồn gốc ở sheet `Trich_dan`.
 
 ## 5. Nguồn dữ liệu theo task (tóm tắt từ file Excel)
 
