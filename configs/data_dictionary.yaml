@@ -46,6 +46,27 @@ columns:
   reasons: {unit: "", description: "missing_features | out_of_training_range | insufficient_calibration_data (phân cách ;)."}
   in_sample: {unit: "bool", description: "True = người này nằm trong dữ liệu huấn luyện → KHÔNG phải đánh giá trên người mới."}
   abs_error: {unit: "{unit}", description: "|y_true − prediction| (chỉ chế độ backtest)."}
+  correct: {unit: "bool", description: "Phân loại, chế độ có đáp án: prediction == y_true."}
+  epoch: {unit: "epoch 30 s", description: "Chỉ số epoch trong đêm (tính từ đầu bản ghi PSG)."}
+  dose_rate_next_1h: {unit: "uGy/h", description: "TARGET: tốc độ liều hấp thụ trung bình 1 giờ sau cutoff_time."}
+  pre_vo2: {unit: "source_REL_VO2PK", description: "VO2peak tương đối đo trước nằm giường (PRE)."}
+  age: {unit: "năm", description: "Tuổi tại PRE (nguồn MR080G)."}
+  group_CONTROL: {unit: "0/1", description: "Nhóm CONTROL (đã đối chiếu MR079G/BRSMImmune). Không tồn tại với phi hành gia thật."}
+  group_EXERCISE: {unit: "0/1", description: "Nhóm EXERCISE (gồm cả EXERCISE + TESTOSTERONE). Không tồn tại với phi hành gia thật."}
+  group_FLY: {unit: "0/1", description: "Nhóm FLY (tập luyện trên thiết bị bay). Không tồn tại với phi hành gia thật."}
+  delta_vo2: {unit: "source_REL_VO2PK", description: "TARGET: REL VO2peak POST1 − PRE (âm = giảm thể lực hiếu khí)."}
+  stage: {unit: "", description: "TARGET: giai đoạn ngủ do chuyên gia chấm (W, N1, N2, N3 = R&K 3+4, REM)."}
+  p_W: {unit: "0–1", description: "Xác suất lớp W (thức)."}
+  p_N1: {unit: "0–1", description: "Xác suất lớp N1."}
+  p_N2: {unit: "0–1", description: "Xác suất lớp N2."}
+  p_N3: {unit: "0–1", description: "Xác suất lớp N3 (ngủ sâu)."}
+  p_REM: {unit: "0–1", description: "Xác suất lớp REM."}
+
+# Mẫu regex cho cột sinh tự động (sleep: 3 kênh × 6 dải × hiện tại/trước/sau). {0},{1}… = nhóm bắt được.
+column_patterns:
+  "(fpz|pz|eog)_logpow": {unit: "log µV²", description: "Kênh {0}: log tổng năng lượng 0,5–30 Hz của epoch hiện tại."}
+  "(fpz|pz|eog)_(delta|theta|alpha|sigma|beta)": {unit: "log tỷ lệ", description: "Kênh {0}: log(năng lượng dải {1} / tổng) của epoch hiện tại."}
+  "(fpz|pz|eog)_(logpow|delta|theta|alpha|sigma|beta)_(prev|next)": {unit: "như cột gốc", description: "Kênh {0}, đặc trưng {1} của epoch {2} (trước/sau; biên đêm dùng chính epoch)."}
 
 tasks:
   hr:
@@ -56,3 +77,42 @@ tasks:
       - "HR ngoài 30–220 bpm coi là thiếu (ngưỡng kỹ thuật, không phải lâm sàng); chưa lọc artifact sinh lý."
       - "Cửa sổ chồng lấn: số hàng ≠ số người độc lập (22)."
       - "Thời gian là phút tương đối trong nghiên cứu, không phải UTC."
+  dose:
+    cohort: "NASA OSDR RadLab — thiết bị Lidal, mô-đun Columbus, ISS, năm 2022 (một chuỗi thiết bị, không phải người)"
+    source: "data/1_source/raw/radlab/instruments/Lidal/*.csv (3 file, lưới 5 phút)"
+    columns:
+      subject_id: {unit: "", description: "Luôn là radlab:Lidal (một chuỗi thiết bị)."}
+      cutoff_time: {unit: "thời điểm nguồn", description: "Điểm cuối cửa sổ 6 giờ quá khứ; giữ như nguồn, CHƯA xác minh là UTC."}
+      fold: {unit: "", description: "Tháng được giữ làm test (by_month; train = các tháng trước, chừa 1 ngày)."}
+    caveats:
+      - "Đánh giá theo 9 tháng (4–12/2022): CI95 rất rộng về mặt lý thuyết, chỉ 9 đơn vị độc lập."
+      - "Mốc thời gian lặp với giá trị khác nhau bị bỏ cả mốc; không nội suy điểm thiếu."
+      - "Liều môi trường trong module, không phải liều cá nhân của phi hành gia."
+  cpet:
+    cohort: "UTMB CFT70 (NASA NLSP) — nằm giường đầu thấp 70 ngày, người khỏe mạnh mặt đất; 33/38 người đủ điều kiện"
+    source: "data/1_source/raw/nlsp/MR080G.zip (+ MR079G, BRSMImmune để đối chiếu GROUP), kiểm SHA-256 + MD5 theo download_manifest.csv"
+    caveats:
+      - "Loại 5/38 người: 4 do cờ QC CPET (HRPK < 20 hoặc sai lệch công thức VO2 > 5 %, ngưỡng kỹ thuật), 1 do GROUP mâu thuẫn giữa các bảng (ID 6546)."
+      - "Một hàng / người (33 hàng): mẫu rất nhỏ; kết quả là pilot kỹ thuật."
+      - "group_* chỉ có trong nghiên cứu nằm giường; phi hành gia thật không có → xem task cpet_physio."
+      - "EXERCISE gộp cả nhóm có testosterone; không diễn giải thành tác dụng nhân quả của tập luyện."
+      - "Đơn vị REL VO2PK giữ như nguồn (suy luận mL/kg/min, chờ codebook)."
+  cpet_physio:
+    cohort: "UTMB CFT70 — như task cpet, 33 người"
+    source: "Như task cpet; chỉ dùng pre_vo2 và age"
+    caveats:
+      - "Contract đầu vào áp dụng được cho phi hành gia (không cần nhóm can thiệp)."
+      - "Một hàng / người (33 hàng): mẫu rất nhỏ; kết quả là pilot kỹ thuật."
+  sleep:
+    cohort: "Sleep-EDF Expanded 1.0.0 (PhysioNet, ODC-By 1.0) — 10 bản ghi Sleep Cassette, người khỏe mạnh mặt đất, 1 đêm/người"
+    source: "data/1_source/raw/sleep_edfx/1.0.0/sleep-cassette/SC4*-PSG.edf + *-Hypnogram.edf (kênh EEG Fpz-Cz, Pz-Oz, EOG ngang)"
+    columns:
+      subject_id: {unit: "", description: "Mã bản ghi, vd. sleep_edfx:SC400 (một đêm của một người)."}
+      fold: {unit: "", description: "Bản ghi bị giữ ra (LOSO theo đêm/người)."}
+      y_true: {unit: "", description: "Giai đoạn ngủ thật."}
+      y_pred: {unit: "", description: "Giai đoạn ngủ dự đoán OOF."}
+      prediction: {unit: "", description: "Giai đoạn ngủ dự đoán."}
+    caveats:
+      - "Chấm điểm HỒI CỨU (dùng cả epoch sau) — không phải dự báo thời gian thực."
+      - "Bỏ epoch '?' và movement; giữ 30 phút thức trước/sau giấc ngủ."
+      - "Đánh giá theo 10 người; macro-F1 nhạy với lớp hiếm N1."

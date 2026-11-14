@@ -2,6 +2,7 @@
 
 Tham số đọc từ configs/tasks.yaml: window, valid_hr_range, features, target.
 """
+
 from pathlib import Path
 
 import numpy as np
@@ -28,7 +29,9 @@ def hr_windows(minutes: pd.DataFrame, cfg: dict) -> pd.DataFrame:
     """Cửa sổ có target (train / backtest). `cutoff_time` = chỉ số trong lưới của người đó."""
     w, names, parts = cfg["window"], check_features(cfg["features"]), []
     for subject_id, grid, _ in _grids(minutes, cfg):
-        windows = make_windows(grid, np.arange(len(grid)), w["past"], w["future"], w["step"], names)
+        windows = make_windows(
+            grid, np.arange(len(grid)), w["past"], w["future"], w["step"], names
+        )
         if len(windows):
             windows.insert(0, "subject_id", subject_id)
             parts.append(windows)
@@ -38,8 +41,15 @@ def hr_windows(minutes: pd.DataFrame, cfg: dict) -> pd.DataFrame:
 def hr_latest(minutes: pd.DataFrame, cfg: dict) -> pd.DataFrame:
     """Một hàng / người: đặc trưng đoạn cuối → dự báo `future` phút TỚI. `cutoff_time` = phút thật."""
     names = check_features(cfg["features"])
-    return pd.DataFrame([{"subject_id": s, **latest_window(grid, times, cfg["window"]["past"], names)}
-                         for s, grid, times in _grids(minutes, cfg)])
+    return pd.DataFrame(
+        [
+            {
+                "subject_id": s,
+                **latest_window(grid, times, cfg["window"]["past"], names),
+            }
+            for s, grid, times in _grids(minutes, cfg)
+        ]
+    )
 
 
 def build_hr(data_dir: Path, cfg: dict) -> tuple[pd.DataFrame, list[str]]:

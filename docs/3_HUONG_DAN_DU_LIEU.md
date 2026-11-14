@@ -1,6 +1,6 @@
 # 3. Hướng dẫn dữ liệu: phân loại, tài liệu kèm, truy vết
 
-> Cập nhật 14/11/2026. Áp dụng cho task `hr` (mô hình duy nhất đang chạy). Bảng nguồn: `docs/Du_lieu_nguon_mo_hinh_hr.xlsx`.
+> Cập nhật 14/11/2026 (16:50). Áp dụng cho 5 task: `hr`, `dose`, `cpet`, `cpet_physio`, `sleep` — cả 5 tái lập đúng run NASA-cl 11/11. Bảng nguồn: `docs/Du_lieu_nguon_mo_hinh.xlsx`.
 
 ## 1. Mục tiêu
 
@@ -60,25 +60,32 @@ Thêm task mới: khai báo `tasks.<task>` (cohort, source, caveats) và cột m
 1. `data/4_predictions/hr/2026-11-14_144709/README.md` → mục *Truy vết* chỉ tới `data/3_models/hr/2026-11-14_144709/ridge/final.joblib`.
 2. `manifest.json` của mô hình → `features_table` = `data/2_features/hr/2026-11-14_144709/table.csv.gz`.
 3. `snapshot.json` của bảng đặc trưng → SHA-256 của `data/1_source/processed/sample-v2/mmash_minutes.csv.gz`.
-4. Đối chiếu SHA-256 đó với sheet `Tep_dau_vao` trong `docs/Du_lieu_nguon_mo_hinh_hr.xlsx` và nguồn gốc ở sheet `Trich_dan`.
+4. Đối chiếu SHA-256 đó với sheet `Tep_dau_vao` trong `docs/Du_lieu_nguon_mo_hinh.xlsx` và nguồn gốc ở sheet `Trich_dan`.
 
-## 5. Nguồn dữ liệu (tóm tắt từ file Excel)
+## 5. Nguồn dữ liệu theo task (tóm tắt từ file Excel)
 
-| Mục | Giá trị |
-|---|---|
-| Bộ dữ liệu | MMASH 1.0.0, PhysioNet — 22 nam trẻ khỏe mạnh, ~24 giờ ghi liên tục (Rossi et al., 2020) |
-| File mô hình đọc | `data/1_source/processed/sample-v2/mmash_minutes.csv.gz` (bảng phút đã QA của NASA-cl) |
-| Giấy phép | ODbL v1.0 — phải ghi nguồn |
-| Giới hạn | Proxy mặt đất, không phải phi hành gia; thời gian là phút tương đối |
+| Task | Bộ dữ liệu | File mô hình đọc (`data/1_source/…`) | Giấy phép / nguồn | Giới hạn chính |
+|---|---|---|---|---|
+| `hr` | MMASH 1.0.0 — 22 nam trẻ khỏe mạnh, ~24 giờ | `processed/sample-v2/mmash_minutes.csv.gz` | ODbL v1.0 | Mặt đất; thời gian là phút tương đối |
+| `dose` | RadLab Lidal, ISS Columbus, 2022 | `raw/radlab/instruments/Lidal/*.csv` | NASA OSDR | Một chuỗi thiết bị; 9 tháng đánh giá; thời gian chưa xác minh UTC |
+| `cpet`, `cpet_physio` | UTMB CFT70 — 70 ngày nằm giường, 33/38 người đủ QC | `raw/nlsp/MR080G.zip` (+ MR079G, BRSMImmune đối chiếu GROUP, `download_manifest.csv`) | NASA NLSP | Mẫu rất nhỏ; GROUP không có ở phi hành gia |
+| `sleep` | Sleep-EDF Expanded 1.0.0 — 10 bản ghi Sleep Cassette | `raw/sleep_edfx/1.0.0/sleep-cassette/SC4*-{PSG,Hypnogram}.edf` | ODC-By v1.0 | Chấm điểm hồi cứu, một đêm/người |
 
-Trích dẫn bắt buộc: Rossi et al. (2020) PhysioNet doi:10.13026/cerq-fc86; Rossi et al. (2020) *Data* 5(4):91 doi:10.3390/data5040091; Pollard et al. (2026) *Nature Health* doi:10.1038/s44360-026-00096-z.
+Trích dẫn đầy đủ (MMASH, Sleep-EDF, CFT70, RadLab, PhysioNet, AASM) ở sheet `Trich_dan`; kết quả từng task ở sheet `Mo_hinh_va_ket_qua`.
 
-File Excel **chỉ giữ phần phục vụ task hr**. Nguồn cho các task sau (UTMB vitals/POMS/glucose, Sleep-EDF, RadLab) vẫn ở file gốc `NASA-cl/docs/Du_lieu_health_monitoring_NASA_Sky.xlsx` và sẽ được thêm khi task tương ứng được xây.
+File Excel chỉ giữ nguồn mà 5 mô hình đang dùng. Nguồn cho task chưa xây (UTMB CRF vitals, POMS, actigraphy, glucose) vẫn ở file gốc `NASA-cl/docs/Du_lieu_health_monitoring_NASA_Sky.xlsx`.
+
+### 5.1 Khác biệt khi đọc dự đoán
+
+- `dose`: chỉ có một chuỗi thiết bị nên `in_sample` luôn True — nghĩa là chuỗi đã được học, không phải giờ được dự báo đã được thấy.
+- `cpet`, `sleep`: chưa có dữ liệu "người mới". Dữ liệu trung thực để hiển thị là `3_models/<task>/<run>/oof.csv.gz` (mỗi người được dự đoán khi bị giữ ra). Dự đoán mới dùng `--mode table` với bảng đặc trưng.
+- `sleep` là phân loại: `prediction` = nhãn, `p_W … p_REM` = xác suất; không có khoảng 90%; độ chính xác dùng macro-F1.
 
 ## 6. Lệnh
 
 ```powershell
 uv run sky-ml load-data          # → data/1_source
+# Thay hr bằng dose | cpet | cpet_physio | sleep cho task khác
 uv run sky-ml build-features hr  # → (1) data/2_features/hr/<run>
 uv run sky-ml train hr           # → (3) data/3_models/hr/<run>
 uv run sky-ml evaluate hr        # → (3) metrics.csv, summary.json

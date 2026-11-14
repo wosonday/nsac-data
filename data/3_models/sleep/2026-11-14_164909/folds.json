@@ -1,0 +1,52 @@
+[
+  {
+    "name": "sleep_edfx:SC400",
+    "n_train": 9072,
+    "n_test": 841
+  },
+  {
+    "name": "sleep_edfx:SC401",
+    "n_train": 8810,
+    "n_test": 1103
+  },
+  {
+    "name": "sleep_edfx:SC402",
+    "n_train": 8888,
+    "n_test": 1025
+  },
+  {
+    "name": "sleep_edfx:SC403",
+    "n_train": 8961,
+    "n_test": 952
+  },
+  {
+    "name": "sleep_edfx:SC404",
+    "n_train": 8678,
+    "n_test": 1235
+  },
+  {
+    "name": "sleep_edfx:SC405",
+    "n_train": 9241,
+    "n_test": 672
+  },
+  {
+    "name": "sleep_edfx:SC406",
+    "n_train": 9070,
+    "n_test": 843
+  },
+  {
+    "name": "sleep_edfx:SC407",
+    "n_train": 8937,
+    "n_test": 976
+  },
+  {
+    "name": "sleep_edfx:SC408",
+    "n_train": 8779,
+    "n_test": 1134
+  },
+  {
+    "name": "sleep_edfx:SC409",
+    "n_train": 8781,
+    "n_test": 1132
+  }
+]

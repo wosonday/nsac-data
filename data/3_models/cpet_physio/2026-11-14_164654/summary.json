@@ -1,0 +1,67 @@
+{
+  "task": "cpet_physio",
+  "run_id": "2026-11-14_164654",
+  "samples": 33,
+  "units": 33,
+  "best_model_exploratory": "mean_delta",
+  "deploy_model": "mean_delta",
+  "metrics": [
+    {
+      "model": "mean_delta",
+      "units": 33,
+      "mae": 3.616899,
+      "ci95_low": 2.655701,
+      "ci95_high": 4.753656,
+      "diff_vs_baseline": -0.508375,
+      "diff_ci95_low": -1.438315,
+      "diff_ci95_high": 0.477211,
+      "rmse": 4.735582
+    },
+    {
+      "model": "ridge",
+      "units": 33,
+      "mae": 3.667946,
+      "ci95_low": 2.723487,
+      "ci95_high": 4.718933,
+      "diff_vs_baseline": -0.457328,
+      "diff_ci95_low": -1.352387,
+      "diff_ci95_high": 0.495698,
+      "rmse": 4.694301
+    },
+    {
+      "model": "lightgbm",
+      "units": 33,
+      "mae": 3.811075,
+      "ci95_low": 2.858937,
+      "ci95_high": 4.894155,
+      "diff_vs_baseline": -0.3142,
+      "diff_ci95_low": -1.302507,
+      "diff_ci95_high": 0.714816,
+      "rmse": 4.823355
+    },
+    {
+      "model": "persistence",
+      "units": 33,
+      "mae": 4.125275,
+      "ci95_low": 2.973637,
+      "ci95_high": 5.492756,
+      "diff_vs_baseline": 0.0,
+      "diff_ci95_low": 0.0,
+      "diff_ci95_high": 0.0,
+      "rmse": 5.526851
+    }
+  ],
+  "interval_coverage": {
+    "model": "mean_delta",
+    "target_coverage": 0.9,
+    "observed_coverage": 0.9090909090909091,
+    "median_half_width": 6.997578268437493
+  },
+  "permutation_test": {
+    "model": "mean_delta",
+    "real_score": 3.616899043503787,
+    "n_permutations": 200,
+    "shuffled_median": 3.616899043503787,
+    "p_value": 0.5124378109452736
+  }
+}

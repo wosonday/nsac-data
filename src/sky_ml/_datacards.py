@@ -5,6 +5,7 @@
                      + cập nhật mục danh mục trong data/README.md (giữa hai marker CATALOG:START/END)
 """
 import csv
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -13,11 +14,24 @@ from ._hashing import sha256_file
 CATALOG_FIELDS = ["created_at_utc", "kind", "task", "run_id", "path", "rows", "bytes", "sha256", "produced_by"]
 
 
-def _column_rows(columns: list[str], dictionary: dict, unit: str | None) -> list[str]:
-    known = dictionary.get("columns", {})
+def _column_info(c: str, known: dict, patterns: dict) -> dict:
+    """Tra cột: tên chính xác (task ghi đè chung) → mẫu regex (vd. ^(fpz|pz|eog)_delta) → rỗng."""
+    if c in known:
+        return known[c]
+    for pat, info in patterns.items():
+        m = re.fullmatch(pat, c)
+        if m:
+            return {**info, "description": info.get("description", "").format(*m.groups())}
+    return {}
+
+
+def _column_rows(columns: list[str], dictionary: dict, unit: str | None, task: str = "") -> list[str]:
+    tinfo = dictionary.get("tasks", {}).get(task, {})
+    known = {**dictionary.get("columns", {}), **tinfo.get("columns", {})}
+    patterns = dictionary.get("column_patterns", {})
     lines = ["| Cột | Đơn vị | Ý nghĩa |", "|---|---|---|"]
     for c in columns:
-        info = known.get(c, {})
+        info = _column_info(c, known, patterns)
         u = str(info.get("unit", "")).replace("{unit}", unit or "")
         lines.append(f"| `{c}` | {u} | {info.get('description', '(chưa mô tả trong data_dictionary.yaml)')} |")
     return lines
@@ -44,7 +58,7 @@ def write_card(folder: Path, kind: str, task: str, run_id: str, dictionary: dict
         lines += ["", "## Số liệu chính", "", "| Chỉ tiêu | Giá trị |", "|---|---|"]
         lines += [f"| {k} | {v} |" for k, v in facts.items()]
     if columns:
-        lines += ["", "## Cột dữ liệu", "", *_column_rows(columns, dictionary, unit)]
+        lines += ["", "## Cột dữ liệu", "", *_column_rows(columns, dictionary, unit, task)]
     if lineage:
         lines += ["", "## Truy vết (lineage)", ""] + [f"- **{k}:** `{v}`" for k, v in lineage.items()]
     if tinfo.get("caveats"):

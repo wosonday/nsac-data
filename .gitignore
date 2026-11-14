@@ -17,5 +17,14 @@ data/1_source/processed/*
 !data/1_source/raw/
 data/1_source/raw/*
 !data/1_source/raw/mmash/
+!data/1_source/raw/nlsp/
+data/1_source/raw/nlsp/*
+!data/1_source/raw/nlsp/MR080G.zip
+!data/1_source/raw/nlsp/MR079G.zip
+!data/1_source/raw/nlsp/BRSMImmune.zip
+!data/1_source/raw/nlsp/download_manifest.csv
+!data/1_source/raw/radlab/
+!data/1_source/raw/sleep_edfx/
+data/1_source/raw/sleep_edfx/1.0.0/sleep-cassette/
 _to_delete/
 runs/

@@ -34,3 +34,131 @@ hr:
       class: lightgbm.LGBMRegressor
       params: {n_estimators: 300, learning_rate: 0.05, max_depth: 4, num_leaves: 15,
                min_child_samples: 50, reg_lambda: 5.0, verbose: -1, n_jobs: 2}
+
+# ---------------------------------------------------------------------------------------------
+# Ba task còn lại của NASA-cl (round 1 = tái lập run 2026-11-11). deploy_model ghi rõ căn cứ chọn.
+dose:
+  description: "RadLab Lidal (ISS, Columbus, 2022): liều hấp thụ trung bình 1 giờ tới từ 6 giờ trước"
+  inputs:
+    - raw/radlab/instruments/Lidal/*.csv     # glob, khớp theo COPY_MANIFEST
+  kind: regression
+  target: dose_rate_next_1h
+  unit: uGy/h
+  window: {past: 72, future: 12, step: 12}   # đơn vị: bước 5 phút (6 giờ → 1 giờ)
+  features: [last_value, mean_last_5, mean_all, std_all, change_last_10, min_all, max_all]
+  split: {type: by_month, test_months: [4, 5, 6, 7, 8, 9, 10, 11, 12], gap_days: 1}
+  baseline: last_value
+  deploy_model: lightgbm      # theo run NASA-cl 11/11 (đã biết trước) — KHÔNG chọn lại theo run này
+  seed: 17
+  interval_alpha: 0.10
+  bootstrap_samples: 10000    # CI95 lấy mẫu lại theo THÁNG (9 đơn vị)
+  permutation_tests: 0
+  save_models: {final: true, folds: false}
+  models:
+    last_value:
+      class: sky_ml._models.LastValue
+    ridge:
+      class: sklearn.linear_model.Ridge
+      params: {alpha: 1.0}
+      scale: true
+    lightgbm:
+      class: lightgbm.LGBMRegressor
+      params: {n_estimators: 300, learning_rate: 0.05, max_depth: 4, num_leaves: 15,
+               min_child_samples: 50, reg_lambda: 5.0, verbose: -1, n_jobs: 2}
+
+cpet:
+  description: "UTMB CFT70 (33 người, nằm giường 70 ngày): thay đổi REL VO2peak POST1 − PRE"
+  inputs:
+    - raw/nlsp/MR080G.zip                    # CPET PRE/POST1/POST2
+    - raw/nlsp/MR079G.zip                    # đối chiếu GROUP
+    - raw/nlsp/BRSMImmune.zip                # đối chiếu GROUP
+    - raw/nlsp/download_manifest.csv         # SHA-256 + MD5 từng member ZIP
+  kind: regression
+  target: delta_vo2
+  unit: source_REL_VO2PK      # đơn vị nguồn; suy luận là mL/kg/min, chờ codebook
+  features: [pre_vo2, age, group_CONTROL, group_EXERCISE, group_FLY]
+  split: {type: leave_one_subject_out}
+  baseline: persistence
+  deploy_model: mean_delta    # GROUP không tồn tại với phi hành gia thật → mô hình dùng cho demo không dựa vào GROUP
+  seed: 17
+  interval_alpha: 0.10
+  bootstrap_samples: 10000
+  permutation_tests: 200      # task nhỏ (33 hàng) → chạy được
+  save_models: {final: true, folds: false}
+  models:
+    persistence:              # dự đoán: VO2peak không đổi
+      class: sklearn.dummy.DummyRegressor
+      params: {strategy: constant, constant: 0.0}
+    mean_delta:               # mức thay đổi trung bình của tập train
+      class: sklearn.dummy.DummyRegressor
+      params: {strategy: mean}
+    ridge:
+      class: sklearn.linear_model.Ridge
+      params: {alpha: 10.0}
+      scale: true
+    lightgbm:
+      class: lightgbm.LGBMRegressor
+      params: {n_estimators: 150, learning_rate: 0.05, max_depth: 2, num_leaves: 4,
+               min_child_samples: 5, reg_lambda: 5.0, verbose: -1, n_jobs: 1}
+
+cpet_physio:                  # cùng dữ liệu cpet, CHỈ đặc trưng sinh lý (không GROUP) — contract dùng được cho phi hành gia
+  builder: cpet
+  description: "UTMB CFT70: thay đổi VO2peak chỉ từ VO2peak PRE + tuổi (không dùng nhóm can thiệp)"
+  inputs: [raw/nlsp/MR080G.zip, raw/nlsp/MR079G.zip, raw/nlsp/BRSMImmune.zip, raw/nlsp/download_manifest.csv]
+  kind: regression
+  target: delta_vo2
+  unit: source_REL_VO2PK
+  features: [pre_vo2, age]
+  split: {type: leave_one_subject_out}
+  baseline: persistence
+  deploy_model: mean_delta
+  seed: 17
+  interval_alpha: 0.10
+  bootstrap_samples: 10000
+  permutation_tests: 200
+  save_models: {final: true, folds: false}
+  models:
+    persistence:
+      class: sklearn.dummy.DummyRegressor
+      params: {strategy: constant, constant: 0.0}
+    mean_delta:
+      class: sklearn.dummy.DummyRegressor
+      params: {strategy: mean}
+    ridge:
+      class: sklearn.linear_model.Ridge
+      params: {alpha: 10.0}
+      scale: true
+    lightgbm:
+      class: lightgbm.LGBMRegressor
+      params: {n_estimators: 150, learning_rate: 0.05, max_depth: 2, num_leaves: 4,
+               min_child_samples: 5, reg_lambda: 5.0, verbose: -1, n_jobs: 1}
+
+sleep:
+  description: "Sleep-EDF Expanded (10 đêm, mặt đất): chấm giai đoạn ngủ từng epoch 30 s từ EEG/EOG"
+  inputs:
+    - raw/sleep_edfx/1.0.0/sleep-cassette/SC4*-PSG.edf
+    - raw/sleep_edfx/1.0.0/sleep-cassette/SC4*-Hypnogram.edf
+  kind: classification
+  target: stage
+  classes: [W, N1, N2, N3, REM]
+  wake_margin_epochs: 60      # giữ 30 phút thức trước/sau giấc ngủ
+  features: all               # 54 cột: 3 kênh × 6 dải × (hiện tại, trước, sau)
+  split: {type: leave_one_subject_out}
+  baseline: majority
+  deploy_model: lightgbm      # theo run NASA-cl 11/11 (đã biết trước)
+  seed: 17
+  bootstrap_samples: 10000
+  permutation_tests: 0
+  save_models: {final: true, folds: false}
+  models:
+    majority:                 # đoán lớp đa số; xác suất = tỷ lệ lớp
+      class: sklearn.dummy.DummyClassifier
+      params: {strategy: prior}
+    logistic:
+      class: sklearn.linear_model.LogisticRegression
+      params: {max_iter: 3000, class_weight: balanced}
+      scale: true
+    lightgbm:
+      class: lightgbm.LGBMClassifier
+      params: {n_estimators: 300, learning_rate: 0.05, max_depth: 4, num_leaves: 15,
+               min_child_samples: 40, reg_lambda: 5.0, class_weight: balanced, verbose: -1, n_jobs: 2}

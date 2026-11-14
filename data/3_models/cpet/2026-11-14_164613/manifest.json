@@ -1,0 +1,121 @@
+{
+  "versions": {
+    "python": "3.12.15",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "numpy": "2.5.4",
+    "joblib": "1.6.0"
+  },
+  "task": "cpet",
+  "run_id": "2026-11-14_164613",
+  "features": [
+    "pre_vo2",
+    "age",
+    "group_CONTROL",
+    "group_EXERCISE",
+    "group_FLY"
+  ],
+  "target": "delta_vo2",
+  "seed": 17,
+  "model_specs": {
+    "persistence": {
+      "class": "sklearn.dummy.DummyRegressor",
+      "params": {
+        "strategy": "constant",
+        "constant": 0.0
+      }
+    },
+    "mean_delta": {
+      "class": "sklearn.dummy.DummyRegressor",
+      "params": {
+        "strategy": "mean"
+      }
+    },
+    "ridge": {
+      "class": "sklearn.linear_model.Ridge",
+      "params": {
+        "alpha": 10.0
+      },
+      "scale": true
+    },
+    "lightgbm": {
+      "class": "lightgbm.LGBMRegressor",
+      "params": {
+        "n_estimators": 150,
+        "learning_rate": 0.05,
+        "max_depth": 2,
+        "num_leaves": 4,
+        "min_child_samples": 5,
+        "reg_lambda": 5.0,
+        "verbose": -1,
+        "n_jobs": 1
+      }
+    }
+  },
+  "split": {
+    "type": "leave_one_subject_out"
+  },
+  "features_table": "data/2_features/cpet/2026-11-14_164613/table.csv.gz",
+  "data_snapshot": {
+    "files": {
+      "raw/nlsp/MR080G.zip": "2e0faa4a6e9989849fd16ceb883f3fb651c2bb3dceb7f8264dab5c7cae04313e",
+      "raw/nlsp/MR079G.zip": "2b855450e015cc84eed5c0de40781135a743be28942dc54f33fb1f5bbf71019d",
+      "raw/nlsp/BRSMImmune.zip": "dfd33127f18302a6ccd3a55911f69dc268c776dd625c6f94116a992b2ac5d0c5",
+      "raw/nlsp/download_manifest.csv": "37e2e53555829b52bc45cc44a2d90e1ad8ed1289a81df3816a3171a91ca289c1"
+    },
+    "python": "3.12.15",
+    "libraries": {
+      "scikit-learn": "1.9.1",
+      "lightgbm": "4.7.0",
+      "pandas": "3.1.1",
+      "numpy": "2.5.4",
+      "scipy": "1.18.1",
+      "mne": "1.13.2",
+      "shap": "0.54.1"
+    },
+    "seed": 17
+  },
+  "note": "final = fit trên toàn bộ người trong table; chỉ dùng cho người mới. Đánh giá dùng oof.csv.gz.",
+  "models": [
+    {
+      "model": "persistence",
+      "kind": "final",
+      "path": "persistence/final.joblib",
+      "n_train_rows": 33,
+      "n_train_units": 33,
+      "file": "final.joblib",
+      "bytes": 470,
+      "sha256": "52114aa449159fa21b06ccd6eb905c51ef10f7bd895cd253877cdff82633ceff"
+    },
+    {
+      "model": "mean_delta",
+      "kind": "final",
+      "path": "mean_delta/final.joblib",
+      "n_train_rows": 33,
+      "n_train_units": 33,
+      "file": "final.joblib",
+      "bytes": 482,
+      "sha256": "3114a83cee4e91511789a4ce8437a58c91c4da4868ed6154b6c5b8cc11f4720b"
+    },
+    {
+      "model": "ridge",
+      "kind": "final",
+      "path": "ridge/final.joblib",
+      "n_train_rows": 33,
+      "n_train_units": 33,
+      "file": "final.joblib",
+      "bytes": 941,
+      "sha256": "767da7a728da255d896416f11a41058740faac8b12ef849e485b8aa1fafd0493"
+    },
+    {
+      "model": "lightgbm",
+      "kind": "final",
+      "path": "lightgbm/final.joblib",
+      "n_train_rows": 33,
+      "n_train_units": 33,
+      "file": "final.joblib",
+      "bytes": 14455,
+      "sha256": "c4dee952136cb32bd9bdfcfb233e513b7c808e817520b0f38c80c1b7cb141de0"
+    }
+  ]
+}

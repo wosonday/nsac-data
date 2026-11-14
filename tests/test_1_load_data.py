@@ -52,3 +52,11 @@ def test_check_detects_modified_file(settings):
         f.write(b"x")
     with pytest.raises(ValueError, match="mmash_minutes"):
         verify_copy(settings)
+
+
+def test_expand_inputs_glob_and_unknown(settings):
+    copy_data(settings)
+    hits = load_data.expand_inputs(settings, ["processed/sample-v2/*.gz", "processed/sample-v2/manifest.json"])
+    assert hits == ["processed/sample-v2/mmash_minutes.csv.gz", "processed/sample-v2/manifest.json"]
+    with pytest.raises(ValueError, match="không khớp"):
+        load_data.expand_inputs(settings, ["raw/none/*.csv"])

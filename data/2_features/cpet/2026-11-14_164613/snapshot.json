@@ -1,0 +1,19 @@
+{
+  "files": {
+    "raw/nlsp/MR080G.zip": "2e0faa4a6e9989849fd16ceb883f3fb651c2bb3dceb7f8264dab5c7cae04313e",
+    "raw/nlsp/MR079G.zip": "2b855450e015cc84eed5c0de40781135a743be28942dc54f33fb1f5bbf71019d",
+    "raw/nlsp/BRSMImmune.zip": "dfd33127f18302a6ccd3a55911f69dc268c776dd625c6f94116a992b2ac5d0c5",
+    "raw/nlsp/download_manifest.csv": "37e2e53555829b52bc45cc44a2d90e1ad8ed1289a81df3816a3171a91ca289c1"
+  },
+  "python": "3.12.15",
+  "libraries": {
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "pandas": "3.1.1",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "mne": "1.13.2",
+    "shap": "0.54.1"
+  },
+  "seed": 17
+}

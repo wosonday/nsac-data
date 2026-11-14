@@ -1,4 +1,5 @@
 """Bước 4 – evaluate: so baseline (theo đơn vị độc lập = người/tháng), CI95 bootstrap, độ bao phủ khoảng 90%."""
+import importlib
 import math
 
 import numpy as np
@@ -46,6 +47,29 @@ def evaluate(oof: pd.DataFrame, cfg: dict) -> pd.DataFrame:
             row["brier"] = float(np.mean(np.sum((proba - truth) ** 2, axis=1)))
         rows.append(row)
     return pd.DataFrame(rows).sort_values(metric, ascending=kind == "regression").reset_index(drop=True)
+
+
+def permutation_test(table: pd.DataFrame, features: list[str], cfg: dict, model: str, n: int,
+                     seed: int = 0) -> dict:
+    """Xáo trộn target rồi train/predict LẠI TOÀN BỘ; p = (1 + #lần xáo trộn tốt bằng/hơn thật) / (1 + n).
+
+    Nếu nhãn xáo trộn vẫn cho điểm tốt như thật → pipeline đang rò rỉ. Chỉ dùng cho task nhỏ (vd. cpet).
+    """
+    train = importlib.import_module("sky_ml.3_train")
+    one = {**cfg, "models": {model: cfg["models"][model]}}
+
+    def mean_score(data):
+        return score_per_fold(train.train_predict(data, features, one), cfg["kind"])[model].mean()
+
+    real, rng, shuffled = mean_score(table), np.random.default_rng(seed), []
+    for _ in range(n):
+        data = table.copy()
+        data[cfg["target"]] = rng.permutation(data[cfg["target"]].to_numpy())
+        shuffled.append(mean_score(data))
+    shuffled = np.array(shuffled)
+    as_good = shuffled <= real if cfg["kind"] == "regression" else shuffled >= real
+    return {"model": model, "real_score": float(real), "n_permutations": n,
+            "shuffled_median": float(np.median(shuffled)), "p_value": float((1 + as_good.sum()) / (1 + n))}
 
 
 def interval_half_width(abs_errors, alpha: float) -> float:

@@ -1,0 +1,47 @@
+[
+  {
+    "name": "month_04",
+    "n_train": 2094,
+    "n_test": 720
+  },
+  {
+    "name": "month_05",
+    "n_train": 2805,
+    "n_test": 736
+  },
+  {
+    "name": "month_06",
+    "n_train": 3541,
+    "n_test": 698
+  },
+  {
+    "name": "month_07",
+    "n_train": 4239,
+    "n_test": 697
+  },
+  {
+    "name": "month_08",
+    "n_train": 4943,
+    "n_test": 721
+  },
+  {
+    "name": "month_09",
+    "n_train": 5657,
+    "n_test": 679
+  },
+  {
+    "name": "month_10",
+    "n_train": 6336,
+    "n_test": 713
+  },
+  {
+    "name": "month_11",
+    "n_train": 7056,
+    "n_test": 715
+  },
+  {
+    "name": "month_12",
+    "n_train": 7764,
+    "n_test": 578
+  }
+]

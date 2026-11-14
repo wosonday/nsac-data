@@ -1,0 +1,9 @@
+{
+  "source_url": "https://visualization.osdr.nasa.gov/radlab/api/?query=%28spacecraft%3DISS%29AND%28instrument_id%3DLidal%29AND%28timestamp%3E%3D2022-04-01%29AND%28timestamp%3C2022-05-01%29&columns=instrument_id%2Ctimestamp%2Cabsorbed_dose_rate%2Cdose_equivalent_rate%2Cspacecraft%2Cmodule%2Clatitude%2Clongitude%2Caltitude&format=csv",
+  "path": "radlab/Lidal/2022-04-01_2022-05-01.csv",
+  "is_synthetic": false,
+  "checked_at_utc": "2026-11-09T03:13:18.391409+00:00",
+  "status": "downloaded",
+  "bytes": 845062,
+  "sha256": "170bd2af12265fb708fc1b05d744fe67f278a2c578377107ba5880aa41d22811"
+}

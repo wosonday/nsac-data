@@ -1,0 +1,49 @@
+{
+  "task": "sleep",
+  "run_id": "2026-11-14_164909",
+  "samples": 9913,
+  "units": 10,
+  "best_model_exploratory": "lightgbm",
+  "deploy_model": "lightgbm",
+  "metrics": [
+    {
+      "model": "lightgbm",
+      "units": 10,
+      "macro_f1": 0.78429,
+      "ci95_low": 0.759864,
+      "ci95_high": 0.807182,
+      "diff_vs_baseline": 0.665629,
+      "diff_ci95_low": 0.637668,
+      "diff_ci95_high": 0.689888,
+      "balanced_accuracy": 0.809162,
+      "cohen_kappa": 0.777164,
+      "brier": 0.238513
+    },
+    {
+      "model": "logistic",
+      "units": 10,
+      "macro_f1": 0.759823,
+      "ci95_low": 0.726545,
+      "ci95_high": 0.790765,
+      "diff_vs_baseline": 0.641161,
+      "diff_ci95_low": 0.603757,
+      "diff_ci95_high": 0.675141,
+      "balanced_accuracy": 0.793683,
+      "cohen_kappa": 0.735999,
+      "brier": 0.28845
+    },
+    {
+      "model": "majority",
+      "units": 10,
+      "macro_f1": 0.118662,
+      "ci95_low": 0.104573,
+      "ci95_high": 0.130824,
+      "diff_vs_baseline": 0.0,
+      "diff_ci95_low": 0.0,
+      "diff_ci95_high": 0.0,
+      "balanced_accuracy": 0.2,
+      "cohen_kappa": 0.0,
+      "brier": 0.730925
+    }
+  ]
+}

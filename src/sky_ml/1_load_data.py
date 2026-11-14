@@ -4,7 +4,7 @@
 - verify_copy: kiểm bản copy còn khớp manifest (phát hiện file bị thiếu / bị sửa)
 - snapshot   : hash đầu vào + phiên bản thư viện, ghi vào mỗi run để tái lập
 """
-
+import fnmatch
 import hashlib
 import json
 import os
@@ -22,21 +22,16 @@ from ._settings import Settings, ensure_writable
 
 # Đường dẫn/glob tương đối trong NASA-cl/data
 ALLOWLIST = [
-    "raw/nlsp/MR080G.zip",
-    "raw/nlsp/MR079G.zip",
-    "raw/nlsp/BRSMImmune.zip",  # cpet
+    "raw/nlsp/MR080G.zip", "raw/nlsp/MR079G.zip", "raw/nlsp/BRSMImmune.zip",   # cpet
     "raw/nlsp/download_manifest.csv",
-    "raw/sleep_edfx/1.0.0/sleep-cassette/SC40?1*-PSG.edf",  # sleep
+    "raw/sleep_edfx/1.0.0/sleep-cassette/SC40?1*-PSG.edf",                       # sleep
     "raw/sleep_edfx/1.0.0/sleep-cassette/SC40?1*-Hypnogram.edf",
     "raw/sleep_edfx/1.0.0/download_manifest.csv",
-    "raw/sleep_edfx/1.0.0/LICENSE.html",
-    "raw/sleep_edfx/1.0.0/SHA256SUMS.txt",
-    "processed/sample-v2/mmash_minutes.csv.gz",  # hr
-    "processed/sample-v2/manifest.json",
-    "processed/sample-v2/quality_report.md",
+    "raw/sleep_edfx/1.0.0/LICENSE.html", "raw/sleep_edfx/1.0.0/SHA256SUMS.txt",
+    "processed/sample-v2/mmash_minutes.csv.gz",                                  # hr
+    "processed/sample-v2/manifest.json", "processed/sample-v2/quality_report.md",
     "raw/mmash/1.0.0/LICENSE.txt",
-    "raw/radlab/instruments/Lidal/*.csv",
-    "raw/radlab/instruments/Lidal/*.csv.meta.json",  # dose
+    "raw/radlab/instruments/Lidal/*.csv", "raw/radlab/instruments/Lidal/*.csv.meta.json",  # dose
 ]
 
 
@@ -56,14 +51,10 @@ def _known_hashes(src: Path) -> dict[str, str]:
             known[f"raw/sleep_edfx/1.0.0/{row.file_name}"] = row.local_sha256
     sample = src / "processed/sample-v2/manifest.json"
     if sample.exists():
-        for name, meta in json.loads(sample.read_text(encoding="utf-8"))[
-            "outputs"
-        ].items():
+        for name, meta in json.loads(sample.read_text(encoding="utf-8"))["outputs"].items():
             known[f"processed/sample-v2/{name}"] = meta["sha256"]
     for meta in (src / "raw/radlab/instruments/Lidal").glob("*.csv.meta.json"):
-        known[meta.relative_to(src).as_posix().removesuffix(".meta.json")] = read_json(
-            meta
-        )["sha256"]
+        known[meta.relative_to(src).as_posix().removesuffix(".meta.json")] = read_json(meta)["sha256"]
     return known
 
 
@@ -95,6 +86,8 @@ def _copy_one(src: Path, dst: Path) -> str:
     return h.hexdigest()
 
 
+
+
 def copy_data(settings: Settings, dry_run: bool = False) -> pd.DataFrame:
     src, dst_root = settings.nasa_cl_data, ensure_writable(settings.data_dir, settings)
     items = build_allowlist(src)
@@ -105,9 +98,7 @@ def copy_data(settings: Settings, dry_run: bool = False) -> pd.DataFrame:
 
     old = {}
     if (dst_root / MANIFEST_NAME).exists():
-        old = (
-            pd.read_csv(dst_root / MANIFEST_NAME).set_index("rel_path").sha256.to_dict()
-        )
+        old = pd.read_csv(dst_root / MANIFEST_NAME).set_index("rel_path").sha256.to_dict()
     rows = []
     for item in items:
         source, target = src / item.rel_path, dst_root / item.rel_path
@@ -119,16 +110,9 @@ def copy_data(settings: Settings, dry_run: bool = False) -> pd.DataFrame:
             if item.expected_sha256 and sha != item.expected_sha256:
                 target.unlink()
                 raise ValueError(f"sha256 lệch manifest NASA-cl: {item.rel_path}")
-        rows.append(
-            {
-                "rel_path": item.rel_path,
-                "bytes": target.stat().st_size,
-                "sha256": sha,
-                "hash_source": item.hash_source,
-                "status": status,
-                "copied_at_utc": datetime.now(UTC).isoformat(timespec="seconds"),
-            }
-        )
+        rows.append({"rel_path": item.rel_path, "bytes": target.stat().st_size, "sha256": sha,
+                     "hash_source": item.hash_source, "status": status,
+                     "copied_at_utc": datetime.now(UTC).isoformat(timespec="seconds")})
     table = pd.DataFrame(rows)
     table.to_csv(dst_root / MANIFEST_NAME, index=False)
     return table
@@ -138,12 +122,22 @@ def copy_data(settings: Settings, dry_run: bool = False) -> pd.DataFrame:
 LIBRARIES = ["scikit-learn", "lightgbm", "pandas", "numpy", "scipy", "mne", "shap"]
 
 
+def expand_inputs(settings: Settings, patterns: list[str]) -> list[str]:
+    """Mẫu glob trong `inputs` (vd. raw/sleep_edfx/**/SC4*-PSG.edf) → danh sách rel_path có trong COPY_MANIFEST."""
+    manifest = pd.read_csv(settings.data_dir / MANIFEST_NAME).rel_path.tolist()
+    out = []
+    for pat in patterns:
+        hits = sorted(r for r in manifest if fnmatch.fnmatch(r, pat)) if any(ch in pat for ch in "*?[") else [pat]
+        if not hits:
+            raise ValueError(f"Mẫu inputs không khớp file nào trong COPY_MANIFEST: {pat}")
+        out += hits
+    return out
+
+
 def verify_copy(settings: Settings, rel_paths: list[str] | None = None) -> int:
     manifest_path = settings.data_dir / MANIFEST_NAME
     if not manifest_path.exists():
-        raise FileNotFoundError(
-            "Chưa có data/COPY_MANIFEST.csv; chạy: sky-ml copy-data"
-        )
+        raise FileNotFoundError("Chưa có data/COPY_MANIFEST.csv; chạy: sky-ml copy-data")
     manifest = pd.read_csv(manifest_path).set_index("rel_path")
     wanted = rel_paths if rel_paths is not None else list(manifest.index)
     problems = []
@@ -154,9 +148,7 @@ def verify_copy(settings: Settings, rel_paths: list[str] | None = None) -> int:
         elif sha256_file(path) != manifest.loc[rel, "sha256"]:
             problems.append(f"đã bị sửa: {rel}")
     if problems:
-        raise ValueError(
-            "Dữ liệu không khớp COPY_MANIFEST:\n  " + "\n  ".join(problems)
-        )
+        raise ValueError("Dữ liệu không khớp COPY_MANIFEST:\n  " + "\n  ".join(problems))
     return len(wanted)
 
 
@@ -169,9 +161,7 @@ def _version(name: str) -> str | None:
 
 def snapshot(settings: Settings, rel_paths: list[str]) -> dict:
     manifest = pd.read_csv(settings.data_dir / MANIFEST_NAME).set_index("rel_path")
-    return {
-        "files": {rel: manifest.loc[rel, "sha256"] for rel in rel_paths},
-        "python": platform.python_version(),
-        "libraries": {name: _version(name) for name in LIBRARIES},
-        "seed": 17,
-    }
+    return {"files": {rel: manifest.loc[rel, "sha256"] for rel in rel_paths},
+            "python": platform.python_version(),
+            "libraries": {name: _version(name) for name in LIBRARIES},
+            "seed": 17}

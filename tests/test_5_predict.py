@@ -49,3 +49,15 @@ def test_latest_window_with_gap_gives_nan():
     v = np.arange(40, dtype=float)
     v[-3] = np.nan
     assert math.isnan(build_features.windows.latest_window(v, np.arange(40), 30, ["mean_all"])["mean_all"])
+
+
+def test_classification_returns_label_and_probabilities():
+    from sklearn.dummy import DummyClassifier
+
+    train = pd.DataFrame({"subject_id": ["a"] * 4, "x": [0.0, 1, 2, 3], "stage": ["W", "N2", "N2", "REM"]})
+    model = DummyClassifier(strategy="prior").fit(train[["x"]], train.stage)
+    cfg = {"kind": "classification", "classes": ["W", "N1", "N2", "N3", "REM"], "target": "stage", "unit": None}
+    rows = pd.DataFrame({"subject_id": ["new"], "x": [1.5]})
+    out = predict.predict_rows(model, rows, ["x"], float("nan"), train, cfg, "majority")
+    assert out.prediction[0] == "N2" and out.p_N2[0] == 0.5 and out.p_N1[0] == 0.0
+    assert not out.abstain[0] and "low90" not in out

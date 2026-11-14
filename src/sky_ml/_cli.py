@@ -5,6 +5,7 @@ data/2_features/<task>/<run>/ (1) đầu vào mô hình · data/3_models/... (3)
 Mỗi thư mục có README.md tự sinh; mọi file được ghi vào data/CATALOG.csv.
 """
 import argparse
+import math
 from datetime import datetime
 from pathlib import Path
 
@@ -25,7 +26,7 @@ def main(argv=None):
     sub.add_parser("steps", help="in thứ tự các bước pipeline")
     sub.add_parser("load-data", help=STEPS[1][2]).add_argument("--dry-run", action="store_true")
     sub.add_parser("check", help="(bước 1) kiểm bản copy còn khớp data/COPY_MANIFEST.csv")
-    sub.add_parser("build-features", help=STEPS[2][2]).add_argument("task", choices=sorted(build_features.BUILD))
+    sub.add_parser("build-features", help=STEPS[2][2]).add_argument("task", help="tên task trong configs/tasks.yaml")
     for name, number in (("train", 3), ("evaluate", 4)):
         p = sub.add_parser(name, help=STEPS[number][2])
         p.add_argument("task")
@@ -35,7 +36,8 @@ def main(argv=None):
     p.add_argument("--input", required=True, help="CSV dữ liệu MỚI, cùng cột với dữ liệu gốc của task")
     p.add_argument("--run", default="latest", help="run chứa mô hình đã huấn luyện (data/3_models/<task>/<run>)")
     p.add_argument("--model", default=None, help="tên mô hình; mặc định = deploy_model trong tasks.yaml")
-    p.add_argument("--mode", choices=["latest", "backtest"], default="latest")
+    p.add_argument("--mode", choices=["latest", "backtest", "table"], default=None,
+                   help="mặc định: latest nếu task hỗ trợ, ngược lại table")
     args = parser.parse_args(argv)
 
     if args.command == "steps":
@@ -58,6 +60,13 @@ def _check(settings, args):
     print(f"OK {load_data.verify_copy(settings)} files")
 
 
+def _task_cfg(settings, task):
+    tasks = load_tasks(settings)
+    if task not in tasks:
+        raise SystemExit(f"Task '{task}' không có trong {settings.tasks_config}; có: {', '.join(tasks)}")
+    return tasks[task]
+
+
 def _catalog(settings):
     return settings.features_dir.parent / "CATALOG.csv"
 
@@ -71,9 +80,11 @@ def _rel(settings, path) -> str:
 
 
 def _build_features(settings, args):
-    cfg = load_tasks(settings)[args.task]
+    cfg = _task_cfg(settings, args.task)
+    patterns = list(cfg["inputs"])
+    cfg["inputs"] = load_data.expand_inputs(settings, patterns)   # cho phép mẫu glob trong tasks.yaml
     load_data.verify_copy(settings, cfg["inputs"])
-    table, features = build_features.BUILD[args.task](settings.data_dir, cfg)
+    table, features = build_features.BUILD[cfg.get("builder", args.task)](settings.data_dir, cfg)
     rp = new_run(settings, args.task)
     out = rp.features
     write_json(out / "snapshot.json", load_data.snapshot(settings, cfg["inputs"]))
@@ -88,7 +99,7 @@ def _build_features(settings, args):
                facts={"Số hàng (mẫu)": len(table), "Số người/chuỗi độc lập": table.subject_id.nunique(),
                       "Số đặc trưng": len(features), "Target": f"`{cfg['target']}` ({cfg.get('unit')})",
                       "Cửa sổ": cfg.get("window")},
-               lineage={"Dữ liệu nguồn": ", ".join(cfg["inputs"]), "Mô hình dùng bảng này": _rel(settings, rp.models)})
+               lineage={"Dữ liệu nguồn": ", ".join(f"data/1_source/{p}" for p in patterns), "Mô hình dùng bảng này": _rel(settings, rp.models)})
     register(_catalog(settings), "features", args.task, rp.run_id,
              [out / "table.csv.gz", out / "features.json", out / "snapshot.json"], cmd,
              settings.features_dir.parent, {"table.csv.gz": len(table)})
@@ -113,7 +124,7 @@ def _model_card(settings, cfg, rp, cmd, facts):
 
 
 def _train(settings, args):
-    cfg = load_tasks(settings)[args.task]
+    cfg = _task_cfg(settings, args.task)
     rp = resolve_run(settings, args.task, args.run)
     table = pd.read_csv(require(rp.features, "table.csv.gz", f"build-features {args.task}"))
     features = read_json(require(rp.features, "features.json", f"build-features {args.task}"))
@@ -158,7 +169,7 @@ def _train(settings, args):
 
 
 def _evaluate(settings, args):
-    cfg = load_tasks(settings)[args.task]
+    cfg = _task_cfg(settings, args.task)
     rp = resolve_run(settings, args.task, args.run)
     oof = pd.read_csv(require(rp.models, "oof.csv.gz", f"train {args.task}"))
     metrics = evaluate.evaluate(oof, cfg)
@@ -167,14 +178,24 @@ def _evaluate(settings, args):
                "units": int(metrics.units[0]), "best_model_exploratory": best,
                "deploy_model": cfg.get("deploy_model"), "metrics": metrics.round(6).to_dict("records")}
     if cfg["kind"] == "regression":
-        summary["interval_coverage"] = evaluate.interval_coverage(oof, best, cfg.get("interval_alpha", 0.10))
-    else:
+        alpha = cfg.get("interval_alpha", 0.10)
+        summary["interval_coverage"] = evaluate.interval_coverage(oof, best, alpha)
+        if cfg.get("deploy_model") and cfg["deploy_model"] != best:
+            summary["interval_coverage_deploy"] = evaluate.interval_coverage(oof, cfg["deploy_model"], alpha)
+    if cfg.get("permutation_tests", 0):
+        table = pd.read_csv(require(rp.features, "table.csv.gz", f"build-features {args.task}"))
+        features = read_json(rp.features / "features.json")
+        summary["permutation_test"] = evaluate.permutation_test(table, features, cfg, best, cfg["permutation_tests"])
+    if cfg["kind"] != "regression":
         evaluate.confusion(oof, best, cfg["classes"]).to_csv(rp.models / "confusion.csv")
     metrics.to_csv(rp.models / "metrics.csv", index=False)
     write_json(rp.models / "summary.json", summary)
     metric = "mae" if cfg["kind"] == "regression" else "macro_f1"
     facts = {f"{metric} – {r['model']}": f"{r[metric]:.4f} (CI95 {r['ci95_low']:.3f}–{r['ci95_high']:.3f}); "
              f"so baseline {r['diff_vs_baseline']:+.3f}" for r in summary["metrics"]}
+    if "permutation_test" in summary:
+        pt = summary["permutation_test"]
+        facts["Kiểm định hoán vị"] = f"{pt['model']}: p = {pt['p_value']:.4f} ({pt['n_permutations']} lần)"
     if "interval_coverage" in summary:
         cov = summary["interval_coverage"]
         facts["Độ bao phủ khoảng 90%"] = f"{cov['observed_coverage']:.4f} (nửa độ rộng {cov['median_half_width']:.3f})"
@@ -190,22 +211,28 @@ def _evaluate(settings, args):
 
 
 def _predict(settings, args):
-    cfg = load_tasks(settings)[args.task]
-    spec = build_features.FOR_PREDICT[args.task]
+    cfg = _task_cfg(settings, args.task)
+    spec = build_features.FOR_PREDICT[cfg.get("builder", args.task)]
     rp = resolve_run(settings, args.task, args.run)
     require(rp.models, "manifest.json", f"train {args.task}")
     model_name = args.model or cfg.get("deploy_model") or cfg["baseline"]
     model = load_model(rp.models, model_name)                       # kiểm SHA-256 trước khi nạp
     features = read_json(require(rp.features, "features.json", f"build-features {args.task}"))
-    if features != cfg["features"]:
+    if cfg["features"] != "all" and features != cfg["features"]:
         raise ValueError("configs/tasks.yaml `features` đã đổi so với lúc train run này; "
                          "chạy lại build-features + train trước khi predict.")
     train_table = pd.read_csv(require(rp.features, "table.csv.gz", f"build-features {args.task}"))
     oof = pd.read_csv(require(rp.models, "oof.csv.gz", f"train {args.task}"))
-    half_width = predict.calibration_half_width(oof, model_name, cfg.get("interval_alpha", 0.10))
+    half_width = predict.calibration_half_width(oof, model_name, cfg.get("interval_alpha", 0.10), cfg["kind"])
 
     source = Path(args.input)
-    rows = spec[args.mode](pd.read_csv(source, usecols=spec["columns"]), cfg)
+    args.mode = args.mode or ("latest" if "latest" in spec else "table")
+    if args.mode == "table":
+        rows = predict.table_rows(pd.read_csv(source), cfg)
+    elif args.mode in spec:
+        rows = spec[args.mode](pd.read_csv(source, usecols=spec["columns"]), cfg)
+    else:
+        raise ValueError(f"Task {args.task} không hỗ trợ --mode {args.mode}; dùng: {['table', *spec.keys() - {'columns'}]}")
     result = predict.predict_rows(model, rows, features, half_width, train_table, cfg, model_name)
 
     out = ensure_writable(rp.predictions, settings)
@@ -213,10 +240,12 @@ def _predict(settings, args):
     stem = f"{source.name.split('.')[0]}_{args.mode}_{model_name}_{datetime.now():%Y%m%d_%H%M%S}"
     result.to_csv(out / f"{stem}.csv", index=False)
     meta = {"task": args.task, "run_id": rp.run_id, "model": model_name, "mode": args.mode,
-            "input": str(source), "half_width_90": half_width, "n_rows": len(result),
+            "input": str(source), "half_width_90": half_width if math.isfinite(half_width) else None, "n_rows": len(result),
             "n_abstain": int(result.abstain.sum()), "n_in_sample": int(result.in_sample.sum())}
     if "abs_error" in result:
         meta["mae_backtest"] = float(result.abs_error.mean())
+    if "correct" in result:
+        meta["accuracy_backtest"] = float(result.correct[~result.abstain].mean())
     write_json(out / f"{stem}.json", meta)
 
     cmd = f"sky-ml predict {args.task} --input {source.name} --mode {args.mode}"
@@ -228,12 +257,13 @@ def _predict(settings, args):
                facts={"Lần chạy mới nhất": stem, "Mô hình": model_name, "Chế độ": args.mode,
                       "Số hàng": len(result), "Từ chối (abstain)": meta["n_abstain"],
                       "Trong dữ liệu huấn luyện (in_sample)": meta["n_in_sample"],
-                      "Nửa độ rộng khoảng 90%": f"{half_width:.3f} {cfg.get('unit') or ''}"},
+                      "Nửa độ rộng khoảng 90%": (f"{half_width:.3f} {cfg.get('unit') or ''}"
+                                                 if cfg["kind"] == "regression" else "— (phân loại)")},
                lineage={"Mô hình": _rel(settings, rp.models / model_name / "final.joblib"),
                         "Bảng đặc trưng của run": _rel(settings, rp.features / "table.csv.gz")})
     register(_catalog(settings), "predictions", args.task, rp.run_id, [out / f"{stem}.csv", out / f"{stem}.json"],
              cmd, settings.features_dir.parent, {f"{stem}.csv": len(result)})
-    print(result.head(10).round(2).to_string(index=False))
+    print(result.head(10).to_string(index=False, float_format=lambda v: f"{v:.2f}"))
     print({k: (round(v, 3) if isinstance(v, float) else v) for k, v in meta.items()})
     print(f"→ {out / (stem + '.csv')}")
     if meta["n_in_sample"]:
