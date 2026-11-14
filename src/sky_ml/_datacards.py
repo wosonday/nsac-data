@@ -88,7 +88,8 @@ def register(catalog: Path, kind: str, task: str, run_id: str, files: list[Path]
 
 
 START, END = "<!-- CATALOG:START -->", "<!-- CATALOG:END -->"
-_KIND = {"features": "(1) đã xử lý", "models": "(3) mô hình", "predictions": "(2) dự đoán"}
+_KIND = {"features": "(1) đã xử lý", "models": "(3) mô hình", "predictions": "(2) dự đoán",
+         "synthetic": "⚠️ GIẢ ĐỊNH"}
 
 
 def render_catalog(catalog: Path, readme: Path) -> None:

@@ -229,3 +229,119 @@ sleep_act:
       class: lightgbm.LGBMRegressor
       params: {n_estimators: 100, learning_rate: 0.05, max_depth: 2, num_leaves: 4,
                min_child_samples: 10, reg_lambda: 5.0, verbose: -1, n_jobs: 1}
+
+# ---------------------------------------------------------------------------------------------
+# 14/11 tối: vitals (CRF), mood (POMS), glucose (OGTT) — chốt cấu hình TRƯỚC khi chạy.
+vitals_sbp: &vitals
+  builder: vitals
+  description: "UTMB CRF: huyết áp tâm thu buổi sáng NGÀY TỚI từ 7 ngày trước; train Campaign 3, kiểm tra ngoài cohort trên 6 persona"
+  inputs: [raw/nlsp/CRF.zip, raw/nlsp/download_manifest.csv]
+  kind: regression
+  measure: sbp                # sbp | dbp | temp | pulse
+  target: sbp_next_day
+  unit: mmHg
+  train_cohort: campaign_3    # 23 người
+  external_cohorts: [cft70, campaign_1]   # 5160, 8072, 8936 + C1G0001–3 (= 6 persona) — KHÔNG dùng để train
+  window: {past: 7, future: 1, step: 1}   # đơn vị: ngày
+  features: [last_value, mean_last_5, mean_all, std_all, min_all, max_all]
+  split: {type: leave_one_subject_out}
+  baseline: last_value
+  deploy_model: ridge         # chốt trước: kết hợp tuyến tính lịch sử gần, 23 người đủ cho ridge
+  seed: 17
+  interval_alpha: 0.10
+  bootstrap_samples: 10000
+  permutation_tests: 0
+  save_models: {final: true, folds: false}
+  models:
+    last_value:
+      class: sky_ml._models.LastValue
+    personal_mean:
+      class: sky_ml._models.LastValue
+      params: {column: mean_all}
+    ridge:
+      class: sklearn.linear_model.Ridge
+      params: {alpha: 10.0}
+      scale: true
+    lightgbm:
+      class: lightgbm.LGBMRegressor
+      params: {n_estimators: 200, learning_rate: 0.05, max_depth: 3, num_leaves: 7,
+               min_child_samples: 30, reg_lambda: 5.0, verbose: -1, n_jobs: 2}
+
+vitals_dbp:
+  <<: *vitals
+  description: "UTMB CRF: huyết áp tâm trương ngày tới từ 7 ngày trước"
+  measure: dbp
+  target: dbp_next_day
+
+vitals_temp:
+  <<: *vitals
+  description: "UTMB CRF: nhiệt độ cơ thể buổi sáng ngày tới từ 7 ngày trước"
+  measure: temp
+  target: temp_next_day
+  unit: "°C"
+
+mood:
+  description: "UTMB CFT70 POMS: điểm rối loạn tâm trạng (TMD) lần đo tới (~1 tuần) từ 3 lần đo trước"
+  inputs: [raw/nlsp/NNX10AP86G.zip, raw/nlsp/download_manifest.csv]
+  kind: regression
+  target: tmd_next
+  unit: "điểm TMD"            # POMS Total Mood Disturbance; cao hơn = rối loạn tâm trạng nhiều hơn
+  window: {past: 3, future: 1, step: 1}   # đơn vị: LẦN ĐO (không đều, ~7 ngày)
+  features: [last_value, mean_all, std_all, min_all, max_all]
+  split: {type: leave_one_subject_out}
+  baseline: last_value
+  deploy_model: personal_mean # chốt trước: thang tự đánh giá, ít điểm/người → trung bình cá nhân
+  seed: 17
+  interval_alpha: 0.10
+  bootstrap_samples: 10000
+  permutation_tests: 0
+  save_models: {final: true, folds: false}
+  models:
+    last_value:
+      class: sky_ml._models.LastValue
+    personal_mean:
+      class: sky_ml._models.LastValue
+      params: {column: mean_all}
+    ridge:
+      class: sklearn.linear_model.Ridge
+      params: {alpha: 10.0}
+      scale: true
+    lightgbm:
+      class: lightgbm.LGBMRegressor
+      params: {n_estimators: 100, learning_rate: 0.05, max_depth: 2, num_leaves: 4,
+               min_child_samples: 10, reg_lambda: 5.0, verbose: -1, n_jobs: 1}
+
+glucose:
+  description: "UTMB CFT70 OGTT: thay đổi đường huyết lúc đói từ trước nằm giường đến ngày nằm giường 66; một hàng / người"
+  inputs: [raw/nlsp/NNX10AP86G.zip, raw/nlsp/download_manifest.csv]
+  kind: regression
+  target: delta_glucose_0
+  unit: mg/dL
+  target_study_day: 66
+  features: [pre_glucose_0, pre_glucose_120, pre_insulin_0]
+  split: {type: leave_one_subject_out}
+  baseline: persistence
+  deploy_model: mean_delta    # chốt trước (như cpet): 23 người, không kỳ vọng mô hình cá nhân hóa
+  seed: 17
+  interval_alpha: 0.10
+  bootstrap_samples: 10000
+  permutation_tests: 200
+  save_models: {final: true, folds: false}
+  models:
+    persistence:
+      class: sklearn.dummy.DummyRegressor
+      params: {strategy: constant, constant: 0.0}
+    mean_delta:
+      class: sklearn.dummy.DummyRegressor
+      params: {strategy: mean}
+    ridge:
+      class: sklearn.linear_model.Ridge
+      params: {alpha: 10.0}
+      scale: true
+
+vitals_pulse:                 # nhịp tim buổi sáng của CHÍNH 6 persona (dữ liệu thật) — bổ sung cho hr (MMASH)
+  <<: *vitals
+  description: "UTMB CRF: nhịp tim buổi sáng ngày tới từ 7 ngày trước"
+  measure: pulse
+  target: pulse_next_day
+  unit: bpm

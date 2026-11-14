@@ -1,6 +1,6 @@
 # 3. Hướng dẫn dữ liệu: phân loại, tài liệu kèm, truy vết
 
-> Cập nhật 14/11/2026 (16:50). Áp dụng cho 5 task: `hr`, `dose`, `cpet`, `cpet_physio`, `sleep` — cả 5 tái lập đúng run NASA-cl 11/11. Bảng nguồn: `docs/Tong_hop_du_lieu_mo_hinh.xlsx`.
+> Cập nhật 14/11/2026 (20:50). 13 task + dữ liệu giả định (`data/1_synthetic`). Tổng hợp đầy đủ: `docs/BAO_CAO_DU_LIEU_VA_MO_HINH_2026-11-14.md` và `docs/Tong_hop_du_lieu_mo_hinh.xlsx`. Bảng nguồn: `docs/Tong_hop_du_lieu_mo_hinh.xlsx`.
 
 ## 1. Mục tiêu
 
@@ -15,6 +15,8 @@ Mỗi file dữ liệu phải trả lời được bốn câu hỏi mà không c
 | (2) Dữ liệu dự đoán | `data/4_predictions/<task>/<run_id>/` | nsac / bước ra quyết định | Giá trị dự báo + khoảng 90% + cờ tin cậy |
 
 `data/1_source/` là bản copy chỉ đọc từ NASA-cl (bước 1), không thuộc ba nhóm trên.
+
+`data/1_synthetic/` là ⚠️ **DỮ LIỆU GIẢ ĐỊNH** (sinh bằng `sky-ml make-synthetic`) cho persona thiếu dữ liệu thật — không dùng để train/đánh giá; mọi hàng có cột `is_synthetic`; chi tiết ở `data/1_synthetic/README.md`.
 
 ### 2.1 (1) `2_features` — đầu vào mô hình
 

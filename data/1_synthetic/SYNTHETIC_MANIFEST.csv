@@ -1,0 +1,10 @@
+file,bytes,sha256,generator,seed,is_synthetic
+mood_c1_poms.csv,2981,9219203b8e4118a255e1ba9a377bfdbd72b9012d4a82fa30735dac3620ac7a6f,sky-ml-synthetic-1.0,17,True
+mood_c1_poms.params.json,838,eeb4ab568e8604f44cef8e337966b189260b0c4da376e534511dfdff322cebd1,sky-ml-synthetic-1.0,17,True
+mood_c1_poms.validation.csv,258,dca34a8662b0ab5eae286dea587090282d6da16bd441777e98cae5917d93f255,sky-ml-synthetic-1.0,17,True
+glucose_daily_personas.csv,31201,35a6e9b055fb6b95210625b9d2a768c16b97f4b8b92f6e6d1e0e740174641eeb,sky-ml-synthetic-1.0,17,True
+glucose_daily_personas.params.json,637,a3a240f4bbccbff8fc3e8a02c155751636790c25cb25c6b8b6e892175df5c991,sky-ml-synthetic-1.0,17,True
+glucose_daily_personas.validation.csv,278,524f2088c02ea2e2a4219b811e3510876995188a5539e96132d61e459ff05961,sky-ml-synthetic-1.0,17,True
+sleep_cft70_actigraphy.csv,18662,88d947c8f9d131d3874c1349deac226d1f4a55e7c014b3cf6d60143b60e6b403,sky-ml-synthetic-1.0,17,True
+sleep_cft70_actigraphy.params.json,1598,0a87d65fd782b4619949f11be3b67d2ecb43ef3463540228493e19cb4f5feb30,sky-ml-synthetic-1.0,17,True
+sleep_cft70_actigraphy.validation.csv,558,65c37ee2921dd4f5e9f78acec0a5293201d502026e76d72dedf4351da8a0572a,sky-ml-synthetic-1.0,17,True

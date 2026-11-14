@@ -24,6 +24,8 @@ data/1_source/raw/nlsp/*
 !data/1_source/raw/nlsp/BRSMImmune.zip
 !data/1_source/raw/nlsp/download_manifest.csv
 !data/1_source/raw/nlsp/BRSMAct.zip
+!data/1_source/raw/nlsp/CRF.zip
+!data/1_source/raw/nlsp/NNX10AP86G.zip
 !data/1_source/raw/radlab/
 !data/1_source/raw/sleep_edfx/
 data/1_source/raw/sleep_edfx/1.0.0/sleep-cassette/

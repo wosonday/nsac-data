@@ -1,0 +1,4 @@
+subject_id,cutoff_time,model,unit,prediction,low90,high90,abstain,reasons,in_sample,input_synthetic
+utmb_cft70:5160,2000-03-17,personal_mean,%,79.78571428571429,67.07142857142858,92.5,False,,False,True
+utmb_cft70:8072,2000-03-17,personal_mean,%,81.24285714285715,68.52857142857144,93.95714285714286,False,,False,True
+utmb_cft70:8936,2000-03-17,personal_mean,%,,,,True,out_of_training_range,False,True

@@ -61,3 +61,4 @@ def test_classification_returns_label_and_probabilities():
     out = predict.predict_rows(model, rows, ["x"], float("nan"), train, cfg, "majority")
     assert out.prediction[0] == "N2" and out.p_N2[0] == 0.5 and out.p_N1[0] == 0.0
     assert not out.abstain[0] and "low90" not in out
+

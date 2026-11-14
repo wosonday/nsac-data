@@ -1,0 +1,19 @@
+# Ánh xạ 6 phi hành gia HƯ CẤU của nsac → người analog THẬT (UTMB bed rest). Chỉ để minh họa; không suy ra danh tính.
+# Mỗi persona chỉ lấy dữ liệu của ĐÚNG MỘT người analog; không trộn người, không trộn cohort.
+# sources: real = dữ liệu đo thật · synthetic = DỮ LIỆU GIẢ ĐỊNH (data/1_synthetic) · none = không có, web hiển thị UNKNOWN
+personas:
+  ayla-reyes:    {analog: "utmb_cft70:5160", cohort: cft70,      bed_rest_days: 70}
+  dae-jung-park: {analog: "utmb_cft70:8072", cohort: cft70,      bed_rest_days: 70}
+  lena-fischer:  {analog: "utmb_cft70:8936", cohort: cft70,      bed_rest_days: 70}
+  tomas-ortega:  {analog: "utmb_c1:C1G0001", cohort: campaign_1, bed_rest_days: 60}
+  yuki-tanaka:   {analog: "utmb_c1:C1G0002", cohort: campaign_1, bed_rest_days: 60}
+  noor-abbasi:   {analog: "utmb_c1:C1G0003", cohort: campaign_1, bed_rest_days: 60}
+
+# Nguồn cho từng chỉ số web theo cohort (task sky-ml → dữ liệu)
+indicators:
+  heart_rate:      {cft70: "real: vitals_pulse (CRF)",          campaign_1: "real: vitals_pulse (CRF)"}
+  blood_pressure:  {cft70: "real: vitals_sbp/vitals_dbp (CRF)", campaign_1: "real: vitals_sbp/vitals_dbp (CRF)"}
+  body_temp:       {cft70: "real: vitals_temp (CRF)",           campaign_1: "real: vitals_temp (CRF; 112/252 ngày có đo — ngày không đo để trống)"}
+  mood:            {cft70: "real: mood (POMS)",                 campaign_1: "synthetic: mood_c1_poms"}
+  activity_sleep:  {cft70: "synthetic: sleep_cft70_actigraphy", campaign_1: "real: sleep_act (BRSMAct)"}
+  glucose:         {cft70: "real (OGTT 5–6 mốc) + synthetic giữa các mốc: glucose_daily_personas", campaign_1: "synthetic: glucose_daily_personas"}

@@ -13,6 +13,7 @@ import pandas as pd
 
 from ._artifacts import load_model, save_model, write_manifest
 from ._datacards import register, write_card
+from ._hashing import sha256_file
 from ._jsonio import read_json, write_json
 from ._runs import new_run, require, resolve_run
 from ._settings import ensure_writable, load_dictionary, load_settings, load_tasks
@@ -26,6 +27,7 @@ def main(argv=None):
     sub.add_parser("steps", help="in thứ tự các bước pipeline")
     sub.add_parser("load-data", help=STEPS[1][2]).add_argument("--dry-run", action="store_true")
     sub.add_parser("check", help="(bước 1) kiểm bản copy còn khớp data/COPY_MANIFEST.csv")
+    sub.add_parser("make-synthetic", help="(ngoài luồng) sinh DỮ LIỆU GIẢ ĐỊNH cho persona thiếu dữ liệu → data/1_synthetic")
     sub.add_parser("build-features", help=STEPS[2][2]).add_argument("task", help="tên task trong configs/tasks.yaml")
     for name, number in (("train", 3), ("evaluate", 4)):
         p = sub.add_parser(name, help=STEPS[number][2])
@@ -46,7 +48,7 @@ def main(argv=None):
         return
     settings = load_settings(args.config)
     {"load-data": _load_data, "check": _check, "build-features": _build_features, "train": _train,
-     "evaluate": _evaluate, "predict": _predict}[args.command](settings, args)
+     "evaluate": _evaluate, "predict": _predict, "make-synthetic": _make_synthetic}[args.command](settings, args)
 
 
 def _load_data(settings, args):
@@ -58,6 +60,60 @@ def _load_data(settings, args):
 
 def _check(settings, args):
     print(f"OK {load_data.verify_copy(settings)} files")
+
+
+def _md_table(df: pd.DataFrame) -> str:
+    rows = [" | ".join(map(str, df.columns)), " | ".join("---" for _ in df.columns)]
+    rows += [" | ".join("" if pd.isna(v) else str(v) for v in r) for r in df.itertuples(index=False)]
+    return "\n".join(f"| {r} |" for r in rows)
+
+
+def _make_synthetic(settings, args):
+    """Sinh dữ liệu giả định (xem _synthetic.py) + params.json + README.md + SYNTHETIC_MANIFEST.csv + CATALOG."""
+    import yaml
+
+    from . import _synthetic
+    crew_path = settings.tasks_config.parent / "crew_map.yaml"
+    crew = yaml.safe_load(crew_path.read_text(encoding="utf-8"))
+    nlsp = settings.data_dir / "raw/nlsp"
+    load_data.verify_copy(settings, ["raw/nlsp/NNX10AP86G.zip", "raw/nlsp/BRSMAct.zip", "raw/nlsp/download_manifest.csv"])
+    out = ensure_writable(settings.features_dir.parent / "1_synthetic", settings)
+    out.mkdir(parents=True, exist_ok=True)
+    lines = ["# data/1_synthetic — DỮ LIỆU GIẢ ĐỊNH (synthetic)", "",
+             ("> ⚠️ **DỮ LIỆU GIẢ ĐỊNH — KHÔNG PHẢI SỐ ĐO THẬT.** Sinh bằng `sky-ml make-synthetic` để lấp chỗ persona "
+              "không có dữ liệu thật (BTC cho phép, phải ghi rõ). Không dùng để train hay đánh giá mô hình. "
+              "Web PHẢI gắn nhãn \"Dữ liệu giả định\" khi hiển thị."), "",
+             f"- Bộ sinh: `{_synthetic.GEN_VERSION}` (src/sky_ml/_synthetic.py) · seed 17 · ánh xạ persona: `configs/crew_map.yaml`",
+             ("- Mô hình sinh chung: `y_it = μ(t) + b_i + e_it`; `b_i ~ N(0, σ_b)`; `e_it` AR(1) với hệ số ρ, SD σ_e. "
+              "Mọi tham số ước lượng từ dữ liệu THẬT trong `data/1_source` và ghi ở `<tên>.params.json`."),
+             "- Cột `is_synthetic`: True = giá trị sinh ra; False = giá trị thật giữ làm điểm neo.", ""]
+    files = []
+    for name, (frame, params, title) in _synthetic.generate(nlsp, crew).items():
+        frame.to_csv(out / f"{name}.csv", index=False)
+        write_json(out / f"{name}.params.json", params)
+        val = _synthetic.validation(name, frame, nlsp)
+        val.to_csv(out / f"{name}.validation.csv", index=False)
+        files += [out / f"{name}.csv", out / f"{name}.params.json", out / f"{name}.validation.csv"]
+        lines += [f"## `{name}.csv`", "", f"**{title}**", "",
+                  f"- Nguồn tham số: {params['source']}",
+                  (f"- Persona: {', '.join(sorted(frame.persona.unique()))} · {len(frame)} hàng · "
+                   f"giả định {int(frame.is_synthetic.sum())} / thật (neo) {int((~frame.is_synthetic).sum())}"),
+                  f"- Cột: {', '.join(f'`{c}`' for c in frame.columns)}", "",
+                  "Kiểm tra: thống kê giả định so với dữ liệu thật dùng để sinh", "",
+                  _md_table(val.round(3)), ""]
+    lines += ["## Giới hạn", "",
+              "1. Giá trị sinh ra phản ánh phân bố QUẦN THỂ analog, không phản ánh người analog cụ thể (trừ điểm neo thật).",
+              "2. Không mô phỏng sự kiện bất thường (bệnh, thuốc, sự cố) — chuỗi \"bình thường\" theo thống kê.",
+              "3. `sleep_cft70_actigraphy` học từ CHỈ 3 người Campaign 1 → độ tin cậy thấp nhất.",
+              "4. `mood_c1_poms` dùng lịch đo và xu hướng của CFT70 (70 ngày) cắt ở 60 ngày.",
+              "5. Cột `date` (nếu có) là lịch nhân tạo 2000-01-01 + study_day."]
+    (out / "README.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    manifest = pd.DataFrame([{"file": f.name, "bytes": f.stat().st_size, "sha256": sha256_file(f),
+                              "generator": _synthetic.GEN_VERSION, "seed": 17, "is_synthetic": True} for f in files])
+    manifest.to_csv(out / "SYNTHETIC_MANIFEST.csv", index=False)
+    register(_catalog(settings), "synthetic", "persona", "seed17", files + [out / "README.md"], "sky-ml make-synthetic",
+             settings.features_dir.parent)
+    print(f"Đã sinh {len(files) // 3} bộ dữ liệu GIẢ ĐỊNH → {out}")
 
 
 def _task_cfg(settings, task):
@@ -90,6 +146,9 @@ def _build_features(settings, args):
     write_json(out / "snapshot.json", load_data.snapshot(settings, cfg["inputs"]))
     table.to_csv(out / "table.csv.gz", index=False)
     write_json(out / "features.json", features)
+    external = table.attrs.get("external")
+    if external is not None:          # bảng NGOÀI cohort (không train) — chấm ở bước evaluate
+        external.to_csv(out / "external.csv.gz", index=False)
     cmd = f"sky-ml build-features {args.task}"
     write_card(out, "features", args.task, rp.run_id, load_dictionary(settings), unit=cfg.get("unit"),
                produced_by=cmd, columns=list(table.columns),
@@ -100,9 +159,12 @@ def _build_features(settings, args):
                       "Số đặc trưng": len(features), "Target": f"`{cfg['target']}` ({cfg.get('unit')})",
                       "Cửa sổ": cfg.get("window")},
                lineage={"Dữ liệu nguồn": ", ".join(f"data/1_source/{p}" for p in patterns), "Mô hình dùng bảng này": _rel(settings, rp.models)})
-    register(_catalog(settings), "features", args.task, rp.run_id,
-             [out / "table.csv.gz", out / "features.json", out / "snapshot.json"], cmd,
-             settings.features_dir.parent, {"table.csv.gz": len(table)})
+    files = [out / "table.csv.gz", out / "features.json", out / "snapshot.json"]
+    if external is not None:
+        files.append(out / "external.csv.gz")
+    register(_catalog(settings), "features", args.task, rp.run_id, files, cmd,
+             settings.features_dir.parent, {"table.csv.gz": len(table),
+                                            **({"external.csv.gz": len(external)} if external is not None else {})})
     print(f"{args.task}: {len(table)} hàng, {table.subject_id.nunique()} người, {len(features)} đặc trưng → {out}")
 
 
@@ -190,6 +252,9 @@ def _evaluate(settings, args):
         evaluate.confusion(oof, best, cfg["classes"]).to_csv(rp.models / "confusion.csv")
     metrics.to_csv(rp.models / "metrics.csv", index=False)
     write_json(rp.models / "summary.json", summary)
+    if (rp.features / "external.csv.gz").exists():
+        summary["external"] = _external(settings, cfg, rp, oof)
+        write_json(rp.models / "summary.json", summary)
     metric = "mae" if cfg["kind"] == "regression" else "macro_f1"
     facts = {f"{metric} – {r['model']}": f"{r[metric]:.4f} (CI95 {r['ci95_low']:.3f}–{r['ci95_high']:.3f}); "
              f"so baseline {r['diff_vs_baseline']:+.3f}" for r in summary["metrics"]}
@@ -200,6 +265,11 @@ def _evaluate(settings, args):
         cov = summary["interval_coverage"]
         facts["Độ bao phủ khoảng 90%"] = f"{cov['observed_coverage']:.4f} (nửa độ rộng {cov['median_half_width']:.3f})"
     facts["Đơn vị độc lập"] = int(metrics.units[0])
+    for r in summary.get("external", {}).get("metrics", []):
+        facts[f"NGOÀI cohort – {r['model']}"] = (f"MAE {r['mae']:.3f} (CI95 {r['ci95_low']:.3f}–{r['ci95_high']:.3f}), "
+                                                 f"{r['units']} người")
+    if "external" in summary:
+        facts["NGOÀI cohort – bao phủ khoảng 90% (deploy)"] = f"{summary['external']['coverage_deploy']:.3f}"
     _model_card(settings, cfg, rp, f"sky-ml train/evaluate {args.task}", facts)
     register(_catalog(settings), "models", args.task, rp.run_id,
              [rp.models / "metrics.csv", rp.models / "summary.json"], f"sky-ml evaluate {args.task}",
@@ -208,6 +278,43 @@ def _evaluate(settings, args):
     if "interval_coverage" in summary:
         cov = summary["interval_coverage"]
         print("coverage:", {k: round(v, 4) if isinstance(v, float) else v for k, v in cov.items()})
+
+
+def _external(settings, cfg, rp, oof) -> dict:
+    """Chấm điểm trên bảng NGOÀI cohort bằng các mô hình final (người chưa từng thấy) + ghi dự đoán deploy."""
+    ext = pd.read_csv(rp.features / "external.csv.gz")
+    features = read_json(rp.features / "features.json")
+    train_table = pd.read_csv(rp.features / "table.csv.gz")
+    n_boot, rows = cfg.get("bootstrap_samples", 10000), []
+    for name in cfg["models"]:
+        model = load_model(rp.models, name)
+        ok = ext[features].notna().all(axis=1)
+        err = (ext.loc[ok, cfg["target"]] - model.predict(ext.loc[ok, features].astype(float))).abs()
+        per = err.groupby(ext.loc[ok, "subject_id"]).mean()
+        lo, hi = evaluate.bootstrap_ci(per, n_boot)
+        rows.append({"model": name, "units": len(per), "rows": int(ok.sum()), "mae": float(per.mean()),
+                     "ci95_low": lo, "ci95_high": hi})
+    pd.DataFrame(rows).to_csv(rp.models / "external_metrics.csv", index=False)
+    deploy = cfg.get("deploy_model") or cfg["baseline"]
+    hw = predict.calibration_half_width(oof, deploy, cfg.get("interval_alpha", 0.10), cfg["kind"])
+    pred = predict.predict_rows(load_model(rp.models, deploy), ext, features, hw, train_table, cfg, deploy)
+    out = ensure_writable(rp.predictions, settings)
+    out.mkdir(parents=True, exist_ok=True)
+    pred.to_csv(out / "external_backtest.csv", index=False)
+    inside = (pred.y_true >= pred.low90) & (pred.y_true <= pred.high90)
+    cov = float(inside[~pred.abstain].mean())
+    write_card(out, "predictions", rp.task, rp.run_id, load_dictionary(settings), unit=cfg.get("unit"),
+               produced_by=f"sky-ml evaluate {rp.task}", columns=list(pred.columns),
+               files={"external_backtest.csv": "Dự đoán ngày-tới cho người NGOÀI cohort train (chưa từng thấy), có đáp án"},
+               facts={"Mô hình": deploy, "Số hàng": len(pred), "Từ chối": int(pred.abstain.sum()),
+                      "Người": pred.subject_id.nunique(), "Bao phủ khoảng 90%": f"{cov:.3f}"},
+               lineage={"Mô hình": _rel(settings, rp.models / deploy / "final.joblib"),
+                        "Bảng ngoài cohort": _rel(settings, rp.features / "external.csv.gz")})
+    register(_catalog(settings), "predictions", rp.task, rp.run_id, [out / "external_backtest.csv"],
+             f"sky-ml evaluate {rp.task}", settings.features_dir.parent, {"external_backtest.csv": len(pred)})
+    print("NGOÀI cohort:\n" + pd.DataFrame(rows).round(4).to_string(index=False) + f"\ncoverage deploy: {cov:.4f}")
+    return {"metrics": rows, "deploy_model": deploy, "coverage_deploy": cov,
+            "subjects": sorted(pred.subject_id.unique().tolist())}
 
 
 def _predict(settings, args):
@@ -228,21 +335,31 @@ def _predict(settings, args):
 
     source = Path(args.input)
     args.mode = args.mode or ("latest" if "latest" in spec else "table")
+    raw = None
     if args.mode == "table":
-        rows = predict.table_rows(pd.read_csv(source), cfg)
+        raw = pd.read_csv(source)
+        rows = predict.table_rows(raw, cfg)
     elif args.mode in spec:
-        rows = spec[args.mode](pd.read_csv(source, usecols=spec["columns"] + cfg.get("context", [])), cfg)
+        cols = spec["columns"] + cfg.get("context", []) if spec.get("columns") else None
+        raw = pd.read_csv(source, usecols=cols)
+        rows = spec[args.mode](raw, cfg)
     else:
         raise ValueError(f"Task {args.task} không hỗ trợ --mode {args.mode}; dùng: {['table', *spec.keys() - {'columns'}]}")
     result = predict.predict_rows(model, rows, features, half_width, train_table, cfg, model_name)
+    if raw is None:
+        raw = pd.read_csv(source)
+    synthetic = set(raw.loc[raw["is_synthetic"].astype(bool), "subject_id"]) if {"is_synthetic", "subject_id"} <= set(raw) else set()
+    result["input_synthetic"] = result.subject_id.isin(synthetic)   # đầu vào là DỮ LIỆU GIẢ ĐỊNH
 
     out = ensure_writable(rp.predictions, settings)
     out.mkdir(parents=True, exist_ok=True)
-    stem = f"{source.name.split('.')[0]}_{args.mode}_{model_name}_{datetime.now():%Y%m%d_%H%M%S}"
+    tag = "_SYNTHETIC-INPUT" if result.input_synthetic.any() else ""
+    stem = f"{source.name.split('.')[0]}_{args.mode}_{model_name}{tag}_{datetime.now():%Y%m%d_%H%M%S}"
     result.to_csv(out / f"{stem}.csv", index=False)
     meta = {"task": args.task, "run_id": rp.run_id, "model": model_name, "mode": args.mode,
             "input": str(source), "half_width_90": half_width if math.isfinite(half_width) else None, "n_rows": len(result),
-            "n_abstain": int(result.abstain.sum()), "n_in_sample": int(result.in_sample.sum())}
+            "n_abstain": int(result.abstain.sum()), "n_in_sample": int(result.in_sample.sum()),
+            "n_input_synthetic": int(result.input_synthetic.sum())}
     if "abs_error" in result:
         meta["mae_backtest"] = float(result.abs_error.mean())
     if "correct" in result:

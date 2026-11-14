@@ -1,0 +1,12 @@
+{
+  "task": "mood",
+  "run_id": "2026-11-14_204452",
+  "model": "personal_mean",
+  "mode": "latest",
+  "input": "data/1_synthetic/mood_c1_poms.csv",
+  "half_width_90": 13.333333333333334,
+  "n_rows": 3,
+  "n_abstain": 0,
+  "n_in_sample": 0,
+  "n_input_synthetic": 3
+}

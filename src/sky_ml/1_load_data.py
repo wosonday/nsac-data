@@ -25,6 +25,8 @@ ALLOWLIST = [
     "raw/nlsp/MR080G.zip", "raw/nlsp/MR079G.zip", "raw/nlsp/BRSMImmune.zip",   # cpet
     "raw/nlsp/download_manifest.csv",
     "raw/nlsp/BRSMAct.zip",                                                      # sleep_act
+    "raw/nlsp/CRF.zip",                                                          # vitals
+    "raw/nlsp/NNX10AP86G.zip",                                                   # mood, glucose
     "raw/sleep_edfx/1.0.0/sleep-cassette/SC40?1*-PSG.edf",                       # sleep
     "raw/sleep_edfx/1.0.0/sleep-cassette/SC40?1*-Hypnogram.edf",
     "raw/sleep_edfx/1.0.0/download_manifest.csv",

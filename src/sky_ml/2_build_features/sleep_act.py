@@ -78,7 +78,10 @@ def build_sleep_act(data_dir: Path, cfg: dict) -> tuple[pd.DataFrame, list[str]]
 
 def from_csv(frame: pd.DataFrame, cfg: dict, kind: str) -> pd.DataFrame:
     """Cho bước predict: file CSV cùng định dạng nguồn (Subject, Date, Sleep … , Notes)."""
-    n = nights(frame)
+    if "Subject" in frame:                          # định dạng nguồn BRSMAct
+        n = nights(frame)
+    else:                                           # định dạng chuẩn hóa (vd. data/1_synthetic): subject_id, date, …
+        n = frame.assign(date=pd.to_datetime(frame.date)).sort_values(["subject_id", "date"])
     return sleep_act_latest(n, cfg) if kind == "latest" else sleep_act_windows(n, cfg)
 
 

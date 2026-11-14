@@ -1,121 +1,164 @@
 # Báo cáo dữ liệu và mô hình sky-ml × nsac
 
-> Ngày 14/11/2026 · Thư mục: `D:\Project\nasa-hackathon` · Bảng chi tiết: [`docs/Tong_hop_du_lieu_mo_hinh.xlsx`](Tong_hop_du_lieu_mo_hinh.xlsx)
+> Cập nhật 14/11/2026, 20:50 · Thư mục: `D:\Project\nasa-hackathon` · Bảng chi tiết: [`docs/Tong_hop_du_lieu_mo_hinh.xlsx`](Tong_hop_du_lieu_mo_hinh.xlsx)
+>
+> ⚠️ Báo cáo có dùng **DỮ LIỆU GIẢ ĐỊNH** (mục 5) cho phần persona không có dữ liệu thật. BTC cho phép việc này; mọi chỗ dùng đều được ghi rõ.
 
 ## 1. Tóm tắt
 
-- **7 task đã chạy:** `hr`, `dose`, `dose_orbit`, `cpet`, `cpet_physio`, `sleep`, `sleep_act`. Mỗi task có đủ 3 nhóm dữ liệu: (1) đặc trưng, (3) mô hình, (2) dự đoán hoặc OOF.
-- **Tái lập:** 5 task gốc trùng run NASA-cl ngày 11/11, sai lệch ≤ 1e-15.
-- **Hai task mới:**
-  - `dose_orbit`: thêm vị trí ISS lúc dự báo, giảm MAE khoảng 17%.
-  - `sleep_act`: pilot giấc ngủ theo đêm cho đúng 3 persona.
-- **Phủ 6 chỉ số web:**
-  - nhịp tim: đã có;
-  - hoạt động và giấc ngủ: có một phần;
-  - huyết áp, nhiệt độ, tâm trạng: chưa có;
-  - đường huyết: chỉ đủ làm thẻ mô tả.
-- **Gói `NSAC_Data_Supplement` (14/11):** không đưa vào. 33 file NLSP trùng từng byte với dữ liệu đã có; OMNI làm mô hình xấu đi; các phần còn lại không phục vụ mô hình.
+- **13 task đã chạy**, mỗi task có đủ (1) đặc trưng, (3) mô hình, (2) dự đoán hoặc OOF:
+  - nhóm cũ: `hr`, `dose`, `dose_orbit`, `cpet`, `cpet_physio`, `sleep`, `sleep_act`;
+  - nhóm mới: `vitals_sbp`, `vitals_dbp`, `vitals_temp`, `vitals_pulse`, `mood`, `glucose`.
+- **Đủ 6 chỉ số web × 6 persona.** Phần lớn là dữ liệu thật; ba khoảng trống được lấp bằng dữ liệu giả định:
+  - tâm trạng của 3 persona Campaign 1;
+  - giấc ngủ theo đêm của 3 persona CFT70;
+  - đường huyết hằng ngày của cả 6 persona.
+- **Bằng chứng mạnh nhất mới có: các chỉ số sinh tồn (`vitals_*`).** Mô hình train trên 23 người Campaign 3 được kiểm tra trên **đúng 6 persona chưa từng thấy**:
+  - sai số tương đương trong cohort;
+  - khoảng 90% bao phủ 0,90–0,93.
+- **Tái lập:** 5 task gốc vẫn trùng run NASA-cl ngày 11/11.
 
-## 2. Dữ liệu, nguồn gốc, lý do và mục tiêu
+## 2. Dữ liệu thật: nguồn gốc, lý do, mục tiêu
 
 | Task | Chỉ số web | Dữ liệu · nguồn | Lý do sử dụng | Mục tiêu dự báo |
 |---|---|---|---|---|
-| `hr` | Nhịp tim | MMASH 1.0.0 · PhysioNet, ODbL | Chuỗi nhịp tim theo phút liên tục, đã QA | Nhịp tim trung bình 5 phút tới (bpm) |
-| `dose` | Bức xạ (ngoài 6 chỉ số) | RadLab Lidal 2022 · NASA OSDR | Liều đo thật trên ISS | Liều trung bình 1 giờ tới (uGy/h) |
-| `dose_orbit` | Bức xạ | Như trên + vĩ độ, kinh độ, độ cao | Liều phụ thuộc vị trí quỹ đạo | Như trên |
-| `cpet` | Thể lực (ngoài 6 chỉ số) | UTMB CFT70 · NASA NLSP | Analog chuẩn của mất thể lực khi bay dài ngày | Thay đổi VO2peak sau 70 ngày nằm giường |
-| `cpet_physio` | Thể lực | Như trên, bỏ biến nhóm can thiệp | Đặc trưng mà phi hành gia thật có | Như trên |
-| `sleep` | Giấc ngủ (giai đoạn) | Sleep-EDF Expanded · PhysioNet, ODC-By | EEG/EOG có nhãn chuyên gia | Giai đoạn ngủ của từng epoch 30 s (W/N1/N2/N3/REM) |
-| `sleep_act` | Giấc ngủ (chất lượng) | UTMB Campaign 1 BRSMAct · NASA NLSP | 3 người C1G0001–3 = 3 persona | Hiệu suất ngủ của đêm tới (%) |
+| `hr` | Nhịp tim | MMASH · PhysioNet (ODbL) | Chuỗi nhịp tim theo phút đã QA | Nhịp tim 5 phút tới |
+| `vitals_pulse` | Nhịp tim | UTMB CRF · NASA NLSP | Nhịp tim buổi sáng của **chính 6 persona** | Nhịp tim sáng ngày tới |
+| `vitals_sbp`, `vitals_dbp` | Huyết áp | UTMB CRF · NASA NLSP | Nguồn duy nhất có huyết áp hằng ngày của các persona | Huyết áp tâm thu / tâm trương ngày tới |
+| `vitals_temp` | Nhiệt độ | UTMB CRF · NASA NLSP | Nhiệt độ buổi sáng hằng ngày | Nhiệt độ ngày tới |
+| `mood` | Tâm trạng | UTMB CFT70 POMS (NNX10AP86G) · NASA NLSP | Thang POMS chuẩn hóa, đo hằng tuần | Điểm rối loạn tâm trạng (TMD) lần đo tới |
+| `sleep` | Giấc ngủ | Sleep-EDF · PhysioNet (ODC-By) | EEG/EOG có nhãn chuyên gia | Giai đoạn ngủ từng epoch 30 s |
+| `sleep_act` | Giấc ngủ | UTMB Campaign 1 BRSMAct · NASA NLSP | Đúng 3 persona C1 | Hiệu suất ngủ đêm tới |
+| `glucose` | Đường huyết | UTMB CFT70 OGTT (NNX10AP86G) · NASA NLSP | Đường huyết đo thật trong nằm giường | Thay đổi đường huyết lúc đói từ trước nằm giường đến ngày 66 |
+| `dose`, `dose_orbit` | Bức xạ (ngoài 6 chỉ số) | RadLab Lidal · NASA OSDR | Liều đo thật trên ISS | Liều 1 giờ tới |
+| `cpet`, `cpet_physio` | Thể lực (ngoài 6 chỉ số) | UTMB CFT70 MR080G · NASA NLSP | Analog của mất thể lực khi bay | Thay đổi VO2peak sau 70 ngày |
+
+**Nguyên tắc chung khi xử lý:**
+- kiểm hash SHA-256 + MD5 cho từng file trong ZIP;
+- ngưỡng chỉ dùng để loại số ghi hỏng (ngưỡng kỹ thuật), không phải ngưỡng lâm sàng;
+- không nội suy dữ liệu thiếu;
+- không gộp người giữa các cohort.
 
 ## 3. Kết quả
 
-Kết quả là dự đoán ngoài tập huấn luyện (OOF): mỗi người hoặc mỗi tháng được dự đoán bởi một mô hình chưa từng thấy họ. CI95 tính bằng bootstrap theo đơn vị độc lập (người hoặc tháng).
+Kết quả là dự đoán ngoài tập huấn luyện (OOF), CI95 tính bằng bootstrap theo đơn vị độc lập (người hoặc tháng). "Ngoài cohort" là đánh giá trên 6 persona khi mô hình chưa từng thấy họ.
 
-| Task | Đơn vị độc lập | Mô hình triển khai | Kết quả | Baseline | Đánh giá |
-|---|---|---|---|---|---|
-| `hr` | 22 người | ridge | MAE 3,92 bpm (3,61–4,24); khoảng 90% bao phủ 0,900 | 4,47 | Tốt hơn baseline rõ ràng |
-| `dose` | 9 tháng | lightgbm | MAE 0,769 uGy/h (0,686–0,871); bao phủ 0,898 | 2,14 | Tốt |
-| `dose_orbit` | 9 tháng | lightgbm | MAE **0,637** (0,559–0,731); bao phủ 0,897 | 2,14 | Tốt hơn `dose` ở 9/9 tháng; cần kiểm lại trên năm khác |
-| `cpet` | 33 người | mean_delta | ridge 2,84 (2,12–3,64), hoán vị p = 0,005 | 4,13 | Lợi thế đến từ biến nhóm can thiệp |
-| `cpet_physio` | 33 người | mean_delta | 3,62 (2,66–4,75); ridge 3,67; hoán vị p = 0,51 | 4,13 | **Không mô hình nào vượt mức giảm trung bình** |
-| `sleep` | 10 người | lightgbm | macro-F1 0,784 (0,760–0,807); kappa 0,777 | 0,119 | Tốt |
-| `sleep_act` | 3 người | personal_mean | MAE 5,40 điểm % (4,65–5,86); khoảng 90% ±12,9 | 5,63 | ML không tốt hơn trung bình cá nhân; CI thiếu tin cậy vì chỉ 3 người |
+| Task | Mô hình triển khai | Trong cohort | **Ngoài cohort (6 persona)** | Baseline |
+|---|---|---|---|---|
+| `vitals_sbp` | ridge | MAE 5,72 mmHg (5,39–6,08), 23 người | **6,14 (5,16–7,15)**, bao phủ 0,899 | last_value 7,34 / 8,08 |
+| `vitals_dbp` | ridge | 5,10 mmHg (4,80–5,42) | **5,11 (4,48–5,92)**, bao phủ 0,905 | 6,61 / 6,71 |
+| `vitals_temp` | ridge | 0,198 °C (0,179–0,218) | **0,162 (0,141–0,180)**, 5 persona, bao phủ 0,933 | 0,246 / 0,231 |
+| `vitals_pulse` | ridge | 5,51 bpm (5,15–5,86) | **4,96 (4,38–5,55)**, bao phủ 0,929 | 6,86 / 6,05 |
+| `mood` | personal_mean | 5,24 điểm TMD (4,20–6,30), 24 người | — | 5,56 (chênh lệch có CI chứa 0) |
+| `glucose` | mean_delta | 3,33 mg/dL (2,16–4,69), 23 người; ridge 2,98, hoán vị p = 0,015 | — | 3,30 |
+| `hr` | ridge | 3,92 bpm (3,61–4,24), 22 người | — | 4,47 |
+| `dose` / `dose_orbit` | lightgbm | 0,769 / **0,637** uGy/h (9 tháng) | — | 2,14 |
+| `cpet` / `cpet_physio` | mean_delta | ridge 2,84 (p = 0,005) / 3,62 (p = 0,51) | — | 4,13 |
+| `sleep` | lightgbm | macro-F1 0,784 (0,760–0,807) | — | 0,119 |
+| `sleep_act` | personal_mean | 5,40 điểm % (3 người, pilot) | — | 5,63 |
 
 ### Cách hiểu
 
-1. **Nhịp tim, bức xạ và giai đoạn ngủ có mô hình thực sự hữu ích.** Ba task này vượt baseline với khoảng tin cậy không chồng lên nhau.
-2. **Thể lực (cpet):**
-   - Mô hình ridge chỉ tốt khi biết nhóm can thiệp, mà phi hành gia thật không có biến này.
-   - Khi bỏ biến nhóm, kiểm định hoán vị cho p = 0,51, tức là không phân biệt được với ngẫu nhiên.
-   - Vì vậy web nên hiển thị "mức giảm trung bình của nhóm analog" kèm khoảng 90%, không phải dự báo cá nhân hóa.
-3. **Giấc ngủ theo đêm (sleep_act):** với 3 người, dự báo tốt nhất là trung bình 7 đêm gần nhất của chính người đó. Đây là kết quả trung thực và vẫn đủ dùng cho persona, kèm khoảng ±12,9 điểm %.
-4. **Vị trí ISS (dose_orbit):** giảm sai số khoảng 17% một cách nhất quán, phù hợp với cơ chế vật lý (liều tăng khi đi qua vùng dị thường Nam Đại Tây Dương).
-   - Cấu hình được chốt sau một thí nghiệm thăm dò trên cùng các tháng test, nên kết quả có thể hơi lạc quan.
+1. **Sinh tồn hằng ngày:** dự báo ngày tới tốt hơn "giữ nguyên hôm nay" khoảng 20%. Kết quả giữ được khi chuyển sang người mới, nên đây là bằng chứng trung thực nhất trên persona.
+2. **Tâm trạng:** trung bình cá nhân là đủ. Không mô hình nào chắc chắn tốt hơn baseline vì CI của chênh lệch chứa 0.
+3. **Đường huyết lúc đói:** gần như không đổi khi nằm giường (trung bình +0,8 mg/dL). Ridge có tín hiệu yếu (p = 0,015) nhưng CI của chênh lệch chứa 0, nên vẫn giữ `mean_delta` như đã chốt trước khi chạy.
+4. **Một số task không có mô hình vượt baseline rõ ràng** (`mood`, `glucose`, `sleep_act`, `cpet_physio`). Web nên hiển thị ước lượng kèm khoảng 90%, không nên trình bày như dự báo cá nhân hóa chính xác.
 
-## 4. Dữ liệu cho web
+## 4. Persona × chỉ số
 
-| Task | Web đọc file nào | Ghi chú |
+| Chỉ số | ayla · dae-jung · lena (CFT70) | tomas · yuki · noor (Campaign 1) |
 |---|---|---|
-| `hr`, `dose`, `dose_orbit` | `data/4_predictions/<task>/<run>/*_latest_*.csv` | Có `prediction`, `low90`, `high90`, `abstain` |
-| `cpet`, `cpet_physio`, `sleep`, `sleep_act` | `data/3_models/<task>/<run>/oof.csv.gz`, lọc theo `deploy_model` | Chưa có dữ liệu "người mới"; OOF là dữ liệu trung thực nhất để hiển thị |
+| Nhịp tim | Thật | Thật |
+| Huyết áp | Thật | Thật |
+| Nhiệt độ | Thật | Thật, có đo 112/252 ngày; ngày không đo để trống |
+| Tâm trạng | Thật | ⚠️ **Giả định** |
+| Hoạt động và giấc ngủ | ⚠️ **Giả định** | Thật |
+| Đường huyết | Thật ở 5–6 mốc OGTT + ⚠️ **giả định** giữa các mốc | ⚠️ **Giả định** |
 
-**Quy tắc hiển thị:** xem `data/README.md` mục 2. Tóm tắt:
-- khi `abstain` → hiển thị UNKNOWN, không hiện số;
-- luôn hiện khoảng 90% kèm dự báo;
-- dòng `in_sample` không được dùng làm bằng chứng độ chính xác;
-- chỉ dùng ngày tương đối, không dùng ngày thật của nghiên cứu.
+Nguồn của bảng này: `configs/crew_map.yaml`. Mỗi persona chỉ lấy dữ liệu của đúng một người analog.
 
-## 5. Đánh giá gói NSAC_Data_Supplement_20261114
+## 5. ⚠️ Dữ liệu giả định (`data/1_synthetic/`)
 
-| Phần | Kết luận | Căn cứ |
+### 5.1 Quy tắc
+
+1. **Tham số lấy từ dữ liệu thật:** mọi tham số được ước lượng từ dữ liệu thật trong `data/1_source` và ghi vào `<tên>.params.json`. Không có số nào lấy từ trí nhớ.
+2. **Mô hình sinh:** `y_it = μ(t) + b_i + e_it`, trong đó:
+   - `μ(t)`: trung bình quần thể theo ngày nghiên cứu;
+   - `b_i ~ N(0, σ_b)`: chênh lệch riêng của từng người, với σ_b là biến thiên giữa người;
+   - `e_it`: dao động ngày qua ngày trong người, theo AR(1) với hệ số tự tương quan ρ và độ lệch σ_e.
+
+   Cách tách "giữa người / trong người" này theo khái niệm biến thiên sinh học được EFLM chuẩn hóa: biến thiên trong người (CVI) là dao động quanh điểm cân bằng của một người ở trạng thái ổn định; biến thiên giữa người (CVG) là khác biệt giữa điểm cân bằng của các người với nhau.
+3. **Không train, không đánh giá:** dữ liệu giả định chỉ dùng làm đầu vào hiển thị hoặc dự đoán minh họa.
+   - Dự đoán từ dữ liệu giả định có cột `input_synthetic = True` và tên file chứa `_SYNTHETIC-INPUT`.
+   - Có test đảm bảo không task nào lấy `1_synthetic` làm đầu vào train.
+4. **Tái lập được:** seed 17 cố định, `SYNTHETIC_MANIFEST.csv` lưu SHA-256, `*.validation.csv` so sánh với dữ liệu thật.
+
+### 5.2 Ba bộ dữ liệu
+
+| File | Persona | Tham số (từ dữ liệu thật) | Kiểm tra: thật → giả định |
+|---|---|---|---|
+| `mood_c1_poms.csv` (45 hàng) | 3 persona C1 | POMS CFT70, 24 người: σ_b 9,56 · σ_e 7,22 · ρ 0,31 | TB −11,1 → −16,1; SD 12,1 → 10,6 |
+| `sleep_cft70_actigraphy.csv` (237 hàng) | 3 persona CFT70 | Actigraphy C1, **chỉ 3 người**: hiệu suất σ_e 6,3 · ρ 0,30 | Hiệu suất 82,0 ± 8,3 → 84,1 ± 9,2; thời lượng 7,23 → 7,26 giờ |
+| `glucose_daily_personas.csv` (498 hàng, 10 hàng thật) | 6 persona | OGTT lúc đói: σ trong người 4,81 · σ giữa người 6,72 · TB 89,6 mg/dL | TB 89,8 → 90,4; SD 6,35 → 6,37 |
+
+### 5.3 Giới hạn của dữ liệu giả định
+
+- Chuỗi giả định phản ánh phân bố của nhóm người analog, không phản ánh người cụ thể (trừ các điểm neo thật).
+- Không mô phỏng sự kiện bất thường như bệnh hay dùng thuốc.
+- Bộ giấc ngủ cho CFT70 học từ chỉ 3 người nên độ tin cậy thấp nhất.
+- Khi dự đoán trên bộ này, mô hình `sleep_act` đã từ chối dự đoán cho lena vì giá trị nằm ngoài miền huấn luyện; cơ chế an toàn hoạt động đúng.
+
+**Web bắt buộc:** gắn nhãn "Dữ liệu giả định" và tách biệt về hình thức (màu hoặc kiểu nét) với dữ liệu thật.
+
+## 6. Dữ liệu cho web
+
+| Task | File | Ghi chú |
 |---|---|---|
-| NLSP actigraphy, iRATS (33 file) | Trùng | Trùng từng byte với `BRSMAct.zip`, `BEDREST_iRATS.zip` trong NASA-cl |
-| Lidal 12 tháng | Không cần | Cùng 103.058 mốc và cùng giá trị; chỉ thêm `b`, `l` (cải thiện thêm khoảng 0,024 uGy/h) |
-| OMNI 2022 | Không cần | MAE xấu hơn 0,017 khi thêm vào (8/9 tháng kém hơn) |
-| GOES 7 ngày, quỹ đạo ISS hiện tại | Không cần cho mô hình | Snapshot 11/2026, không trùng thời gian với dữ liệu train |
-| OSD-569 omics QC | Không cần | Không thuộc 6 chỉ số |
-| OSD-575 CMP bản SUBMITTED | Để sau | Hữu ích cho thẻ đường huyết mô tả |
+| `vitals_*` | `4_predictions/vitals_*/<run>/external_backtest.csv` | 6 persona, `in_sample = False`, có `y_true` |
+| `mood` | CFT70: `3_models/mood/<run>/oof.csv.gz`; C1: `4_predictions/mood/…SYNTHETIC-INPUT…csv` | C1 là giả định |
+| `glucose` | `3_models/glucose/<run>/oof.csv.gz` + `1_synthetic/glucose_daily_personas.csv` | Hiển thị điểm thật khác với phần giả định |
+| `sleep_act` | C1: OOF; CFT70: `4_predictions/sleep_act/…SYNTHETIC-INPUT…csv` | — |
+| `hr`, `dose`, `dose_orbit` | `4_predictions/<task>/<run>/*_latest_*.csv` | — |
+| `cpet`, `cpet_physio`, `sleep` | `3_models/<task>/<run>/oof.csv.gz` | — |
 
-**Toàn vẹn gói:** 79/79 file khớp manifest của gói. Các script trong gói chỉ dùng thư viện chuẩn để tải về, không có thao tác nguy hiểm.
+## 7. Giới hạn chung
 
-## 6. Giới hạn chung
+1. Không có dữ liệu phi hành gia thật trong mô hình. Nguồn là analog nằm giường (UTMB), người mặt đất (MMASH, Sleep-EDF) hoặc dữ liệu thiết bị (RadLab).
+2. Ngày gốc của các nghiên cứu (2004–2009) không được hiển thị lên web; chỉ dùng ngày tương đối.
+3. Các ngưỡng dùng để loại số ghi hỏng là ngưỡng kỹ thuật, không phải ngưỡng lâm sàng hay ngưỡng cảnh báo.
+4. Timestamp RadLab chưa xác minh múi giờ; cấu hình `dose_orbit` cần kiểm lại trên năm khác.
 
-1. **Không có dữ liệu phi hành gia thật** cho mô hình. Các nguồn đều là analog mặt đất (MMASH, Sleep-EDF, UTMB) hoặc dữ liệu thiết bị (RadLab).
-2. **Không ghép người hay thời gian giữa các nguồn.** Ánh xạ persona ↔ người analog chỉ dùng để minh họa.
-3. **Timestamp RadLab chưa xác minh múi giờ.**
-4. **Ngưỡng QC là ngưỡng kỹ thuật.** Ví dụ HR 30–220 bpm, HRPK < 20; đây không phải ngưỡng lâm sàng.
-5. **Đường huyết OSD-575 mốc R+45:** 3/4 người có giá trị 36–44 mg/dL, nghi lỗi xử lý mẫu. Đây là suy luận từ số liệu, cần đối chiếu bài gốc (Jones et al., 2024).
-
-## 7. Đề xuất bổ sung
+## 8. Đề xuất bổ sung
 
 | Ưu tiên | Việc | Vì sao |
 |---|---|---|
-| Cao | Task `vitals` từ UTMB CRF (huyết áp, nhiệt độ) | Hai chỉ số web chưa có dữ liệu; CRF có đủ 6 người analog đã gán persona |
-| Cao | Task `mood` từ POMS (NNX10AP86G) | Chỉ số tâm trạng chưa có dữ liệu |
-| Cao | `export-nsac` (bundle v2) + `crew_map.yaml` | Một hợp đồng JSON duy nhất cho web thay vì đọc rời từng file OOF/CSV |
-| Trung bình | Thẻ đường huyết mô tả từ OSD-575 | Phi hành đoàn thật, nhưng chỉ đủ để mô tả |
-| Trung bình | Kiểm lại `dose_orbit` trên Lidal 2023 | Loại bỏ nghi ngờ chọn cấu hình theo tháng test |
-| Trung bình | Xác minh múi giờ RadLab | Bắt buộc trước khi ghép với dữ liệu UTC |
-| Trung bình | `sleep_act` cho thời lượng ngủ và độ trễ vào giấc | Chỉ cần khai báo thêm trong YAML (`measure:`) |
-| Thấp | Thêm `b`, `l` vào `dose_orbit`; mở rộng `cpet` bằng iRATS; kiểm định hoán vị cho `sleep_act` | Cải thiện nhỏ hoặc để củng cố kết quả |
+| Cao | `export-nsac` dùng `crew_map.yaml` | Đã đủ 6 × 6; web cần một file JSON duy nhất có cờ real/synthetic cho từng điểm |
+| Cao | Nhãn "Dữ liệu giả định" trên web | Yêu cầu của BTC |
+| Trung bình | Thay dữ liệu giả định bằng dữ liệu thật khi tìm được | POMS Campaign 1, actigraphy CFT70 trên NLSP |
+| Trung bình | Thẻ đường huyết mô tả từ OSD-575 (Inspiration4) | Bằng chứng từ chuyến bay thật; có cờ nghi vấn ở mốc R+45 |
+| Trung bình | Kiểm lại `dose_orbit` trên Lidal 2023; xác minh múi giờ RadLab | Tránh kết quả lạc quan |
+| Thấp | Thêm MFSI-SF (mệt mỏi), các thang con của POMS; iRATS cho `cpet` | Dữ liệu đã có sẵn trong NASA-cl |
 
-## 8. Tái lập
+## 9. Tái lập
 
 ```powershell
 uv run sky-ml load-data
-foreach ($t in "hr","dose","dose_orbit","cpet","cpet_physio","sleep","sleep_act") {
+foreach ($t in "hr","dose","dose_orbit","cpet","cpet_physio","sleep","sleep_act",
+               "vitals_sbp","vitals_dbp","vitals_temp","vitals_pulse","mood","glucose") {
   uv run sky-ml build-features $t; uv run sky-ml train $t; uv run sky-ml evaluate $t
 }
-uv run pytest -m slow     # đối chiếu với run NASA-cl 11/11 (hr, dose, cpet, sleep)
+uv run sky-ml make-synthetic                     # DỮ LIỆU GIẢ ĐỊNH → data/1_synthetic
+uv run sky-ml predict mood      --input data/1_synthetic/mood_c1_poms.csv
+uv run sky-ml predict sleep_act --input data/1_synthetic/sleep_cft70_actigraphy.csv
 ```
 
 ## Nguồn
 
+- NASA Life Sciences Portal — UTMB Bed Rest: CRF Daily Vitals, NNX10AP86G (POMS, OGTT), MR080G, BRSMAct — https://nlsp.nasa.gov/explore
+- McNair DM, Lorr M, Droppleman LF. *Manual for the Profile of Mood States*. EdITS, 1971
+- Fraser CG, Harris EK. Generation and application of data on biological variation in clinical chemistry. *Crit Rev Clin Lab Sci* 1989;27(5):409–437
+- Coşkun A, Sandberg S, et al. Personalized reference intervals in laboratory medicine: a new model based on within-subject biological variation. *Clin Chem* 2021;67(2):374
 - Rossi A, et al. MMASH 1.0.0. PhysioNet, 2020. doi:10.13026/cerq-fc86
 - Kemp B, et al. *IEEE Trans Biomed Eng* 2000;47(9):1185–1194; Sleep-EDF Expanded doi:10.13026/C2X676
-- Iber C, et al. *The AASM Manual for the Scoring of Sleep and Associated Events*. AASM, 2007
-- NASA NTRS 20210016728 (CFT70 Aerobic Fitness, HDBR); NASA Life Sciences Portal (MR080G, MR079G, BRSMImmune, BRSMAct)
 - NASA OSDR RadLab data API — https://visualization.osdr.nasa.gov/radlab/gui/data-api/
-- Jones CW, et al. Molecular and physiological changes in the SpaceX Inspiration4 civilian crew. *Nature* 2024. doi:10.1038/s41586-024-07648-x
 - Pollard T, et al. PhysioNet as a global platform for biomedical research. *Nature Health* 2026. doi:10.1038/s44360-026-00096-z

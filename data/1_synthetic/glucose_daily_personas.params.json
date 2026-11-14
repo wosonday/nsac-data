@@ -1,0 +1,20 @@
+{
+  "title": "Đường huyết lúc đói hằng ngày cho 6 persona (CFT70 neo vào OGTT thật)",
+  "seed": 17,
+  "generator": "sky-ml-synthetic-1.0",
+  "source": "NNX10AP86G_CFT70_OGTT.csv, phút 0 (24 người)",
+  "sigma_within_day": 4.807653283353033,
+  "sigma_between": 6.722132003789474,
+  "pre_mean": 89.586805555625,
+  "population_trend": {
+    "-20.0": -0.08368055562500842,
+    "-10.0": 4.509027778124988,
+    "-0.0": -1.4472222222916713,
+    "40.0": 0.7208333331249861,
+    "60.0": -0.23680555562501127,
+    "70.0": 0.5566727052445657,
+    "80.0": -0.19097222229167699
+  },
+  "observed_min": 70.8,
+  "observed_max": 104.5
+}
