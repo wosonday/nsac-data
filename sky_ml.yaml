@@ -1,0 +1,5 @@
+# Cấu hình chung. Đường dẫn tương đối tính theo thư mục chứa file này.
+nasa_cl_data: D:/Project/NASA-cl/data # nguồn, CHỈ ĐỌC (ghi đè bằng env SKY_NASA_CL_DATA)
+data_dir: data # bản copy
+runs_dir: runs # kết quả từng lần chạy
+tasks_config: configs/tasks.yaml # tham số từng task

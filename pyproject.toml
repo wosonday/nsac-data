@@ -1,0 +1,33 @@
+[project]
+name = "sky-ml"
+version = "0.1.0"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "numpy>=2.1",
+    "pandas>=2.2",
+    "scipy>=1.14",
+    "scikit-learn==1.9.1",
+    "lightgbm==4.7.0",
+    "mne>=1.8",
+    "shap>=0.46",
+    "matplotlib>=3.9",
+    "pyyaml>=6.0",
+    "joblib>=1.4",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.3", "ruff>=0.8"]
+
+[project.scripts]
+sky-ml = "sky_ml.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sky_ml"]
+
+[tool.pytest.ini_options]
+markers = ["slow: cần dữ liệu thật"]
+addopts = "-m 'not slow'"
