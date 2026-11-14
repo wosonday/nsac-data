@@ -1,5 +1,5 @@
 # Tham số từng task — giá trị chép từ NASA-cl/src/nasa_cl/pipeline/config.py (run 2026-11-11).
-# Mô hình khai báo ở khóa `models` của từng task (dựng bằng sky_ml.models.build_model).
+# Mô hình khai báo ở khóa `models` của từng task (dựng bằng sky_ml._models.build_model).
 hr:
   description: "MMASH (22 người, mặt đất): HR trung bình 5 phút tới từ 30 phút trước"
   inputs:
@@ -8,20 +8,24 @@ hr:
   target: hr_next_5min
   unit: bpm
   window: {past: 30, future: 5, step: 5}     # đơn vị: phút
+  # Bước 2 – build-features: chọn đặc trưng (tên trong FEATURES của 2_build_features/windows.py).
+  # Thứ tự & danh sách dưới đây = cấu hình tái lập run 11/11. Thêm: median_all, range_all, slope_all.
+  features: [last_value, mean_last_5, mean_all, std_all, change_last_10, min_all, max_all]
   valid_hr_range: [30.0, 220.0]              # ngưỡng kỹ thuật loại số đo hỏng, KHÔNG phải ngưỡng lâm sàng
   split: {type: leave_one_subject_out}
   baseline: last_value
+  deploy_model: ridge          # mô hình dùng ở bước 5 (predict); chọn TRƯỚC, không chọn theo điểm test
   seed: 17
   interval_alpha: 0.10        # khoảng dự đoán 90%
   bootstrap_samples: 10000    # CI95 lấy mẫu lại theo người
   permutation_tests: 0        # 0 = bỏ qua (task này nhiều cửa sổ, tốn thời gian)
-  save_models:                # lưu mô hình đã huấn luyện vào runs/<task>/<run>/models/
+  save_models:                # lưu mô hình đã huấn luyện vào runs/<task>/<run>/3_models/
     final: true               # fit trên toàn bộ dữ liệu → dùng cho người MỚI (vd. persona nsac)
     folds: false              # true = lưu cả mô hình từng fold LOSO (22 × 3 file) để kiểm toán OOF
   # Mô hình: class = đường dẫn import; params = tham số; scale = chuẩn hóa trong pipeline (fit trên train của từng fold)
   models:
     last_value:
-      class: sky_ml.models.LastValue
+      class: sky_ml._models.LastValue
     ridge:
       class: sklearn.linear_model.Ridge
       params: {alpha: 1.0}

@@ -1,10 +1,12 @@
 import numpy as np
 import pandas as pd
 
-from sky_ml.train import make_folds, train_predict
+from sky_ml._steps import train
+
+make_folds, train_predict = train.make_folds, train.train_predict
 
 CFG = {"kind": "regression", "target": "y", "seed": 17, "split": {"type": "leave_one_subject_out"},
-       "models": {"last_value": {"class": "sky_ml.models.LastValue"},
+       "models": {"last_value": {"class": "sky_ml._models.LastValue"},
                   "ridge": {"class": "sklearn.linear_model.Ridge", "params": {"alpha": 1.0}, "scale": True}}}
 
 

@@ -19,7 +19,7 @@ dependencies = [
 dev = ["pytest>=8.3", "ruff>=0.8"]
 
 [project.scripts]
-sky-ml = "sky_ml.cli:main"
+sky-ml = "sky_ml._cli:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -31,3 +31,8 @@ packages = ["src/sky_ml"]
 [tool.pytest.ini_options]
 markers = ["slow: cần dữ liệu thật"]
 addopts = "-m 'not slow'"
+
+[tool.ruff.lint.per-file-ignores]
+# Bước pipeline đánh số 1_, 2_, ... (nạp qua importlib trong _steps.py) — tên module bắt đầu bằng số là có chủ ý
+"src/sky_ml/[0-9]_*.py" = ["N999"]
+"src/sky_ml/[0-9]_*/*.py" = ["N999"]

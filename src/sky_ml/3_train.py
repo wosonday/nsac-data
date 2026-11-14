@@ -1,8 +1,8 @@
-"""Bước train: chia fold (theo người / theo tháng), fit MỌI mô hình trên CÙNG các fold, trả dự đoán OOF."""
+"""Bước 3 – train: chia fold (theo người / theo tháng), fit MỌI mô hình trên CÙNG các fold, trả dự đoán OOF."""
 import pandas as pd
 from sklearn.base import clone
 
-from .models import build_model
+from ._models import build_model
 
 
 def make_folds(table: pd.DataFrame, split: dict) -> list[dict]:

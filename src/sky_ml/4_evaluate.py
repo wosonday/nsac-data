@@ -1,4 +1,4 @@
-"""Bước evaluate: so baseline (theo đơn vị độc lập = người/tháng), CI95 bootstrap, độ bao phủ khoảng 90%."""
+"""Bước 4 – evaluate: so baseline (theo đơn vị độc lập = người/tháng), CI95 bootstrap, độ bao phủ khoảng 90%."""
 import math
 
 import numpy as np

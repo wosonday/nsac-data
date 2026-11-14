@@ -2,7 +2,9 @@ import math
 
 import pandas as pd
 
-from sky_ml.evaluate import evaluate, interval_half_width
+from sky_ml._steps import evaluate as ev
+
+evaluate, interval_half_width = ev.evaluate, ev.interval_half_width
 
 
 def test_half_width_infinite_when_too_few():

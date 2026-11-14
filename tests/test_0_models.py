@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.pipeline import Pipeline
 
-from sky_ml.models import LastValue, build_model
+from sky_ml._models import LastValue, build_model
 
 
 def test_build_ridge_with_scaling():

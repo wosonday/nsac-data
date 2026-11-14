@@ -66,3 +66,23 @@ Things that span several files:
 - Dependencies must be OSI-licensed. Use `pathlib` (no hard-coded `/mnt/d`); commands must work in PowerShell.
 - Out of scope: crawler, new downloads, raw MMASH processing, SEISS/omics, web UI code (lives in nsac), nested CV and sleep calibration (round 2 if time). The nsac bundle (`export-nsac`) is now IN scope.
 - Bundles keep only relative `mission_day`, never real calendar dates of the analog studies.
+
+## Naming convention and pipeline (user preference, 2026-11-14 14:15)
+
+Pipeline steps are numbered in run order; support/config/off-pipeline modules start with `_`.
+
+| Step | Module | Command | Writes to `runs/<task>/<run>/` |
+|---|---|---|---|
+| 1 | `1_load_data.py` (copy + verify + snapshot) | `sky-ml load-data [--dry-run]`, `sky-ml check` | `data/` + `data/COPY_MANIFEST.csv` |
+| 2 | `2_build_features/` (features chosen in `configs/tasks.yaml` → `features:`) | `sky-ml build-features <task>` | `2_snapshot.json`, `2_table.csv.gz`, `2_features.json` |
+| 3 | `3_train.py` | `sky-ml train <task>` | `3_oof.csv.gz`, `3_folds.json`, `3_models/` (joblib + `manifest.json` with SHA-256) |
+| 4 | `4_evaluate.py` | `sky-ml evaluate <task>` | `4_metrics.csv`, `4_summary.json` |
+| 5 | `5_predict.py` (load saved model, predict new data) | `sky-ml predict <task> --input X.csv [--mode latest\|backtest] [--model M]` | `5_predictions/*.csv/json` |
+
+- Support modules: `_settings.py`, `_runs.py`, `_models.py`, `_artifacts.py`, `_hashing.py`, `_steps.py`, `_cli.py`. The entry point is `sky_ml._cli:main`.
+- Module names starting with a digit cannot be used with `import`. Load steps only via `sky_ml._steps` (importlib); a step that needs another step uses `importlib.import_module("sky_ml.4_evaluate")`.
+- Ruff's N999 rule is ignored for these files in `pyproject.toml`.
+- Tests: `test_<step>_*.py`; support tests use `test_0_*`; the slow reproduction test is `test_9_reproduce.py`.
+- `deploy_model` in `tasks.yaml` is chosen up front (not by test score).
+- `predict` refuses to run if `features` changed since training, abstains on missing or out-of-training-range features, and flags `in_sample` subjects.
+

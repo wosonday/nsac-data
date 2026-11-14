@@ -1,9 +1,8 @@
 """Thư mục kết quả runs/<task>/<run_id>/; không bao giờ ghi đè."""
-
 from datetime import datetime
 from pathlib import Path
 
-from .settings import Settings, ensure_writable
+from ._settings import Settings, ensure_writable
 
 
 def new_run(settings: Settings, task: str) -> Path:
@@ -22,7 +21,7 @@ def resolve_run(settings: Settings, task: str, run: str = "latest") -> Path:
         return base / run
     runs = sorted(p for p in base.glob("*") if p.is_dir()) if base.exists() else []
     if not runs:
-        raise FileNotFoundError(f"Chưa có run cho {task}; chạy: sky-ml prepare {task}")
+        raise FileNotFoundError(f"Chưa có run cho {task}; chạy: sky-ml build-features {task}")
     return runs[-1]
 
 

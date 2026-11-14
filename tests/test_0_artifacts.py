@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from sky_ml.artifacts import load_model, save_model, write_manifest
-from sky_ml.models import build_model
+from sky_ml._artifacts import load_model, save_model, write_manifest
+from sky_ml._models import build_model
 
 
 def _fit():

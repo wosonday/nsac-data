@@ -1,5 +1,19 @@
 # Hướng dẫn build `sky-ml`: copy dữ liệu và preprocess ban đầu
 
+> **Cập nhật 14/11 14:10, quy ước đặt tên.** Bước pipeline được đánh số theo thứ tự chạy; file hỗ trợ (ngoài luồng) có tiền tố `_`. Trong tài liệu này, tên cũ tương ứng với tên mới như sau:
+> - `copydata.py` → `1_copydata.py`
+> - `datacheck.py` → `2_datacheck.py`
+> - `prepare/` → `3_prepare/`
+> - `train.py` → `4_train.py`
+> - `evaluate.py` → `5_evaluate.py`
+> - `settings.py` → `_settings.py`; `runs.py` → `_runs.py`; `models.py` → `_models.py`; `artifacts.py` → `_artifacts.py`; `cli.py` → `_cli.py`
+> - mới: `_hashing.py`, `_steps.py`
+>
+> File trong `runs/<task>/<run>/` mang số của bước tạo ra nó: `3_snapshot.json`, `3_table.csv.gz`, `3_features.json`; `4_oof.csv.gz`, `4_folds.json`, `4_models/`; `5_metrics.csv`, `5_summary.json`.
+>
+> Lệnh `sky-ml …` giữ nguyên. Lệnh mới `uv run sky-ml steps` in thứ tự các bước. **Code trong phần phụ lục của tài liệu này là bản trước khi đổi tên; bản đúng là các file trong `src/`.**
+
+
 Áp dụng cho Task 1–4 của kế hoạch `docs/superpowers/plans/2026-11-14-sky-ml.md`. Mọi lệnh chạy trong **PowerShell**, tại `D:\Project\nasa-hackathon`.
 
 Mã nguồn dưới đây đã được kiểm tra trước với dữ liệu thật của NASA-cl:
