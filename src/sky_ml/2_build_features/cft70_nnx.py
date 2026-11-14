@@ -31,11 +31,12 @@ def _study_day(phase: pd.Series, br_day: pd.Series) -> pd.Series:
 
 
 # ------------------------------------------------------------------------------------------- mood (POMS)
-def poms(nlsp: Path) -> pd.DataFrame:
-    raw = _read(nlsp, "POMS_TMD.csv")
+def poms(nlsp: Path, member: str = "POMS_TMD.csv", column: str = "Total Mood Disturbance (TMD)") -> pd.DataFrame:
+    """Chuỗi bảng hỏi lặp lại (POMS, MFSI-SF…) dạng dài. Cột giá trị luôn đặt tên `tmd` để dùng chung code."""
+    raw = _read(nlsp, member)
     out = pd.DataFrame({"subject_id": "utmb_cft70:" + raw.Subject.astype(str),
                         "study_day": _study_day(raw.Test_Phase, raw.BR_Day),
-                        "tmd": pd.to_numeric(raw["Total Mood Disturbance (TMD)"], errors="coerce")})
+                        "tmd": pd.to_numeric(raw[column], errors="coerce")})
     return out.dropna(subset=["study_day"]).sort_values(["subject_id", "study_day"]).reset_index(drop=True)
 
 
@@ -59,7 +60,9 @@ def mood_latest(assess: pd.DataFrame, cfg: dict) -> pd.DataFrame:
 
 
 def build_mood(data_dir: Path, cfg: dict) -> tuple[pd.DataFrame, list[str]]:
-    return mood_windows(poms(data_dir / "raw/nlsp"), cfg), check_features(cfg["features"])
+    series = poms(data_dir / "raw/nlsp", cfg.get("member", "POMS_TMD.csv"),
+                  cfg.get("value_column", "Total Mood Disturbance (TMD)"))
+    return mood_windows(series, cfg), check_features(cfg["features"])
 
 
 # ------------------------------------------------------------------------------------------- glucose (OGTT)

@@ -17,3 +17,12 @@ indicators:
   mood:            {cft70: "real: mood (POMS)",                 campaign_1: "synthetic: mood_c1_poms"}
   activity_sleep:  {cft70: "synthetic: sleep_cft70_actigraphy", campaign_1: "real: sleep_act (BRSMAct)"}
   glucose:         {cft70: "real (OGTT 5–6 mốc) + synthetic giữa các mốc: glucose_daily_personas", campaign_1: "synthetic: glucose_daily_personas"}
+  # bổ sung 14/11 21:15 — dữ liệu THẬT chưa dùng trước đó
+  respiration:     {cft70: "real: vitals_resp (CRF)",           campaign_1: "real: vitals_resp (CRF)"}
+  body_weight:     {cft70: "real: vitals_weight (CRF)",         campaign_1: "real: vitals_weight (CRF)"}
+  sleep_hours:     {cft70: "synthetic: sleep_cft70_actigraphy (duration)", campaign_1: "real: sleep_act_duration (BRSMAct)"}
+  fatigue:         {cft70: "real: fatigue (MFSI-SF)",           campaign_1: "none"}
+  lean_mass_legs:  {cft70: "real: lean_mass_legs (iDXA, PRE → ngày 70)",  campaign_1: "none"}
+  bone_mineral:    {cft70: "real: bone_mineral (iDXA BMC, PRE → ngày 70)", campaign_1: "none"}
+  lv_mass:         {cft70: "real: lv_mass (siêu âm tim 3D, PRE → ngày 70)", campaign_1: "none"}
+  lv_volume:       {cft70: "real: lv_diastolic_volume (siêu âm tim 3D, PRE → ngày 70)", campaign_1: "none"}

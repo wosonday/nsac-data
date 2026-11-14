@@ -1,0 +1,92 @@
+{
+  "versions": {
+    "python": "3.12.15",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "numpy": "2.5.4",
+    "joblib": "1.6.0"
+  },
+  "task": "bone_mineral",
+  "run_id": "2026-11-14_211319",
+  "features": [
+    "baseline"
+  ],
+  "target": "pct_change_day70",
+  "seed": 17,
+  "model_specs": {
+    "persistence": {
+      "class": "sklearn.dummy.DummyRegressor",
+      "params": {
+        "strategy": "constant",
+        "constant": 0.0
+      }
+    },
+    "mean_delta": {
+      "class": "sklearn.dummy.DummyRegressor",
+      "params": {
+        "strategy": "mean"
+      }
+    },
+    "ridge": {
+      "class": "sklearn.linear_model.Ridge",
+      "params": {
+        "alpha": 10.0
+      },
+      "scale": true
+    }
+  },
+  "split": {
+    "type": "leave_one_subject_out"
+  },
+  "features_table": "data/2_features/bone_mineral/2026-11-14_211319/table.csv.gz",
+  "data_snapshot": {
+    "files": {
+      "raw/nlsp/NNX10AP86G.zip": "6bff50708c0d7fd190b6d486dbd565d7ee2fa0882ba80d778e5fb74333e66f4d",
+      "raw/nlsp/download_manifest.csv": "37e2e53555829b52bc45cc44a2d90e1ad8ed1289a81df3816a3171a91ca289c1"
+    },
+    "python": "3.12.15",
+    "libraries": {
+      "scikit-learn": "1.9.1",
+      "lightgbm": "4.7.0",
+      "pandas": "3.1.1",
+      "numpy": "2.5.4",
+      "scipy": "1.18.1",
+      "mne": "1.13.2",
+      "shap": "0.54.1"
+    },
+    "seed": 17
+  },
+  "note": "final = fit trên toàn bộ người trong table; chỉ dùng cho người mới. Đánh giá dùng oof.csv.gz.",
+  "models": [
+    {
+      "model": "persistence",
+      "kind": "final",
+      "path": "persistence/final.joblib",
+      "n_train_rows": 18,
+      "n_train_units": 18,
+      "file": "final.joblib",
+      "bytes": 420,
+      "sha256": "937d8f5c094fa589ad4b79b0eac9d3fe7b5626fb9c9d26d33fc09a471cfd7d2d"
+    },
+    {
+      "model": "mean_delta",
+      "kind": "final",
+      "path": "mean_delta/final.joblib",
+      "n_train_rows": 18,
+      "n_train_units": 18,
+      "file": "final.joblib",
+      "bytes": 438,
+      "sha256": "a290fe94f7582d5c320537772fbb0a14639db7f4670dce69677bce7ad87be3fa"
+    },
+    {
+      "model": "ridge",
+      "kind": "final",
+      "path": "ridge/final.joblib",
+      "n_train_rows": 18,
+      "n_train_units": 18,
+      "file": "final.joblib",
+      "bytes": 756,
+      "sha256": "66873886a18b8fb92bcc6f6c76eb022ab8df581993019c5545891d8f05d074e0"
+    }
+  ]
+}

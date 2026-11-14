@@ -3,7 +3,7 @@
 Mô hình đã fit (joblib) + dự đoán ngoài tập huấn luyện (OOF) + kết quả đánh giá. `final` fit trên TOÀN BỘ người của bảng đặc trưng → chỉ dùng dự báo cho NGƯỜI MỚI. Điểm đánh giá luôn lấy từ OOF (mỗi người được dự đoán bởi mô hình chưa từng thấy họ).
 
 - **Tạo bởi:** `sky-ml train/evaluate vitals_pulse`
-- **Thời điểm (UTC):** 2026-11-14T13:44:50+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:15:11+00:00
 - **Cohort:** UTMB bed rest CRF Daily Vitals — TRAIN: Campaign 3 (23 người); NGOÀI cohort: CFT70 (5160, 8072, 8936) + Campaign 1 (C1G0001–3) = 6 persona
 - **Nguồn:** data/1_source/raw/nlsp/CRF.zip › */Daily_Vitals/*.csv, CFT70_VITALS/*.csv (kiểm SHA-256 + MD5)
 
@@ -15,18 +15,23 @@ Mô hình đã fit (joblib) + dự đoán ngoài tập huấn luyện (OOF) + k�
 | `folds.json` | Danh sách fold và số mẫu train/test |
 | `manifest.json` | SHA-256 + phiên bản + tham số |
 | `<model>/final.joblib` | Mô hình fit trên toàn bộ người → chỉ dùng cho NGƯỜI MỚI |
-| `metrics.csv` | Metric theo người, CI95, so baseline |
-| `summary.json` | Tóm tắt + độ bao phủ khoảng 90% |
+| `metrics.csv` | Metric theo đơn vị độc lập, CI95, so baseline |
+| `summary.json` | Tóm tắt: metric, độ bao phủ khoảng 90%, kiểm định hoán vị, kết quả ngoài cohort |
+| `external_metrics.csv` | MAE + CI95 trên người NGOÀI cohort (chưa từng thấy) cho mọi mô hình |
 
 ## Số liệu chính
 
 | Chỉ tiêu | Giá trị |
 |---|---|
+| Số fold | 23 |
+| Mô hình | last_value, personal_mean, ridge, lightgbm |
+| Số file mô hình | 4 |
 | mae – ridge | 5.5139 (CI95 5.152–5.864); so baseline -1.346 |
 | mae – personal_mean | 5.5354 (CI95 5.144–5.920); so baseline -1.325 |
 | mae – lightgbm | 5.8414 (CI95 5.357–6.363); so baseline -1.019 |
 | mae – last_value | 6.8602 (CI95 6.310–7.393); so baseline +0.000 |
-| Độ bao phủ khoảng 90% | 0.8991 (nửa độ rộng 11.580) |
+| Mô hình triển khai (chốt trước) | ridge |
+| Độ bao phủ khoảng 90% – ridge | 0.8991 (nửa độ rộng 11.580) |
 | Đơn vị độc lập | 23 |
 | NGOÀI cohort – last_value | MAE 6.048 (CI95 5.273–6.853), 6 người |
 | NGOÀI cohort – personal_mean | MAE 4.917 (CI95 4.163–5.627), 6 người |

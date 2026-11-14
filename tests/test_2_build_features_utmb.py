@@ -3,6 +3,7 @@ import importlib
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from sky_ml import _synthetic
 
@@ -58,3 +59,21 @@ def test_synthetic_never_listed_as_training_input():
     import yaml
     tasks = yaml.safe_load((Path(__file__).parents[1] / "configs/tasks.yaml").read_text(encoding="utf-8"))
     assert not any("synthetic" in str(t.get("inputs", "")) for t in tasks.values())
+
+
+def test_prepost_percent_change_from_mean_pre():
+    pp = importlib.import_module("sky_ml.2_build_features.prepost")
+    raw = pd.DataFrame({"Subject": ["7"] * 4 + ["8"], "Test_Phase": ["PRE-TEST", "PRE_TEST", "IN_TEST", "IN_TEST", "PRE_TEST"],
+                        "BR_Day": ["2", "1", "70", "7", "2"], "v": ["100", "300", "180", "1", "50"]})
+    cfg = {"phase_column": "Test_Phase", "day_column": "BR_Day", "value_column": "v", "target_phase": "IN_TEST",
+           "target_day": 70, "target": "y"}
+    t = pp.prepost_table(raw, cfg)
+    assert list(t.subject_id) == ["utmb_cft70:7"]          # người 8 thiếu ngày 70 → bỏ, không đoán
+    assert t.baseline[0] == 200 and t.y[0] == pytest.approx(-10.0)
+
+
+def test_vitals_resp_and_weight_aliases():
+    a = pd.DataFrame({"Subject": ["7"], "Date": ["1/2/2007"], "Test_Phase": ["IN_TEST"], "BR_Day": ["1"],
+                      "Resp Rate (rpm)": ["16"], "Weight (Kg)": ["70.5"]})
+    n = vitals.normalize(a, "campaign_3")
+    assert n.resp[0] == 16 and n.weight[0] == 70.5

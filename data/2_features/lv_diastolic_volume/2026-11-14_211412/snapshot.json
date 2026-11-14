@@ -1,0 +1,17 @@
+{
+  "files": {
+    "raw/nlsp/BRSMCF.zip": "03413681e88cf5e75b673c7f4013ccc980a6a60a9228e0213c3fee814ef04cff",
+    "raw/nlsp/download_manifest.csv": "37e2e53555829b52bc45cc44a2d90e1ad8ed1289a81df3816a3171a91ca289c1"
+  },
+  "python": "3.12.15",
+  "libraries": {
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "pandas": "3.1.1",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "mne": "1.13.2",
+    "shap": "0.54.1"
+  },
+  "seed": 17
+}

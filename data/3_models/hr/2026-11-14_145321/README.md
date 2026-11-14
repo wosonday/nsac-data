@@ -3,7 +3,7 @@
 Mô hình đã fit (joblib) + dự đoán ngoài tập huấn luyện (OOF) + kết quả đánh giá. `final` fit trên TOÀN BỘ người của bảng đặc trưng → chỉ dùng dự báo cho NGƯỜI MỚI. Điểm đánh giá luôn lấy từ OOF (mỗi người được dự đoán bởi mô hình chưa từng thấy họ).
 
 - **Tạo bởi:** `sky-ml train/evaluate hr`
-- **Thời điểm (UTC):** 2026-11-14T07:53:28+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:15:08+00:00
 - **Cohort:** MMASH 1.0.0 (PhysioNet, ODbL 1.0) — 22 nam khỏe mạnh, mặt đất, ~24 giờ/người
 - **Nguồn:** data/1_source/processed/sample-v2/mmash_minutes.csv.gz (bảng phút đã QA của NASA-cl)
 
@@ -15,17 +15,21 @@ Mô hình đã fit (joblib) + dự đoán ngoài tập huấn luyện (OOF) + k�
 | `folds.json` | Danh sách fold và số mẫu train/test |
 | `manifest.json` | SHA-256 + phiên bản + tham số |
 | `<model>/final.joblib` | Mô hình fit trên toàn bộ người → chỉ dùng cho NGƯỜI MỚI |
-| `metrics.csv` | Metric theo người, CI95, so baseline |
-| `summary.json` | Tóm tắt + độ bao phủ khoảng 90% |
+| `metrics.csv` | Metric theo đơn vị độc lập, CI95, so baseline |
+| `summary.json` | Tóm tắt: metric, độ bao phủ khoảng 90%, kiểm định hoán vị, kết quả ngoài cohort |
 
 ## Số liệu chính
 
 | Chỉ tiêu | Giá trị |
 |---|---|
+| Số fold | 22 |
+| Mô hình | last_value, ridge, lightgbm |
+| Số file mô hình | 3 |
 | mae – ridge | 3.9174 (CI95 3.612–4.239); so baseline -0.548 |
 | mae – lightgbm | 4.0660 (CI95 3.713–4.471); so baseline -0.399 |
 | mae – last_value | 4.4652 (CI95 4.086–4.872); so baseline +0.000 |
-| Độ bao phủ khoảng 90% | 0.9004 (nửa độ rộng 8.714) |
+| Mô hình triển khai (chốt trước) | ridge |
+| Độ bao phủ khoảng 90% – ridge | 0.9004 (nửa độ rộng 8.714) |
 | Đơn vị độc lập | 22 |
 
 ## Cột dữ liệu

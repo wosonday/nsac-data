@@ -1,14 +1,15 @@
 # Báo cáo dữ liệu và mô hình sky-ml × nsac
 
-> Cập nhật 14/11/2026, 20:50 · Thư mục: `D:\Project\nasa-hackathon` · Bảng chi tiết: [`docs/Tong_hop_du_lieu_mo_hinh.xlsx`](Tong_hop_du_lieu_mo_hinh.xlsx)
+> Cập nhật 14/11/2026, 21:20 · Thư mục: `D:\Project\nasa-hackathon` · Bảng chi tiết: [`docs/Tong_hop_du_lieu_mo_hinh.xlsx`](Tong_hop_du_lieu_mo_hinh.xlsx)
 >
 > ⚠️ Báo cáo có dùng **DỮ LIỆU GIẢ ĐỊNH** (mục 5) cho phần persona không có dữ liệu thật. BTC cho phép việc này; mọi chỗ dùng đều được ghi rõ.
 
 ## 1. Tóm tắt
 
-- **13 task đã chạy**, mỗi task có đủ (1) đặc trưng, (3) mô hình, (2) dự đoán hoặc OOF:
+- **21 task đã chạy**, mỗi task có đủ (1) đặc trưng, (3) mô hình, (2) dự đoán hoặc OOF:
   - nhóm cũ: `hr`, `dose`, `dose_orbit`, `cpet`, `cpet_physio`, `sleep`, `sleep_act`;
-  - nhóm mới: `vitals_sbp`, `vitals_dbp`, `vitals_temp`, `vitals_pulse`, `mood`, `glucose`.
+  - nhóm 20:45: `vitals_sbp`, `vitals_dbp`, `vitals_temp`, `vitals_pulse`, `mood`, `glucose`;
+  - **nhóm 21:15 (ưu tiên dữ liệu thật chưa dùng trong NASA-cl):** `vitals_resp`, `vitals_weight`, `sleep_act_duration`, `fatigue`, `lean_mass_legs`, `bone_mineral`, `lv_mass`, `lv_diastolic_volume`.
 - **Đủ 6 chỉ số web × 6 persona.** Phần lớn là dữ liệu thật; ba khoảng trống được lấp bằng dữ liệu giả định:
   - tâm trạng của 3 persona Campaign 1;
   - giấc ngủ theo đêm của 3 persona CFT70;
@@ -56,13 +57,26 @@ Kết quả là dự đoán ngoài tập huấn luyện (OOF), CI95 tính bằng
 | `cpet` / `cpet_physio` | mean_delta | ridge 2,84 (p = 0,005) / 3,62 (p = 0,51) | — | 4,13 |
 | `sleep` | lightgbm | macro-F1 0,784 (0,760–0,807) | — | 0,119 |
 | `sleep_act` | personal_mean | 5,40 điểm % (3 người, pilot) | — | 5,63 |
+| `vitals_resp` | ridge | 1,18 lần/phút (1,07–1,30) | 0,72 (0,56–0,89), bao phủ 0,97 — **last_value tốt hơn (0,50)** | 1,28 |
+| `vitals_weight` | ridge | 0,37 kg (0,32–0,43) | 0,42 (0,33–0,49), bao phủ 0,85 | **last_value tốt nhất 0,35** |
+| `sleep_act_duration` | personal_mean | 0,40 giờ (0,37–0,43), 3 người | — | 0,40 |
+| `fatigue` | personal_mean | 4,57 điểm MFSI-SF (3,77–5,38), 24 người; ΔMAE −1,04 (−1,45…−0,68) | — | 5,62 |
+| `lean_mass_legs` | mean_delta | 6,1 điểm % (4,3–7,9), 18 người; TB −2,7 % | — | 6,0 |
+| `bone_mineral` | mean_delta | 0,67 điểm % (0,48–0,86); TB +0,1 % | — | 0,63 |
+| `lv_mass` | mean_delta | 7,8 điểm % (6,2–9,5), 35 người; TB **−7,6 %** | — | 9,7 |
+| `lv_diastolic_volume` | mean_delta | 8,2 điểm % (6,4–10,2), 35 người; TB **−7,8 %** | — | 10,2 |
 
 ### Cách hiểu
 
 1. **Sinh tồn hằng ngày:** dự báo ngày tới tốt hơn "giữ nguyên hôm nay" khoảng 20%. Kết quả giữ được khi chuyển sang người mới, nên đây là bằng chứng trung thực nhất trên persona.
 2. **Tâm trạng:** trung bình cá nhân là đủ. Không mô hình nào chắc chắn tốt hơn baseline vì CI của chênh lệch chứa 0.
 3. **Đường huyết lúc đói:** gần như không đổi khi nằm giường (trung bình +0,8 mg/dL). Ridge có tín hiệu yếu (p = 0,015) nhưng CI của chênh lệch chứa 0, nên vẫn giữ `mean_delta` như đã chốt trước khi chạy.
-4. **Một số task không có mô hình vượt baseline rõ ràng** (`mood`, `glucose`, `sleep_act`, `cpet_physio`). Web nên hiển thị ước lượng kèm khoảng 90%, không nên trình bày như dự báo cá nhân hóa chính xác.
+4. **Dữ liệu thật mới (21:15):**
+   - Mệt mỏi (MFSI-SF): trung bình cá nhân tốt hơn hẳn "lần đo trước" (CI của chênh lệch không chứa 0).
+   - Nhịp thở và cân nặng: ngoài cohort, giá trị đo gần nhất là dự báo tốt nhất. Web nên hiển thị số đo mới nhất kèm khoảng 90%, không cần mô hình phức tạp.
+   - Tim: sau 70 ngày nằm giường, khối lượng và thể tích cuối tâm trương thất trái giảm trung bình khoảng 8% (siêu âm 3D, 35 người). Persona lena-fischer (CFT70 8936) giảm 20%.
+   - Khối nạc chân và khoáng xương toàn thân: thay đổi trung bình nhỏ, khác nhau nhiều giữa người do nhóm tập luyện. Không mô hình nào tốt hơn "không đổi".
+5. **Một số task không có mô hình vượt baseline rõ ràng** (`mood`, `glucose`, `sleep_act`, `cpet_physio`). Web nên hiển thị ước lượng kèm khoảng 90%, không nên trình bày như dự báo cá nhân hóa chính xác.
 
 ## 4. Persona × chỉ số
 
@@ -74,6 +88,10 @@ Kết quả là dự đoán ngoài tập huấn luyện (OOF), CI95 tính bằng
 | Tâm trạng | Thật | ⚠️ **Giả định** |
 | Hoạt động và giấc ngủ | ⚠️ **Giả định** | Thật |
 | Đường huyết | Thật ở 5–6 mốc OGTT + ⚠️ **giả định** giữa các mốc | ⚠️ **Giả định** |
+| Nhịp thở, cân nặng | Thật | Thật |
+| Thời lượng ngủ | ⚠️ **Giả định** | Thật |
+| Mệt mỏi | Thật | Không có (UNKNOWN) |
+| Cơ, xương, tim (PRE → ngày 70) | Thật | Không có (UNKNOWN) |
 
 Nguồn của bảng này: `configs/crew_map.yaml`. Mỗi persona chỉ lấy dữ liệu của đúng một người analog.
 
@@ -137,14 +155,15 @@ Nguồn của bảng này: `configs/crew_map.yaml`. Mỗi persona chỉ lấy d�
 | Trung bình | Thay dữ liệu giả định bằng dữ liệu thật khi tìm được | POMS Campaign 1, actigraphy CFT70 trên NLSP |
 | Trung bình | Thẻ đường huyết mô tả từ OSD-575 (Inspiration4) | Bằng chứng từ chuyến bay thật; có cờ nghi vấn ở mốc R+45 |
 | Trung bình | Kiểm lại `dose_orbit` trên Lidal 2023; xác minh múi giờ RadLab | Tránh kết quả lạc quan |
-| Thấp | Thêm MFSI-SF (mệt mỏi), các thang con của POMS; iRATS cho `cpet` | Dữ liệu đã có sẵn trong NASA-cl |
+| Trung bình | DXA hông/cột sống (BRSMiDXA), MRI cơ (iRATS), WinSCAT (nhận thức C1 + C3), lipid, cortisol | Dữ liệu thật còn lại trong NASA-cl; dùng lại builder `prepost` / `mood`, chỉ cần khai báo YAML |
 
 ## 9. Tái lập
 
 ```powershell
 uv run sky-ml load-data
-foreach ($t in "hr","dose","dose_orbit","cpet","cpet_physio","sleep","sleep_act",
-               "vitals_sbp","vitals_dbp","vitals_temp","vitals_pulse","mood","glucose") {
+foreach ($t in "hr","dose","dose_orbit","cpet","cpet_physio","sleep","sleep_act","sleep_act_duration",
+               "vitals_sbp","vitals_dbp","vitals_temp","vitals_pulse","vitals_resp","vitals_weight",
+               "mood","fatigue","glucose","lean_mass_legs","bone_mineral","lv_mass","lv_diastolic_volume") {
   uv run sky-ml build-features $t; uv run sky-ml train $t; uv run sky-ml evaluate $t
 }
 uv run sky-ml make-synthetic                     # DỮ LIỆU GIẢ ĐỊNH → data/1_synthetic
@@ -156,6 +175,7 @@ uv run sky-ml predict sleep_act --input data/1_synthetic/sleep_cft70_actigraphy.
 
 - NASA Life Sciences Portal — UTMB Bed Rest: CRF Daily Vitals, NNX10AP86G (POMS, OGTT), MR080G, BRSMAct — https://nlsp.nasa.gov/explore
 - McNair DM, Lorr M, Droppleman LF. *Manual for the Profile of Mood States*. EdITS, 1971
+- Stein KD, Jacobsen PB, Blanchard CM, Thors C. Further validation of the multidimensional fatigue symptom inventory-short form. *J Pain Symptom Manage* 2004;27(1):14–23
 - Fraser CG, Harris EK. Generation and application of data on biological variation in clinical chemistry. *Crit Rev Clin Lab Sci* 1989;27(5):409–437
 - Coşkun A, Sandberg S, et al. Personalized reference intervals in laboratory medicine: a new model based on within-subject biological variation. *Clin Chem* 2021;67(2):374
 - Rossi A, et al. MMASH 1.0.0. PhysioNet, 2020. doi:10.13026/cerq-fc86

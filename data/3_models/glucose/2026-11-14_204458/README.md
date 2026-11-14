@@ -3,7 +3,7 @@
 Mô hình đã fit (joblib) + dự đoán ngoài tập huấn luyện (OOF) + kết quả đánh giá. `final` fit trên TOÀN BỘ người của bảng đặc trưng → chỉ dùng dự báo cho NGƯỜI MỚI. Điểm đánh giá luôn lấy từ OOF (mỗi người được dự đoán bởi mô hình chưa từng thấy họ).
 
 - **Tạo bởi:** `sky-ml train/evaluate glucose`
-- **Thời điểm (UTC):** 2026-11-14T13:45:25+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:15:11+00:00
 - **Cohort:** UTMB CFT70 — NNX10AP86G OGTT, 23 người đủ dữ liệu PRE + ngày nằm giường 66
 - **Nguồn:** data/1_source/raw/nlsp/NNX10AP86G.zip › NNX10AP86G_CFT70_OGTT.csv (phút 0 = lúc đói; 30–120 = sau uống glucose)
 
@@ -15,18 +15,23 @@ Mô hình đã fit (joblib) + dự đoán ngoài tập huấn luyện (OOF) + k�
 | `folds.json` | Danh sách fold và số mẫu train/test |
 | `manifest.json` | SHA-256 + phiên bản + tham số |
 | `<model>/final.joblib` | Mô hình fit trên toàn bộ người → chỉ dùng cho NGƯỜI MỚI |
-| `metrics.csv` | Metric theo người, CI95, so baseline |
-| `summary.json` | Tóm tắt + độ bao phủ khoảng 90% |
+| `metrics.csv` | Metric theo đơn vị độc lập, CI95, so baseline |
+| `summary.json` | Tóm tắt: metric, độ bao phủ khoảng 90%, kiểm định hoán vị, kết quả ngoài cohort |
 
 ## Số liệu chính
 
 | Chỉ tiêu | Giá trị |
 |---|---|
+| Số fold | 23 |
+| Mô hình | persistence, mean_delta, ridge |
+| Số file mô hình | 3 |
 | mae – ridge | 2.9797 (CI95 2.032–4.030); so baseline -0.317 |
 | mae – persistence | 3.2971 (CI95 2.159–4.590); so baseline +0.000 |
 | mae – mean_delta | 3.3348 (CI95 2.158–4.691); so baseline +0.038 |
+| Mô hình triển khai (chốt trước) | mean_delta |
 | Kiểm định hoán vị | ridge: p = 0.0149 (200 lần) |
-| Độ bao phủ khoảng 90% | 0.9130 (nửa độ rộng 7.531) |
+| Độ bao phủ khoảng 90% – ridge | 0.9130 (nửa độ rộng 7.531) |
+| Độ bao phủ khoảng 90% (deploy) – mean_delta | 0.9130 (nửa độ rộng 8.958) |
 | Đơn vị độc lập | 23 |
 
 ## Cột dữ liệu

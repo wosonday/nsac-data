@@ -3,7 +3,7 @@
 Bảng mẫu sau khi chuẩn hóa và tạo đặc trưng (bước 2). Mỗi hàng là MỘT mẫu đưa vào mô hình: đặc trưng chỉ lấy từ quá khứ, target là giá trị cần dự báo. Đây là dữ liệu duy nhất bước train đọc.
 
 - **Tạo bởi:** `sky-ml build-features vitals_dbp`
-- **Thời điểm (UTC):** 2026-11-14T13:44:24+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:15:10+00:00
 - **Cohort:** UTMB bed rest CRF Daily Vitals — TRAIN: Campaign 3 (23 người); NGOÀI cohort: CFT70 (5160, 8072, 8936) + Campaign 1 (C1G0001–3) = 6 persona
 - **Nguồn:** data/1_source/raw/nlsp/CRF.zip › */Daily_Vitals/*.csv, CFT70_VITALS/*.csv (kiểm SHA-256 + MD5)
 
@@ -11,9 +11,10 @@ Bảng mẫu sau khi chuẩn hóa và tạo đặc trưng (bước 2). Mỗi hà
 
 | File | Nội dung |
 |---|---|
-| `table.csv.gz` | Bảng mẫu: subject_id, cutoff_time, đặc trưng, target |
+| `table.csv.gz` | Bảng mẫu TRAIN: subject_id, cutoff_time, đặc trưng, target |
 | `features.json` | Danh sách cột mô hình được phép dùng (theo `features` trong tasks.yaml) |
 | `snapshot.json` | SHA-256 file nguồn + phiên bản thư viện + seed (tái lập) |
+| `external.csv.gz` | Bảng NGOÀI cohort (cùng quy tắc, KHÔNG dùng để train) — cohort cft70, campaign_1; chấm điểm ở bước evaluate |
 
 ## Số liệu chính
 
@@ -24,6 +25,7 @@ Bảng mẫu sau khi chuẩn hóa và tạo đặc trưng (bước 2). Mỗi hà
 | Số đặc trưng | 6 |
 | Target | `dbp_next_day` (mmHg) |
 | Cửa sổ | {'past': 7, 'future': 1, 'step': 1} |
+| Ngoài cohort | 431 hàng, 6 người (utmb_c1:C1G0001, utmb_c1:C1G0002, utmb_c1:C1G0003, utmb_cft70:5160, utmb_cft70:8072, utmb_cft70:8936) |
 
 ## Cột dữ liệu
 

@@ -1,0 +1,62 @@
+{
+  "task": "lv_mass",
+  "run_id": "2026-11-14_211332",
+  "samples": 35,
+  "units": 35,
+  "best_model_exploratory": "ridge",
+  "deploy_model": "mean_delta",
+  "metrics": [
+    {
+      "model": "ridge",
+      "units": 35,
+      "mae": 7.696587,
+      "ci95_low": 6.153058,
+      "ci95_high": 9.335068,
+      "diff_vs_baseline": -2.005215,
+      "diff_ci95_low": -4.104147,
+      "diff_ci95_high": 0.140141,
+      "rmse": 9.096524
+    },
+    {
+      "model": "mean_delta",
+      "units": 35,
+      "mae": 7.831959,
+      "ci95_low": 6.236453,
+      "ci95_high": 9.471251,
+      "diff_vs_baseline": -1.869843,
+      "diff_ci95_low": -3.943522,
+      "diff_ci95_high": 0.321528,
+      "rmse": 9.253024
+    },
+    {
+      "model": "persistence",
+      "units": 35,
+      "mae": 9.701802,
+      "ci95_low": 7.563,
+      "ci95_high": 11.90625,
+      "diff_vs_baseline": 0.0,
+      "diff_ci95_low": 0.0,
+      "diff_ci95_high": 0.0,
+      "rmse": 11.783996
+    }
+  ],
+  "interval_coverage": {
+    "model": "ridge",
+    "target_coverage": 0.9,
+    "observed_coverage": 0.9142857142857143,
+    "median_half_width": 14.511562479001022
+  },
+  "interval_coverage_deploy": {
+    "model": "mean_delta",
+    "target_coverage": 0.9,
+    "observed_coverage": 0.9142857142857143,
+    "median_half_width": 15.39908925063715
+  },
+  "permutation_test": {
+    "model": "ridge",
+    "real_score": 7.696586951360985,
+    "n_permutations": 200,
+    "shuffled_median": 7.965815067454718,
+    "p_value": 0.13432835820895522
+  }
+}

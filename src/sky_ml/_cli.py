@@ -11,12 +11,13 @@ from pathlib import Path
 
 import pandas as pd
 
+from . import _cards as cards
 from ._artifacts import load_model, save_model, write_manifest
-from ._datacards import register, write_card
+from ._datacards import register
 from ._hashing import sha256_file
 from ._jsonio import read_json, write_json
 from ._runs import new_run, require, resolve_run
-from ._settings import ensure_writable, load_dictionary, load_settings, load_tasks
+from ._settings import ensure_writable, load_settings, load_tasks
 from ._steps import STEPS, build_features, evaluate, load_data, predict, train
 
 
@@ -27,6 +28,7 @@ def main(argv=None):
     sub.add_parser("steps", help="in thứ tự các bước pipeline")
     sub.add_parser("load-data", help=STEPS[1][2]).add_argument("--dry-run", action="store_true")
     sub.add_parser("check", help="(bước 1) kiểm bản copy còn khớp data/COPY_MANIFEST.csv")
+    sub.add_parser("refresh-docs", help="(ngoài luồng) viết lại README của run mới nhất mọi task + danh mục data/README.md")
     sub.add_parser("make-synthetic", help="(ngoài luồng) sinh DỮ LIỆU GIẢ ĐỊNH cho persona thiếu dữ liệu → data/1_synthetic")
     sub.add_parser("build-features", help=STEPS[2][2]).add_argument("task", help="tên task trong configs/tasks.yaml")
     for name, number in (("train", 3), ("evaluate", 4)):
@@ -48,7 +50,8 @@ def main(argv=None):
         return
     settings = load_settings(args.config)
     {"load-data": _load_data, "check": _check, "build-features": _build_features, "train": _train,
-     "evaluate": _evaluate, "predict": _predict, "make-synthetic": _make_synthetic}[args.command](settings, args)
+     "evaluate": _evaluate, "predict": _predict, "make-synthetic": _make_synthetic,
+     "refresh-docs": _refresh_docs}[args.command](settings, args)
 
 
 def _load_data(settings, args):
@@ -116,6 +119,25 @@ def _make_synthetic(settings, args):
     print(f"Đã sinh {len(files) // 3} bộ dữ liệu GIẢ ĐỊNH → {out}")
 
 
+def _refresh_docs(settings, args):
+    """Viết lại README (data card) của run mới nhất mỗi task từ file trên đĩa — không chạy lại mô hình."""
+    from ._datacards import render_catalog
+    for task, cfg in load_tasks(settings).items():
+        try:
+            rp = resolve_run(settings, task)
+        except FileNotFoundError:
+            continue
+        done = [cards.features_card(settings, task, cfg, rp)]
+        if (rp.models / "oof.csv.gz").exists():
+            done.append(cards.models_card(settings, task, cfg, rp))
+        if rp.predictions.exists():
+            done.append(cards.predictions_card(settings, task, cfg, rp))
+        print(f"{task:<14} {rp.run_id}  {sum(d is not None for d in done)} README")
+    catalog = _catalog(settings)
+    if catalog.exists():
+        render_catalog(catalog, settings.features_dir.parent / "README.md")
+
+
 def _task_cfg(settings, task):
     tasks = load_tasks(settings)
     if task not in tasks:
@@ -128,11 +150,7 @@ def _catalog(settings):
 
 
 def _rel(settings, path) -> str:
-    """Đường dẫn tương đối so với thư mục data/ (để README không phụ thuộc máy)."""
-    try:
-        return "data/" + Path(path).resolve().relative_to(settings.features_dir.parent.resolve()).as_posix()
-    except ValueError:
-        return str(path)
+    return cards.rel(settings.features_dir.parent, path)
 
 
 def _build_features(settings, args):
@@ -150,15 +168,7 @@ def _build_features(settings, args):
     if external is not None:          # bảng NGOÀI cohort (không train) — chấm ở bước evaluate
         external.to_csv(out / "external.csv.gz", index=False)
     cmd = f"sky-ml build-features {args.task}"
-    write_card(out, "features", args.task, rp.run_id, load_dictionary(settings), unit=cfg.get("unit"),
-               produced_by=cmd, columns=list(table.columns),
-               files={"table.csv.gz": "Bảng mẫu: subject_id, cutoff_time, đặc trưng, target",
-                      "features.json": "Danh sách cột mô hình được phép dùng (theo `features` trong tasks.yaml)",
-                      "snapshot.json": "SHA-256 file nguồn + phiên bản thư viện + seed (tái lập)"},
-               facts={"Số hàng (mẫu)": len(table), "Số người/chuỗi độc lập": table.subject_id.nunique(),
-                      "Số đặc trưng": len(features), "Target": f"`{cfg['target']}` ({cfg.get('unit')})",
-                      "Cửa sổ": cfg.get("window")},
-               lineage={"Dữ liệu nguồn": ", ".join(f"data/1_source/{p}" for p in patterns), "Mô hình dùng bảng này": _rel(settings, rp.models)})
+    cards.features_card(settings, args.task, {**cfg, "inputs": patterns}, rp)
     files = [out / "table.csv.gz", out / "features.json", out / "snapshot.json"]
     if external is not None:
         files.append(out / "external.csv.gz")
@@ -166,23 +176,6 @@ def _build_features(settings, args):
              settings.features_dir.parent, {"table.csv.gz": len(table),
                                             **({"external.csv.gz": len(external)} if external is not None else {})})
     print(f"{args.task}: {len(table)} hàng, {table.subject_id.nunique()} người, {len(features)} đặc trưng → {out}")
-
-
-def _model_card(settings, cfg, rp, cmd, facts):
-    files = {"oof.csv.gz": "Dự đoán ngoài tập huấn luyện (OOF) của mọi mô hình — nguồn của mọi điểm đánh giá",
-             "folds.json": "Danh sách fold và số mẫu train/test", "manifest.json": "SHA-256 + phiên bản + tham số",
-             "<model>/final.joblib": "Mô hình fit trên toàn bộ người → chỉ dùng cho NGƯỜI MỚI"}
-    if (rp.models / "metrics.csv").exists():
-        files["metrics.csv"] = "Metric theo người, CI95, so baseline"
-        files["summary.json"] = "Tóm tắt + độ bao phủ khoảng 90%"
-    write_card(rp.models, "models", rp.task, rp.run_id, load_dictionary(settings), unit=cfg.get("unit"),
-               produced_by=cmd, files=files, facts=facts,
-               columns=["fold", "row", "subject_id", "model", "y_true", "y_pred"],
-               lineage={"Bảng đặc trưng (đầu vào)": _rel(settings, rp.features / "table.csv.gz"),
-                        "Dự đoán từ các mô hình này": _rel(settings, rp.predictions)},
-               extra=["## Cảnh báo bảo mật", "",
-                      ("File `.joblib` có thể chạy mã khi nạp. Chỉ nạp qua `sky_ml._artifacts.load_model` "
-                       "(kiểm SHA-256 theo manifest.json); không nạp file từ nguồn khác.")])
 
 
 def _train(settings, args):
@@ -221,9 +214,7 @@ def _train(settings, args):
             "data_snapshot": read_json(snap) if snap.exists() else None,
             "note": "final = fit trên toàn bộ người trong table; chỉ dùng cho người mới. Đánh giá dùng oof.csv.gz."})
         print(f"Đã lưu {len(entries)} mô hình → {out}")
-    _model_card(settings, cfg, rp, cmd, {"Số fold": len(folds), "Mô hình": ", ".join(cfg["models"]),
-                                         "Mô hình triển khai (deploy_model)": cfg.get("deploy_model"),
-                                         "Số file mô hình": len(entries)})
+    cards.models_card(settings, args.task, cfg, rp)
     register(_catalog(settings), "models", args.task, rp.run_id,
              [out / "oof.csv.gz", out / "folds.json"] + [out / e["path"] for e in entries]
              + ([out / "manifest.json"] if entries else []), cmd, settings.features_dir.parent,
@@ -255,22 +246,7 @@ def _evaluate(settings, args):
     if (rp.features / "external.csv.gz").exists():
         summary["external"] = _external(settings, cfg, rp, oof)
         write_json(rp.models / "summary.json", summary)
-    metric = "mae" if cfg["kind"] == "regression" else "macro_f1"
-    facts = {f"{metric} – {r['model']}": f"{r[metric]:.4f} (CI95 {r['ci95_low']:.3f}–{r['ci95_high']:.3f}); "
-             f"so baseline {r['diff_vs_baseline']:+.3f}" for r in summary["metrics"]}
-    if "permutation_test" in summary:
-        pt = summary["permutation_test"]
-        facts["Kiểm định hoán vị"] = f"{pt['model']}: p = {pt['p_value']:.4f} ({pt['n_permutations']} lần)"
-    if "interval_coverage" in summary:
-        cov = summary["interval_coverage"]
-        facts["Độ bao phủ khoảng 90%"] = f"{cov['observed_coverage']:.4f} (nửa độ rộng {cov['median_half_width']:.3f})"
-    facts["Đơn vị độc lập"] = int(metrics.units[0])
-    for r in summary.get("external", {}).get("metrics", []):
-        facts[f"NGOÀI cohort – {r['model']}"] = (f"MAE {r['mae']:.3f} (CI95 {r['ci95_low']:.3f}–{r['ci95_high']:.3f}), "
-                                                 f"{r['units']} người")
-    if "external" in summary:
-        facts["NGOÀI cohort – bao phủ khoảng 90% (deploy)"] = f"{summary['external']['coverage_deploy']:.3f}"
-    _model_card(settings, cfg, rp, f"sky-ml train/evaluate {args.task}", facts)
+    cards.models_card(settings, args.task, cfg, rp)
     register(_catalog(settings), "models", args.task, rp.run_id,
              [rp.models / "metrics.csv", rp.models / "summary.json"], f"sky-ml evaluate {args.task}",
              settings.features_dir.parent)
@@ -303,13 +279,7 @@ def _external(settings, cfg, rp, oof) -> dict:
     pred.to_csv(out / "external_backtest.csv", index=False)
     inside = (pred.y_true >= pred.low90) & (pred.y_true <= pred.high90)
     cov = float(inside[~pred.abstain].mean())
-    write_card(out, "predictions", rp.task, rp.run_id, load_dictionary(settings), unit=cfg.get("unit"),
-               produced_by=f"sky-ml evaluate {rp.task}", columns=list(pred.columns),
-               files={"external_backtest.csv": "Dự đoán ngày-tới cho người NGOÀI cohort train (chưa từng thấy), có đáp án"},
-               facts={"Mô hình": deploy, "Số hàng": len(pred), "Từ chối": int(pred.abstain.sum()),
-                      "Người": pred.subject_id.nunique(), "Bao phủ khoảng 90%": f"{cov:.3f}"},
-               lineage={"Mô hình": _rel(settings, rp.models / deploy / "final.joblib"),
-                        "Bảng ngoài cohort": _rel(settings, rp.features / "external.csv.gz")})
+    cards.predictions_card(settings, rp.task, cfg, rp)
     register(_catalog(settings), "predictions", rp.task, rp.run_id, [out / "external_backtest.csv"],
              f"sky-ml evaluate {rp.task}", settings.features_dir.parent, {"external_backtest.csv": len(pred)})
     print("NGOÀI cohort:\n" + pd.DataFrame(rows).round(4).to_string(index=False) + f"\ncoverage deploy: {cov:.4f}")
@@ -367,18 +337,7 @@ def _predict(settings, args):
     write_json(out / f"{stem}.json", meta)
 
     cmd = f"sky-ml predict {args.task} --input {source.name} --mode {args.mode}"
-    listing = sorted(p.name for p in out.glob("*.csv"))
-    write_card(out, "predictions", args.task, rp.run_id, load_dictionary(settings), unit=cfg.get("unit"),
-               produced_by="sky-ml predict", columns=list(result.columns),
-               files={**{n: "Dự đoán (mỗi lần chạy predict một file; .json cùng tên = thông tin lần chạy)"
-                         for n in listing}},
-               facts={"Lần chạy mới nhất": stem, "Mô hình": model_name, "Chế độ": args.mode,
-                      "Số hàng": len(result), "Từ chối (abstain)": meta["n_abstain"],
-                      "Trong dữ liệu huấn luyện (in_sample)": meta["n_in_sample"],
-                      "Nửa độ rộng khoảng 90%": (f"{half_width:.3f} {cfg.get('unit') or ''}"
-                                                 if cfg["kind"] == "regression" else "— (phân loại)")},
-               lineage={"Mô hình": _rel(settings, rp.models / model_name / "final.joblib"),
-                        "Bảng đặc trưng của run": _rel(settings, rp.features / "table.csv.gz")})
+    cards.predictions_card(settings, args.task, cfg, rp)
     register(_catalog(settings), "predictions", args.task, rp.run_id, [out / f"{stem}.csv", out / f"{stem}.json"],
              cmd, settings.features_dir.parent, {f"{stem}.csv": len(result)})
     print(result.head(10).to_string(index=False, float_format=lambda v: f"{v:.2f}"))

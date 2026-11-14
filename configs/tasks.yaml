@@ -345,3 +345,132 @@ vitals_pulse:                 # nhịp tim buổi sáng của CHÍNH 6 persona (
   measure: pulse
   target: pulse_next_day
   unit: bpm
+
+# ---------------------------------------------------------------------------------------------
+# 14/11 21:15 — ưu tiên dữ liệu THẬT chưa dùng trong NASA-cl (cấu hình chốt trước khi chạy).
+vitals_resp:
+  <<: *vitals
+  description: "UTMB CRF: nhịp thở buổi sáng ngày tới từ 7 ngày trước"
+  measure: resp
+  target: resp_next_day
+  unit: "lần/phút"
+
+vitals_weight:
+  <<: *vitals
+  description: "UTMB CRF: cân nặng buổi sáng ngày tới từ 7 ngày trước"
+  measure: weight
+  target: weight_next_day
+  unit: kg
+
+sleep_act_duration:
+  builder: sleep_act
+  description: "UTMB Campaign 1 actigraphy: thời lượng ngủ đêm tới từ 7 đêm trước"
+  inputs: [raw/nlsp/BRSMAct.zip, raw/nlsp/download_manifest.csv]
+  kind: regression
+  measure: duration
+  target: sleep_hours_next_night
+  unit: "giờ"
+  window: {past: 7, future: 1, step: 1}
+  features: [last_value, mean_last_5, mean_all, std_all, min_all, max_all]
+  split: {type: leave_one_subject_out}
+  baseline: last_value
+  deploy_model: personal_mean
+  seed: 17
+  interval_alpha: 0.10
+  bootstrap_samples: 10000
+  permutation_tests: 0
+  save_models: {final: true, folds: false}
+  models: &small_series_models
+    last_value:
+      class: sky_ml._models.LastValue
+    personal_mean:
+      class: sky_ml._models.LastValue
+      params: {column: mean_all}
+    ridge:
+      class: sklearn.linear_model.Ridge
+      params: {alpha: 10.0}
+      scale: true
+    lightgbm:
+      class: lightgbm.LGBMRegressor
+      params: {n_estimators: 100, learning_rate: 0.05, max_depth: 2, num_leaves: 4,
+               min_child_samples: 10, reg_lambda: 5.0, verbose: -1, n_jobs: 1}
+
+fatigue:
+  builder: mood
+  description: "UTMB CFT70 MFSI-SF: tổng điểm mệt mỏi lần đo tới (~1 tuần) từ 3 lần đo trước"
+  inputs: [raw/nlsp/NNX10AP86G.zip, raw/nlsp/download_manifest.csv]
+  member: MFSI-SF_Total_Scale.csv
+  value_column: Total Score
+  kind: regression
+  target: mfsi_total_next
+  unit: "điểm MFSI-SF"
+  window: {past: 3, future: 1, step: 1}
+  features: [last_value, mean_all, std_all, min_all, max_all]
+  split: {type: leave_one_subject_out}
+  baseline: last_value
+  deploy_model: personal_mean
+  seed: 17
+  interval_alpha: 0.10
+  bootstrap_samples: 10000
+  permutation_tests: 0
+  save_models: {final: true, folds: false}
+  models: *small_series_models
+
+lean_mass_legs: &prepost
+  builder: prepost
+  description: "UTMB CFT70 iDXA: % thay đổi khối nạc hai chân từ PRE đến ngày nằm giường 70"
+  inputs: [raw/nlsp/NNX10AP86G.zip, raw/nlsp/download_manifest.csv]
+  archive: NNX10AP86G.zip
+  member: cft70/NNX10AP86G_CFT70/NNX10AP86G_CFT70_iDXA_obsv.csv
+  value_column: LBM_Legs
+  phase_column: Test_Phase
+  day_column: BR Day
+  target_phase: IN_TEST
+  target_day: 70
+  change: percent
+  kind: regression
+  target: pct_change_day70
+  unit: "% so với PRE"
+  features: [baseline]
+  split: {type: leave_one_subject_out}
+  baseline: persistence
+  deploy_model: mean_delta    # chốt trước (như cpet/glucose): một hàng / người, không kỳ vọng cá nhân hóa
+  seed: 17
+  interval_alpha: 0.10
+  bootstrap_samples: 10000
+  permutation_tests: 200
+  save_models: {final: true, folds: false}
+  models:
+    persistence:
+      class: sklearn.dummy.DummyRegressor
+      params: {strategy: constant, constant: 0.0}
+    mean_delta:
+      class: sklearn.dummy.DummyRegressor
+      params: {strategy: mean}
+    ridge:
+      class: sklearn.linear_model.Ridge
+      params: {alpha: 10.0}
+      scale: true
+
+bone_mineral:
+  <<: *prepost
+  description: "UTMB CFT70 iDXA: % thay đổi khối khoáng xương toàn thân (BMC) từ PRE đến ngày nằm giường 70"
+  value_column: BMC_Total
+
+lv_mass:
+  <<: *prepost
+  description: "UTMB CFT70 siêu âm tim 3D: % thay đổi khối lượng thất trái từ PRE đến ngày nằm giường 70"
+  inputs: [raw/nlsp/BRSMCF.zip, raw/nlsp/download_manifest.csv]
+  archive: BRSMCF.zip
+  member: cft70/BRSMCF_CFT70/BRSMCF_CFT70_3D_Echo_All.csv
+  value_column: LV mass
+  day_column: BR_Day
+
+lv_diastolic_volume:
+  <<: *prepost
+  description: "UTMB CFT70 siêu âm tim 3D: % thay đổi thể tích cuối tâm trương thất trái (LVDV) từ PRE đến ngày nằm giường 70"
+  inputs: [raw/nlsp/BRSMCF.zip, raw/nlsp/download_manifest.csv]
+  archive: BRSMCF.zip
+  member: cft70/BRSMCF_CFT70/BRSMCF_CFT70_3D_Echo_All.csv
+  value_column: LVDV
+  day_column: BR_Day

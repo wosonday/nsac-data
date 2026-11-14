@@ -2,8 +2,8 @@
 
 Kết quả dự báo của mô hình đã lưu (bước 5) cho một file đầu vào mới, kèm khoảng 90%, cờ từ chối dự báo (abstain) và cờ in_sample.
 
-- **Tạo bởi:** `sky-ml evaluate vitals_pulse`
-- **Thời điểm (UTC):** 2026-11-14T13:44:50+00:00
+- **Tạo bởi:** `sky-ml predict / evaluate vitals_pulse`
+- **README cập nhật (UTC):** 2026-11-14T14:15:11+00:00
 - **Cohort:** UTMB bed rest CRF Daily Vitals — TRAIN: Campaign 3 (23 người); NGOÀI cohort: CFT70 (5160, 8072, 8936) + Campaign 1 (C1G0001–3) = 6 persona
 - **Nguồn:** data/1_source/raw/nlsp/CRF.zip › */Daily_Vitals/*.csv, CFT70_VITALS/*.csv (kiểm SHA-256 + MD5)
 
@@ -11,17 +11,15 @@ Kết quả dự báo của mô hình đã lưu (bước 5) cho một file đầ
 
 | File | Nội dung |
 |---|---|
-| `external_backtest.csv` | Dự đoán ngày-tới cho người NGOÀI cohort train (chưa từng thấy), có đáp án |
+| `external_backtest.csv` | Dự đoán ngày tới cho người NGOÀI cohort train (chưa từng thấy), có đáp án `y_true` |
 
 ## Số liệu chính
 
 | Chỉ tiêu | Giá trị |
 |---|---|
-| Mô hình | ridge |
-| Số hàng | 423 |
-| Từ chối | 0 |
-| Người | 6 |
-| Bao phủ khoảng 90% | 0.929 |
+| external_backtest – người | 6 (utmb_c1:C1G0001, utmb_c1:C1G0002, utmb_c1:C1G0003, utmb_cft70:5160, utmb_cft70:8072, utmb_cft70:8936) |
+| external_backtest – hàng / từ chối | 423 / 0 |
+| external_backtest – MAE gộp mọi hàng / bao phủ 90% | 5.030 / 0.929 |
 
 ## Cột dữ liệu
 
@@ -35,7 +33,7 @@ Kết quả dự báo của mô hình đã lưu (bước 5) cho một file đầ
 | `low90` | bpm | Cận dưới khoảng 90% (split-conformal từ sai số OOF). |
 | `high90` | bpm | Cận trên khoảng 90%. |
 | `abstain` | bool | True = từ chối dự báo; lý do ở cột reasons. |
-| `reasons` |  | missing_features | out_of_training_range | insufficient_calibration_data (phân cách ;). |
+| `reasons` |  | Lý do từ chối, phân cách bằng dấu chấm phẩy: missing_features, out_of_training_range, insufficient_calibration_data. |
 | `in_sample` | bool | True = người này nằm trong dữ liệu huấn luyện → KHÔNG phải đánh giá trên người mới. |
 | `y_true` | bpm | Giá trị thật của target. |
 | `abs_error` | bpm | |y_true − prediction| (chỉ chế độ backtest). |
@@ -43,7 +41,7 @@ Kết quả dự báo của mô hình đã lưu (bước 5) cho một file đầ
 ## Truy vết (lineage)
 
 - **Mô hình:** `data/3_models/vitals_pulse/2026-11-14_204445/ridge/final.joblib`
-- **Bảng ngoài cohort:** `data/2_features/vitals_pulse/2026-11-14_204445/external.csv.gz`
+- **Bảng đặc trưng của run:** `data/2_features/vitals_pulse/2026-11-14_204445/table.csv.gz`
 
 ## Giới hạn cần nhớ
 

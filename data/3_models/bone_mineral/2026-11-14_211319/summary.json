@@ -1,0 +1,62 @@
+{
+  "task": "bone_mineral",
+  "run_id": "2026-11-14_211319",
+  "samples": 18,
+  "units": 18,
+  "best_model_exploratory": "persistence",
+  "deploy_model": "mean_delta",
+  "metrics": [
+    {
+      "model": "persistence",
+      "units": 18,
+      "mae": 0.633843,
+      "ci95_low": 0.457966,
+      "ci95_high": 0.818325,
+      "diff_vs_baseline": 0.0,
+      "diff_ci95_low": 0.0,
+      "diff_ci95_high": 0.0,
+      "rmse": 0.746759
+    },
+    {
+      "model": "mean_delta",
+      "units": 18,
+      "mae": 0.667845,
+      "ci95_low": 0.480789,
+      "ci95_high": 0.858953,
+      "diff_vs_baseline": 0.034003,
+      "diff_ci95_low": -0.010061,
+      "diff_ci95_high": 0.0789,
+      "rmse": 0.784034
+    },
+    {
+      "model": "ridge",
+      "units": 18,
+      "mae": 0.693639,
+      "ci95_low": 0.497576,
+      "ci95_high": 0.899924,
+      "diff_vs_baseline": 0.059796,
+      "diff_ci95_low": 0.006312,
+      "diff_ci95_high": 0.115239,
+      "rmse": 0.820737
+    }
+  ],
+  "interval_coverage": {
+    "model": "persistence",
+    "target_coverage": 0.9,
+    "observed_coverage": 0.9444444444444444,
+    "median_half_width": 1.3493253373313419
+  },
+  "interval_coverage_deploy": {
+    "model": "mean_delta",
+    "target_coverage": 0.9,
+    "observed_coverage": 0.9444444444444444,
+    "median_half_width": 1.3924057604545403
+  },
+  "permutation_test": {
+    "model": "persistence",
+    "real_score": 0.6338429469469659,
+    "n_permutations": 200,
+    "shuffled_median": 0.6338429469469659,
+    "p_value": 1.0
+  }
+}

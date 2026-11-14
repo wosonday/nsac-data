@@ -43,7 +43,7 @@ columns:
   high90: {unit: "{unit}", description: "Cận trên khoảng 90%."}
   unit: {unit: "", description: "Đơn vị của prediction."}
   abstain: {unit: "bool", description: "True = từ chối dự báo; lý do ở cột reasons."}
-  reasons: {unit: "", description: "missing_features | out_of_training_range | insufficient_calibration_data (phân cách ;)."}
+  reasons: {unit: "", description: "Lý do từ chối, phân cách bằng dấu chấm phẩy: missing_features, out_of_training_range, insufficient_calibration_data."}
   in_sample: {unit: "bool", description: "True = người này nằm trong dữ liệu huấn luyện → KHÔNG phải đánh giá trên người mới."}
   abs_error: {unit: "{unit}", description: "|y_true − prediction| (chỉ chế độ backtest)."}
   input_synthetic: {unit: "bool", description: "True = đầu vào là DỮ LIỆU GIẢ ĐỊNH (data/1_synthetic) — dự đoán chỉ để minh họa."}
@@ -182,3 +182,34 @@ tasks:
     caveats:
       - "Một hàng / người (23 hàng) — pilot. OGTT là nghiệm pháp tại phòng thí nghiệm, không phải CGM."
       - "Đường huyết hằng ngày của persona trên web là DỮ LIỆU GIẢ ĐỊNH (data/1_synthetic/glucose_daily_personas.csv), neo vào giá trị OGTT thật với CFT70."
+  vitals_resp: *vitals_dict
+  vitals_weight: *vitals_dict
+  sleep_act_duration:
+    cohort: "UTMB Bed Rest Campaign 1 (BRSMAct) — 3 người C1G0001–3 (= tomas, yuki, noor)"
+    source: "data/1_source/raw/nlsp/BRSMAct.zip › BRSMACT_Campagin_1_Actigraphy.csv"
+    columns:
+      sleep_hours_next_night: {unit: "giờ", description: "TARGET: thời lượng ngủ (actigraphy) đêm tới."}
+    caveats:
+      - "Chỉ 3 người → pilot; có đêm dùng thuốc ngủ (Ambien)."
+      - "3 persona CFT70 dùng dữ liệu GIẢ ĐỊNH data/1_synthetic/sleep_cft70_actigraphy.csv (cột duration)."
+  fatigue:
+    cohort: "UTMB CFT70 — NNX10AP86G MFSI-SF (Multidimensional Fatigue Symptom Inventory – Short Form), 24 người, ~16 lần đo/người"
+    source: "data/1_source/raw/nlsp/NNX10AP86G.zip › NNX10AP86G_CFT70_MFSI-SF_Total_Scale.csv"
+    columns:
+      cutoff_time: {unit: "ngày nghiên cứu", description: "PRE = −BR_Day, IN = +BR_Day, POST = 70 + BR_Day."}
+      mfsi_total_next: {unit: "điểm", description: "TARGET: tổng điểm mệt mỏi MFSI-SF lần đo tới (cao hơn = mệt hơn; có thể âm vì trừ thang sức sống)."}
+    caveats:
+      - "Thang tự đánh giá; 3 persona Campaign 1 không có MFSI-SF."
+  lean_mass_legs: &prepost_dict
+    cohort: "UTMB CFT70 (nằm giường 70 ngày) — người có đo PRE và ngày 70"
+    source: "data/1_source/raw/nlsp/NNX10AP86G.zip (iDXA) hoặc BRSMCF.zip (siêu âm tim 3D) — xem tasks.yaml › member, value_column"
+    columns:
+      baseline: {unit: "đơn vị nguồn", description: "Trung bình mọi lần đo PRE của người đó (g với iDXA, g với LV mass, mL với LVDV)."}
+      pct_change_day70: {unit: "% so với PRE", description: "TARGET: (giá trị ngày nằm giường 70 / baseline − 1) × 100."}
+    caveats:
+      - "Một hàng / người — pilot; đánh giá LOSO + kiểm định hoán vị 200 lần."
+      - "Nhóm can thiệp (tập luyện, testosterone…) ảnh hưởng mạnh nhưng KHÔNG dùng làm đặc trưng (phi hành gia thật không có nhãn này)."
+      - "Chỉ có ở 3 persona CFT70; persona Campaign 1 → UNKNOWN."
+  bone_mineral: *prepost_dict
+  lv_mass: *prepost_dict
+  lv_diastolic_volume: *prepost_dict

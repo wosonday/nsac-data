@@ -2,8 +2,8 @@
 
 Kết quả dự báo của mô hình đã lưu (bước 5) cho một file đầu vào mới, kèm khoảng 90%, cờ từ chối dự báo (abstain) và cờ in_sample.
 
-- **Tạo bởi:** `sky-ml predict`
-- **Thời điểm (UTC):** 2026-11-14T07:54:12+00:00
+- **Tạo bởi:** `sky-ml predict / evaluate hr`
+- **README cập nhật (UTC):** 2026-11-14T14:15:08+00:00
 - **Cohort:** MMASH 1.0.0 (PhysioNet, ODbL 1.0) — 22 nam khỏe mạnh, mặt đất, ~24 giờ/người
 - **Nguồn:** data/1_source/processed/sample-v2/mmash_minutes.csv.gz (bảng phút đã QA của NASA-cl)
 
@@ -11,19 +11,13 @@ Kết quả dự báo của mô hình đã lưu (bước 5) cho một file đầ
 
 | File | Nội dung |
 |---|---|
-| `mmash_minutes_latest_ridge_20261114_145412.csv` | Dự đoán (mỗi lần chạy predict một file; .json cùng tên = thông tin lần chạy) |
+| `mmash_minutes_latest_ridge_20261114_145412.csv` | Dự đoán (.json cùng tên = thông tin lần chạy) |
 
 ## Số liệu chính
 
 | Chỉ tiêu | Giá trị |
 |---|---|
-| Lần chạy mới nhất | mmash_minutes_latest_ridge_20261114_145412 |
-| Mô hình | ridge |
-| Chế độ | latest |
-| Số hàng | 22 |
-| Từ chối (abstain) | 9 |
-| Trong dữ liệu huấn luyện (in_sample) | 22 |
-| Nửa độ rộng khoảng 90% | 8.722 bpm |
+| mmash_minutes_latest_ridge_20261114_145412 | mô hình ridge, chế độ latest, 22 hàng, từ chối 9, in_sample 22, đầu vào giả định 0, nửa độ rộng 90% 8.722 bpm |
 
 ## Cột dữ liệu
 
@@ -37,7 +31,7 @@ Kết quả dự báo của mô hình đã lưu (bước 5) cho một file đầ
 | `low90` | bpm | Cận dưới khoảng 90% (split-conformal từ sai số OOF). |
 | `high90` | bpm | Cận trên khoảng 90%. |
 | `abstain` | bool | True = từ chối dự báo; lý do ở cột reasons. |
-| `reasons` |  | missing_features | out_of_training_range | insufficient_calibration_data (phân cách ;). |
+| `reasons` |  | Lý do từ chối, phân cách bằng dấu chấm phẩy: missing_features, out_of_training_range, insufficient_calibration_data. |
 | `in_sample` | bool | True = người này nằm trong dữ liệu huấn luyện → KHÔNG phải đánh giá trên người mới. |
 
 ## Truy vết (lineage)

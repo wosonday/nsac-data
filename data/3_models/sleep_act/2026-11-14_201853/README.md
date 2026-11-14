@@ -3,7 +3,7 @@
 Mô hình đã fit (joblib) + dự đoán ngoài tập huấn luyện (OOF) + kết quả đánh giá. `final` fit trên TOÀN BỘ người của bảng đặc trưng → chỉ dùng dự báo cho NGƯỜI MỚI. Điểm đánh giá luôn lấy từ OOF (mỗi người được dự đoán bởi mô hình chưa từng thấy họ).
 
 - **Tạo bởi:** `sky-ml train/evaluate sleep_act`
-- **Thời điểm (UTC):** 2026-11-14T13:18:57+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:15:10+00:00
 - **Cohort:** UTMB Bed Rest Campaign 1 (NASA NLSP, BRSMAct) — 3 người C1G0001–3, 2 đêm trước, ~60 đêm nằm giường, 7 đêm sau
 - **Nguồn:** data/1_source/raw/nlsp/BRSMAct.zip › BRSMACT_Campagin_1_Actigraphy.csv (kiểm SHA-256 + MD5 theo download_manifest.csv)
 
@@ -15,18 +15,22 @@ Mô hình đã fit (joblib) + dự đoán ngoài tập huấn luyện (OOF) + k�
 | `folds.json` | Danh sách fold và số mẫu train/test |
 | `manifest.json` | SHA-256 + phiên bản + tham số |
 | `<model>/final.joblib` | Mô hình fit trên toàn bộ người → chỉ dùng cho NGƯỜI MỚI |
-| `metrics.csv` | Metric theo người, CI95, so baseline |
-| `summary.json` | Tóm tắt + độ bao phủ khoảng 90% |
+| `metrics.csv` | Metric theo đơn vị độc lập, CI95, so baseline |
+| `summary.json` | Tóm tắt: metric, độ bao phủ khoảng 90%, kiểm định hoán vị, kết quả ngoài cohort |
 
 ## Số liệu chính
 
 | Chỉ tiêu | Giá trị |
 |---|---|
+| Số fold | 3 |
+| Mô hình | last_value, personal_mean, ridge, lightgbm |
+| Số file mô hình | 4 |
 | mae – personal_mean | 5.3991 (CI95 4.653–5.859); so baseline -0.230 |
 | mae – last_value | 5.6289 (CI95 4.411–6.379); so baseline +0.000 |
 | mae – ridge | 5.9025 (CI95 5.179–7.132); so baseline +0.274 |
 | mae – lightgbm | 6.1706 (CI95 5.438–7.371); so baseline +0.542 |
-| Độ bao phủ khoảng 90% | 0.8951 (nửa độ rộng 12.857) |
+| Mô hình triển khai (chốt trước) | personal_mean |
+| Độ bao phủ khoảng 90% – personal_mean | 0.8951 (nửa độ rộng 12.857) |
 | Đơn vị độc lập | 3 |
 
 ## Cột dữ liệu

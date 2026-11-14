@@ -3,7 +3,7 @@
 Bảng mẫu sau khi chuẩn hóa và tạo đặc trưng (bước 2). Mỗi hàng là MỘT mẫu đưa vào mô hình: đặc trưng chỉ lấy từ quá khứ, target là giá trị cần dự báo. Đây là dữ liệu duy nhất bước train đọc.
 
 - **Tạo bởi:** `sky-ml build-features mood`
-- **Thời điểm (UTC):** 2026-11-14T13:44:52+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:15:11+00:00
 - **Cohort:** UTMB CFT70 — NNX10AP86G POMS, 24 người, 13–16 lần đo/người (~hằng tuần)
 - **Nguồn:** data/1_source/raw/nlsp/NNX10AP86G.zip › NNX10AP86G_CFT70_POMS_TMD.csv
 
@@ -11,7 +11,7 @@ Bảng mẫu sau khi chuẩn hóa và tạo đặc trưng (bước 2). Mỗi hà
 
 | File | Nội dung |
 |---|---|
-| `table.csv.gz` | Bảng mẫu: subject_id, cutoff_time, đặc trưng, target |
+| `table.csv.gz` | Bảng mẫu TRAIN: subject_id, cutoff_time, đặc trưng, target |
 | `features.json` | Danh sách cột mô hình được phép dùng (theo `features` trong tasks.yaml) |
 | `snapshot.json` | SHA-256 file nguồn + phiên bản thư viện + seed (tái lập) |
 

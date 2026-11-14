@@ -47,13 +47,14 @@ def write_card(folder: Path, kind: str, task: str, run_id: str, dictionary: dict
     lines = [f"# {meta.get('title', kind)} — `{task}` / run `{run_id}`", "",
              meta.get("purpose", ""), "",
              f"- **Tạo bởi:** `{produced_by}`",
-             f"- **Thời điểm (UTC):** {datetime.now(UTC).isoformat(timespec='seconds')}"]
+             f"- **README cập nhật (UTC):** {datetime.now(UTC).isoformat(timespec='seconds')}"]
     if tinfo.get("cohort"):
         lines.append(f"- **Cohort:** {tinfo['cohort']}")
     if tinfo.get("source"):
         lines.append(f"- **Nguồn:** {tinfo['source']}")
     lines += ["", "## File trong thư mục", "", "| File | Nội dung |", "|---|---|"]
     lines += [f"| `{f}` | {d} |" for f, d in files.items()]
+    lines = [ln.replace("\n", " ") for ln in lines]
     if facts:
         lines += ["", "## Số liệu chính", "", "| Chỉ tiêu | Giá trị |", "|---|---|"]
         lines += [f"| {k} | {v} |" for k, v in facts.items()]
@@ -99,11 +100,13 @@ def render_catalog(catalog: Path, readme: Path) -> None:
     rows = sorted(latest.values(), key=lambda r: (r["task"], r["run_id"], r["kind"], r["path"]), reverse=True)
     lines = [START, "", "_Tự sinh bởi `sky-ml` từ `CATALOG.csv` — không sửa tay phần này._", "",
              "| Task | Run mới nhất | Dự đoán mới nhất |", "|---|---|---|"]
-    for task in sorted({r["task"] for r in rows}):
+    for task in sorted({r["task"] for r in rows if r["kind"] != "synthetic"}):
         runs = sorted({r["run_id"] for r in rows if r["task"] == task})
         preds = sorted(r["path"] for r in rows if r["task"] == task and r["kind"] == "predictions"
                        and r["path"].endswith(".csv"))
         lines.append(f"| `{task}` | `{runs[-1]}` | {f'[`{preds[-1]}`]({preds[-1]})' if preds else '—'} |")
+    if any(r["kind"] == "synthetic" for r in rows):
+        lines.append("| ⚠️ dữ liệu giả định | `1_synthetic` | [`1_synthetic/README.md`](1_synthetic/README.md) |")
     lines += ["", "| Nhóm | Task | Run | File | Số hàng | Byte | SHA-256 (12 ký tự đầu) | Lệnh tạo |",
               "|---|---|---|---|---|---|---|---|"]
     lines += [f"| {_KIND.get(r['kind'], r['kind'])} | `{r['task']}` | `{r['run_id']}` | [`{r['path']}`]({r['path']}) "

@@ -22,10 +22,13 @@ COLUMN_ALIASES = {
     "dbp": ["DiaBP", "DiaBP (mmHg)", "Blood Pressure, diastolic"],
     "temp": ["Body Temp", "Body Temp (Celsius)", "Temperature, body (Celsius)"],
     "pulse": ["Pulse", "Pulse (bpm)"],
+    "resp": ["Resp Rate", "Resp Rate (rpm)", "Respiration rate", "Respiration rate (rpm)"],
+    "weight": ["Weight", "Weight (Kg)", "Weight (kg)"],
     "date": ["Date", "Test_Date"],
 }
-VALID_RANGE = {"sbp": (60, 250), "dbp": (30, 150), "temp": (34.0, 42.0), "pulse": (30, 220)}
-UNITS = {"sbp": "mmHg", "dbp": "mmHg", "temp": "°C", "pulse": "bpm"}
+VALID_RANGE = {"sbp": (60, 250), "dbp": (30, 150), "temp": (34.0, 42.0), "pulse": (30, 220),
+               "resp": (4, 60), "weight": (30, 200)}
+UNITS = {"sbp": "mmHg", "dbp": "mmHg", "temp": "°C", "pulse": "bpm", "resp": "lần/phút", "weight": "kg"}
 COHORTS = {"campaign_3": ("campaign_3/CRF_Campaign_3_Daily_Vitals/", "utmb_c3:"),
            "cft70": ("cft70/CRF_CFT70_VITALS/", "utmb_cft70:"),
            "campaign_1": ("campaign_1/CRF_Campaign_1_Daily_Vitals/CRF_Campaign_1_Daily_Vitals_All.csv", "utmb_c1:")}
@@ -57,7 +60,7 @@ def _dedupe(days: pd.DataFrame) -> pd.DataFrame:
         return u[0] if len(u) == 1 else np.nan
     keys = ["subject_id", "cohort", "date"]
     first = days.groupby(keys, as_index=False)[["phase", "br_day"]].first()
-    vals = days.groupby(keys)[list(VALID_RANGE)].agg(one).reset_index()
+    vals = days.groupby(keys)[[m for m in VALID_RANGE if m in days]].agg(one).reset_index()
     return first.merge(vals, on=keys)
 
 

@@ -3,7 +3,7 @@
 Bảng mẫu sau khi chuẩn hóa và tạo đặc trưng (bước 2). Mỗi hàng là MỘT mẫu đưa vào mô hình: đặc trưng chỉ lấy từ quá khứ, target là giá trị cần dự báo. Đây là dữ liệu duy nhất bước train đọc.
 
 - **Tạo bởi:** `sky-ml build-features hr`
-- **Thời điểm (UTC):** 2026-11-14T07:53:22+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:15:08+00:00
 - **Cohort:** MMASH 1.0.0 (PhysioNet, ODbL 1.0) — 22 nam khỏe mạnh, mặt đất, ~24 giờ/người
 - **Nguồn:** data/1_source/processed/sample-v2/mmash_minutes.csv.gz (bảng phút đã QA của NASA-cl)
 
@@ -11,7 +11,7 @@ Bảng mẫu sau khi chuẩn hóa và tạo đặc trưng (bước 2). Mỗi hà
 
 | File | Nội dung |
 |---|---|
-| `table.csv.gz` | Bảng mẫu: subject_id, cutoff_time, đặc trưng, target |
+| `table.csv.gz` | Bảng mẫu TRAIN: subject_id, cutoff_time, đặc trưng, target |
 | `features.json` | Danh sách cột mô hình được phép dùng (theo `features` trong tasks.yaml) |
 | `snapshot.json` | SHA-256 file nguồn + phiên bản thư viện + seed (tái lập) |
 
@@ -42,7 +42,7 @@ Bảng mẫu sau khi chuẩn hóa và tạo đặc trưng (bước 2). Mỗi hà
 
 ## Truy vết (lineage)
 
-- **Dữ liệu nguồn:** `processed/sample-v2/mmash_minutes.csv.gz`
+- **Dữ liệu nguồn:** `data/1_source/processed/sample-v2/mmash_minutes.csv.gz`
 - **Mô hình dùng bảng này:** `data/3_models/hr/2026-11-14_145321`
 
 ## Giới hạn cần nhớ

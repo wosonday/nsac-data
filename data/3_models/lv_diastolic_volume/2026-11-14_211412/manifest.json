@@ -1,0 +1,92 @@
+{
+  "versions": {
+    "python": "3.12.15",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "numpy": "2.5.4",
+    "joblib": "1.6.0"
+  },
+  "task": "lv_diastolic_volume",
+  "run_id": "2026-11-14_211412",
+  "features": [
+    "baseline"
+  ],
+  "target": "pct_change_day70",
+  "seed": 17,
+  "model_specs": {
+    "persistence": {
+      "class": "sklearn.dummy.DummyRegressor",
+      "params": {
+        "strategy": "constant",
+        "constant": 0.0
+      }
+    },
+    "mean_delta": {
+      "class": "sklearn.dummy.DummyRegressor",
+      "params": {
+        "strategy": "mean"
+      }
+    },
+    "ridge": {
+      "class": "sklearn.linear_model.Ridge",
+      "params": {
+        "alpha": 10.0
+      },
+      "scale": true
+    }
+  },
+  "split": {
+    "type": "leave_one_subject_out"
+  },
+  "features_table": "data/2_features/lv_diastolic_volume/2026-11-14_211412/table.csv.gz",
+  "data_snapshot": {
+    "files": {
+      "raw/nlsp/BRSMCF.zip": "03413681e88cf5e75b673c7f4013ccc980a6a60a9228e0213c3fee814ef04cff",
+      "raw/nlsp/download_manifest.csv": "37e2e53555829b52bc45cc44a2d90e1ad8ed1289a81df3816a3171a91ca289c1"
+    },
+    "python": "3.12.15",
+    "libraries": {
+      "scikit-learn": "1.9.1",
+      "lightgbm": "4.7.0",
+      "pandas": "3.1.1",
+      "numpy": "2.5.4",
+      "scipy": "1.18.1",
+      "mne": "1.13.2",
+      "shap": "0.54.1"
+    },
+    "seed": 17
+  },
+  "note": "final = fit trên toàn bộ người trong table; chỉ dùng cho người mới. Đánh giá dùng oof.csv.gz.",
+  "models": [
+    {
+      "model": "persistence",
+      "kind": "final",
+      "path": "persistence/final.joblib",
+      "n_train_rows": 35,
+      "n_train_units": 35,
+      "file": "final.joblib",
+      "bytes": 420,
+      "sha256": "937d8f5c094fa589ad4b79b0eac9d3fe7b5626fb9c9d26d33fc09a471cfd7d2d"
+    },
+    {
+      "model": "mean_delta",
+      "kind": "final",
+      "path": "mean_delta/final.joblib",
+      "n_train_rows": 35,
+      "n_train_units": 35,
+      "file": "final.joblib",
+      "bytes": 437,
+      "sha256": "783d78c2bc60b784a2a00397f84d674658c09a75d7643a1426ea2a85ad836e2f"
+    },
+    {
+      "model": "ridge",
+      "kind": "final",
+      "path": "ridge/final.joblib",
+      "n_train_rows": 35,
+      "n_train_units": 35,
+      "file": "final.joblib",
+      "bytes": 752,
+      "sha256": "5e04a63254f1e83bbcbfe18d65789f977e21cf5df686fe728aaf44255176d83b"
+    }
+  ]
+}

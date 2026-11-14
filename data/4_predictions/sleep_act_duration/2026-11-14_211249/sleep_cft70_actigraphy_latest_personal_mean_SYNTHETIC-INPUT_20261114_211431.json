@@ -1,0 +1,12 @@
+{
+  "task": "sleep_act_duration",
+  "run_id": "2026-11-14_211249",
+  "model": "personal_mean",
+  "mode": "latest",
+  "input": "data/1_synthetic/sleep_cft70_actigraphy.csv",
+  "half_width_90": 1.0714285714285703,
+  "n_rows": 3,
+  "n_abstain": 1,
+  "n_in_sample": 0,
+  "n_input_synthetic": 3
+}

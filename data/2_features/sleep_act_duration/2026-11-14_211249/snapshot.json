@@ -1,0 +1,17 @@
+{
+  "files": {
+    "raw/nlsp/BRSMAct.zip": "70ba7198b8aceb32ee22a631db6f56dc131e3f8099f0af0a9498cef5d4e590a3",
+    "raw/nlsp/download_manifest.csv": "37e2e53555829b52bc45cc44a2d90e1ad8ed1289a81df3816a3171a91ca289c1"
+  },
+  "python": "3.12.15",
+  "libraries": {
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "pandas": "3.1.1",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "mne": "1.13.2",
+    "shap": "0.54.1"
+  },
+  "seed": 17
+}

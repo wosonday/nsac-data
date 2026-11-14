@@ -3,7 +3,7 @@
 Bảng mẫu sau khi chuẩn hóa và tạo đặc trưng (bước 2). Mỗi hàng là MỘT mẫu đưa vào mô hình: đặc trưng chỉ lấy từ quá khứ, target là giá trị cần dự báo. Đây là dữ liệu duy nhất bước train đọc.
 
 - **Tạo bởi:** `sky-ml build-features glucose`
-- **Thời điểm (UTC):** 2026-11-14T13:44:58+00:00
+- **README cập nhật (UTC):** 2026-11-14T14:15:11+00:00
 - **Cohort:** UTMB CFT70 — NNX10AP86G OGTT, 23 người đủ dữ liệu PRE + ngày nằm giường 66
 - **Nguồn:** data/1_source/raw/nlsp/NNX10AP86G.zip › NNX10AP86G_CFT70_OGTT.csv (phút 0 = lúc đói; 30–120 = sau uống glucose)
 
@@ -11,7 +11,7 @@ Bảng mẫu sau khi chuẩn hóa và tạo đặc trưng (bước 2). Mỗi hà
 
 | File | Nội dung |
 |---|---|
-| `table.csv.gz` | Bảng mẫu: subject_id, cutoff_time, đặc trưng, target |
+| `table.csv.gz` | Bảng mẫu TRAIN: subject_id, cutoff_time, đặc trưng, target |
 | `features.json` | Danh sách cột mô hình được phép dùng (theo `features` trong tasks.yaml) |
 | `snapshot.json` | SHA-256 file nguồn + phiên bản thư viện + seed (tái lập) |
 
@@ -23,7 +23,7 @@ Bảng mẫu sau khi chuẩn hóa và tạo đặc trưng (bước 2). Mỗi hà
 | Số người/chuỗi độc lập | 23 |
 | Số đặc trưng | 3 |
 | Target | `delta_glucose_0` (mg/dL) |
-| Cửa sổ | None |
+| Cửa sổ | — (một hàng / người) |
 
 ## Cột dữ liệu
 

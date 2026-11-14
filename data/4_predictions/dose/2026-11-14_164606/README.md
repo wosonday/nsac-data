@@ -2,8 +2,8 @@
 
 Kết quả dự báo của mô hình đã lưu (bước 5) cho một file đầu vào mới, kèm khoảng 90%, cờ từ chối dự báo (abstain) và cờ in_sample.
 
-- **Tạo bởi:** `sky-ml predict`
-- **Thời điểm (UTC):** 2026-11-14T09:48:35+00:00
+- **Tạo bởi:** `sky-ml predict / evaluate dose`
+- **README cập nhật (UTC):** 2026-11-14T14:15:08+00:00
 - **Cohort:** NASA OSDR RadLab — thiết bị Lidal, mô-đun Columbus, ISS, năm 2022 (một chuỗi thiết bị, không phải người)
 - **Nguồn:** data/1_source/raw/radlab/instruments/Lidal/*.csv (3 file, lưới 5 phút)
 
@@ -11,19 +11,13 @@ Kết quả dự báo của mô hình đã lưu (bước 5) cho một file đầ
 
 | File | Nội dung |
 |---|---|
-| `2022-05-01_2023-01-01_latest_lightgbm_20261114_164835.csv` | Dự đoán (mỗi lần chạy predict một file; .json cùng tên = thông tin lần chạy) |
+| `2022-05-01_2023-01-01_latest_lightgbm_20261114_164835.csv` | Dự đoán (.json cùng tên = thông tin lần chạy) |
 
 ## Số liệu chính
 
 | Chỉ tiêu | Giá trị |
 |---|---|
-| Lần chạy mới nhất | 2022-05-01_2023-01-01_latest_lightgbm_20261114_164835 |
-| Mô hình | lightgbm |
-| Chế độ | latest |
-| Số hàng | 1 |
-| Từ chối (abstain) | 0 |
-| Trong dữ liệu huấn luyện (in_sample) | 1 |
-| Nửa độ rộng khoảng 90% | 1.696 uGy/h |
+| 2022-05-01_2023-01-01_latest_lightgbm_20261114_164835 | mô hình lightgbm, chế độ latest, 1 hàng, từ chối 0, in_sample 1, đầu vào giả định 0, nửa độ rộng 90% 1.696 uGy/h |
 
 ## Cột dữ liệu
 
@@ -37,7 +31,7 @@ Kết quả dự báo của mô hình đã lưu (bước 5) cho một file đầ
 | `low90` | uGy/h | Cận dưới khoảng 90% (split-conformal từ sai số OOF). |
 | `high90` | uGy/h | Cận trên khoảng 90%. |
 | `abstain` | bool | True = từ chối dự báo; lý do ở cột reasons. |
-| `reasons` |  | missing_features | out_of_training_range | insufficient_calibration_data (phân cách ;). |
+| `reasons` |  | Lý do từ chối, phân cách bằng dấu chấm phẩy: missing_features, out_of_training_range, insufficient_calibration_data. |
 | `in_sample` | bool | True = người này nằm trong dữ liệu huấn luyện → KHÔNG phải đánh giá trên người mới. |
 
 ## Truy vết (lineage)

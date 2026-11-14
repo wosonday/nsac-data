@@ -1,0 +1,56 @@
+{
+  "task": "lv_diastolic_volume",
+  "run_id": "2026-11-14_211412",
+  "samples": 35,
+  "units": 35,
+  "best_model_exploratory": "mean_delta",
+  "deploy_model": "mean_delta",
+  "metrics": [
+    {
+      "model": "mean_delta",
+      "units": 35,
+      "mae": 8.24501,
+      "ci95_low": 6.357213,
+      "ci95_high": 10.231107,
+      "diff_vs_baseline": -1.939305,
+      "diff_ci95_low": -4.166331,
+      "diff_ci95_high": 0.291914,
+      "rmse": 10.127847
+    },
+    {
+      "model": "ridge",
+      "units": 35,
+      "mae": 8.457581,
+      "ci95_low": 6.560285,
+      "ci95_high": 10.452308,
+      "diff_vs_baseline": -1.726734,
+      "diff_ci95_low": -3.916761,
+      "diff_ci95_high": 0.474503,
+      "rmse": 10.327101
+    },
+    {
+      "model": "persistence",
+      "units": 35,
+      "mae": 10.184315,
+      "ci95_low": 7.879716,
+      "ci95_high": 12.782354,
+      "diff_vs_baseline": 0.0,
+      "diff_ci95_low": 0.0,
+      "diff_ci95_high": 0.0,
+      "rmse": 12.570595
+    }
+  ],
+  "interval_coverage": {
+    "model": "mean_delta",
+    "target_coverage": 0.9,
+    "observed_coverage": 0.9142857142857143,
+    "median_half_width": 16.876266347667972
+  },
+  "permutation_test": {
+    "model": "mean_delta",
+    "real_score": 8.245010068011073,
+    "n_permutations": 200,
+    "shuffled_median": 8.245010068011073,
+    "p_value": 0.6368159203980099
+  }
+}
