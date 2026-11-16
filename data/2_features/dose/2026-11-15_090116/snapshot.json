@@ -1,0 +1,18 @@
+{
+  "files": {
+    "raw/radlab/instruments/Lidal/2022-01-01_2022-04-01.csv": "5d93bf0dd621d908f7ed46357ca1a8cb4a224aa31b9457dd190046121a4083a3",
+    "raw/radlab/instruments/Lidal/2022-04-01_2022-05-01.csv": "170bd2af12265fb708fc1b05d744fe67f278a2c578377107ba5880aa41d22811",
+    "raw/radlab/instruments/Lidal/2022-05-01_2023-01-01.csv": "1977ddd2b11c9d8999d7cdd55b4464fb0d055f9eb0a3eb8235935950007804d5"
+  },
+  "python": "3.12.12",
+  "libraries": {
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "pandas": "3.1.1",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "mne": "1.13.2",
+    "shap": "0.54.1"
+  },
+  "seed": 17
+}

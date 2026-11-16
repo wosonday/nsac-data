@@ -1,3 +1,3 @@
 dataset,variable,people,rows,mean,sd,min,max,lag1_autocorr
 THẬT – OGTT phút 0,glucose_fasting,24,120,89.7975,6.349811105365907,70.8,104.5,0.62393319401747
-GIẢ ĐỊNH – hằng ngày,glucose_fasting,6,488,90.3844262295082,6.370556250368193,73.7,104.5,0.4108939877655144
+GIẢ ĐỊNH – hằng ngày,glucose_fasting,6,488,90.3844262295082,6.370556250368193,73.7,104.5,0.4108939877655145

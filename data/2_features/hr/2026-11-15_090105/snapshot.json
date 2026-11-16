@@ -1,0 +1,16 @@
+{
+  "files": {
+    "processed/sample-v2/mmash_minutes.csv.gz": "d2df2474d267197a736bbcbd7b0b5e3069ef7b1a160983b6ba4d89d0eb297125"
+  },
+  "python": "3.12.12",
+  "libraries": {
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "pandas": "3.1.1",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "mne": "1.13.2",
+    "shap": "0.54.1"
+  },
+  "seed": 17
+}

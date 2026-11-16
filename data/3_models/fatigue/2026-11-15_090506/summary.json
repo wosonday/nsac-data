@@ -1,0 +1,60 @@
+{
+  "task": "fatigue",
+  "run_id": "2026-11-15_090506",
+  "samples": 286,
+  "units": 24,
+  "best_model_exploratory": "personal_mean",
+  "deploy_model": "personal_mean",
+  "metrics": [
+    {
+      "model": "personal_mean",
+      "units": 24,
+      "mae": 4.574924,
+      "ci95_low": 3.768681,
+      "ci95_high": 5.378045,
+      "diff_vs_baseline": -1.040958,
+      "diff_ci95_low": -1.445918,
+      "diff_ci95_high": -0.678599,
+      "rmse": 7.317157
+    },
+    {
+      "model": "ridge",
+      "units": 24,
+      "mae": 4.756757,
+      "ci95_low": 4.09496,
+      "ci95_high": 5.453485,
+      "diff_vs_baseline": -0.859125,
+      "diff_ci95_low": -1.419406,
+      "diff_ci95_high": -0.299403,
+      "rmse": 6.90681
+    },
+    {
+      "model": "lightgbm",
+      "units": 24,
+      "mae": 5.123754,
+      "ci95_low": 4.353034,
+      "ci95_high": 6.010607,
+      "diff_vs_baseline": -0.492128,
+      "diff_ci95_low": -1.126279,
+      "diff_ci95_high": 0.138912,
+      "rmse": 7.232806
+    },
+    {
+      "model": "last_value",
+      "units": 24,
+      "mae": 5.615882,
+      "ci95_low": 4.555176,
+      "ci95_high": 6.676098,
+      "diff_vs_baseline": 0.0,
+      "diff_ci95_low": 0.0,
+      "diff_ci95_high": 0.0,
+      "rmse": 9.095069
+    }
+  ],
+  "interval_coverage": {
+    "model": "personal_mean",
+    "target_coverage": 0.9,
+    "observed_coverage": 0.8986013986013986,
+    "median_half_width": 10.666666666666668
+  }
+}

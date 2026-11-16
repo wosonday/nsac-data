@@ -1,0 +1,49 @@
+{
+  "task": "hr",
+  "run_id": "2026-11-15_090105",
+  "samples": 5301,
+  "units": 22,
+  "best_model_exploratory": "ridge",
+  "deploy_model": "ridge",
+  "metrics": [
+    {
+      "model": "ridge",
+      "units": 22,
+      "mae": 3.917428,
+      "ci95_low": 3.611716,
+      "ci95_high": 4.238608,
+      "diff_vs_baseline": -0.547793,
+      "diff_ci95_low": -0.6771,
+      "diff_ci95_high": -0.425986,
+      "rmse": 6.019831
+    },
+    {
+      "model": "lightgbm",
+      "units": 22,
+      "mae": 4.066027,
+      "ci95_low": 3.713363,
+      "ci95_high": 4.471079,
+      "diff_vs_baseline": -0.399195,
+      "diff_ci95_low": -0.532191,
+      "diff_ci95_high": -0.266568,
+      "rmse": 6.383037
+    },
+    {
+      "model": "last_value",
+      "units": 22,
+      "mae": 4.465221,
+      "ci95_low": 4.086349,
+      "ci95_high": 4.871781,
+      "diff_vs_baseline": 0.0,
+      "diff_ci95_low": 0.0,
+      "diff_ci95_high": 0.0,
+      "rmse": 7.014988
+    }
+  ],
+  "interval_coverage": {
+    "model": "ridge",
+    "target_coverage": 0.9,
+    "observed_coverage": 0.9003961516694963,
+    "median_half_width": 8.713734143078238
+  }
+}

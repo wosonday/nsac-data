@@ -1,0 +1,12 @@
+{
+  "task": "hr",
+  "run_id": "2026-11-15_090105",
+  "model": "ridge",
+  "mode": "latest",
+  "input": "data\\1_source\\processed\\sample-v2\\mmash_minutes.csv.gz",
+  "half_width_90": 8.721679102418214,
+  "n_rows": 22,
+  "n_abstain": 9,
+  "n_in_sample": 22,
+  "n_input_synthetic": 0
+}

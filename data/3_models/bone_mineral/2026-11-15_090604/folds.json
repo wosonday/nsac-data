@@ -1,0 +1,92 @@
+[
+  {
+    "name": "utmb_cft70:5160",
+    "n_train": 17,
+    "n_test": 1
+  },
+  {
+    "name": "utmb_cft70:5188",
+    "n_train": 17,
+    "n_test": 1
+  },
+  {
+    "name": "utmb_cft70:5297",
+    "n_train": 17,
+    "n_test": 1
+  },
+  {
+    "name": "utmb_cft70:6213",
+    "n_train": 17,
+    "n_test": 1
+  },
+  {
+    "name": "utmb_cft70:6546",
+    "n_train": 17,
+    "n_test": 1
+  },
+  {
+    "name": "utmb_cft70:6611",
+    "n_train": 17,
+    "n_test": 1
+  },
+  {
+    "name": "utmb_cft70:6791",
+    "n_train": 17,
+    "n_test": 1
+  },
+  {
+    "name": "utmb_cft70:6877",
+    "n_train": 17,
+    "n_test": 1
+  },
+  {
+    "name": "utmb_cft70:6947",
+    "n_train": 17,
+    "n_test": 1
+  },
+  {
+    "name": "utmb_cft70:7152",
+    "n_train": 17,
+    "n_test": 1
+  },
+  {
+    "name": "utmb_cft70:7326",
+    "n_train": 17,
+    "n_test": 1
+  },
+  {
+    "name": "utmb_cft70:7350",
+    "n_train": 17,
+    "n_test": 1
+  },
+  {
+    "name": "utmb_cft70:7574",
+    "n_train": 17,
+    "n_test": 1
+  },
+  {
+    "name": "utmb_cft70:7750",
+    "n_train": 17,
+    "n_test": 1
+  },
+  {
+    "name": "utmb_cft70:8010",
+    "n_train": 17,
+    "n_test": 1
+  },
+  {
+    "name": "utmb_cft70:8072",
+    "n_train": 17,
+    "n_test": 1
+  },
+  {
+    "name": "utmb_cft70:8936",
+    "n_train": 17,
+    "n_test": 1
+  },
+  {
+    "name": "utmb_cft70:9713",
+    "n_train": 17,
+    "n_test": 1
+  }
+]

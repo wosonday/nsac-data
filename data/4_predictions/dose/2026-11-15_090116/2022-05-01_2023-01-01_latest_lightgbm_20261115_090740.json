@@ -1,0 +1,12 @@
+{
+  "task": "dose",
+  "run_id": "2026-11-15_090116",
+  "model": "lightgbm",
+  "mode": "latest",
+  "input": "data\\1_source\\raw\\radlab\\instruments\\Lidal\\2022-05-01_2023-01-01.csv",
+  "half_width_90": 1.6955585390375463,
+  "n_rows": 1,
+  "n_abstain": 0,
+  "n_in_sample": 1,
+  "n_input_synthetic": 0
+}

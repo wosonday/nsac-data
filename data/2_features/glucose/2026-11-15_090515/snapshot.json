@@ -1,0 +1,17 @@
+{
+  "files": {
+    "raw/nlsp/NNX10AP86G.zip": "6bff50708c0d7fd190b6d486dbd565d7ee2fa0882ba80d778e5fb74333e66f4d",
+    "raw/nlsp/download_manifest.csv": "37e2e53555829b52bc45cc44a2d90e1ad8ed1289a81df3816a3171a91ca289c1"
+  },
+  "python": "3.12.12",
+  "libraries": {
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "pandas": "3.1.1",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "mne": "1.13.2",
+    "shap": "0.54.1"
+  },
+  "seed": 17
+}

@@ -1,0 +1,4 @@
+subject_id,cutoff_time,model,unit,prediction,low90,high90,abstain,reasons,in_sample,input_synthetic
+utmb_c1:C1G0001,72.0,personal_mean,điểm TMD,-12.0,-25.333333333333336,1.333333333333334,False,,False,True
+utmb_c1:C1G0002,72.0,personal_mean,điểm TMD,-18.0,-31.333333333333336,-4.666666666666666,False,,False,True
+utmb_c1:C1G0003,72.0,personal_mean,điểm TMD,-21.0,-34.333333333333336,-7.666666666666666,False,,False,True

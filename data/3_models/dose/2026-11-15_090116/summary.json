@@ -1,0 +1,49 @@
+{
+  "task": "dose",
+  "run_id": "2026-11-15_090116",
+  "samples": 6257,
+  "units": 9,
+  "best_model_exploratory": "lightgbm",
+  "deploy_model": "lightgbm",
+  "metrics": [
+    {
+      "model": "lightgbm",
+      "units": 9,
+      "mae": 0.769126,
+      "ci95_low": 0.685671,
+      "ci95_high": 0.870877,
+      "diff_vs_baseline": -1.367528,
+      "diff_ci95_low": -1.611753,
+      "diff_ci95_high": -1.141642,
+      "rmse": 1.18773
+    },
+    {
+      "model": "ridge",
+      "units": 9,
+      "mae": 0.977819,
+      "ci95_low": 0.901295,
+      "ci95_high": 1.067527,
+      "diff_vs_baseline": -1.158834,
+      "diff_ci95_low": -1.415167,
+      "diff_ci95_high": -0.920265,
+      "rmse": 1.329502
+    },
+    {
+      "model": "last_value",
+      "units": 9,
+      "mae": 2.136653,
+      "ci95_low": 1.850147,
+      "ci95_high": 2.436119,
+      "diff_vs_baseline": 0.0,
+      "diff_ci95_low": 0.0,
+      "diff_ci95_high": 0.0,
+      "rmse": 4.697491
+    }
+  ],
+  "interval_coverage": {
+    "model": "lightgbm",
+    "target_coverage": 0.9,
+    "observed_coverage": 0.8975547386926642,
+    "median_half_width": 1.7135965395333237
+  }
+}

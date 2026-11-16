@@ -1,0 +1,118 @@
+{
+  "versions": {
+    "python": "3.12.12",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "numpy": "2.5.4",
+    "joblib": "1.6.0"
+  },
+  "task": "cpet_physio",
+  "run_id": "2026-11-15_090220",
+  "features": [
+    "pre_vo2",
+    "age"
+  ],
+  "target": "delta_vo2",
+  "seed": 17,
+  "model_specs": {
+    "persistence": {
+      "class": "sklearn.dummy.DummyRegressor",
+      "params": {
+        "strategy": "constant",
+        "constant": 0.0
+      }
+    },
+    "mean_delta": {
+      "class": "sklearn.dummy.DummyRegressor",
+      "params": {
+        "strategy": "mean"
+      }
+    },
+    "ridge": {
+      "class": "sklearn.linear_model.Ridge",
+      "params": {
+        "alpha": 10.0
+      },
+      "scale": true
+    },
+    "lightgbm": {
+      "class": "lightgbm.LGBMRegressor",
+      "params": {
+        "n_estimators": 150,
+        "learning_rate": 0.05,
+        "max_depth": 2,
+        "num_leaves": 4,
+        "min_child_samples": 5,
+        "reg_lambda": 5.0,
+        "verbose": -1,
+        "n_jobs": 1
+      }
+    }
+  },
+  "split": {
+    "type": "leave_one_subject_out"
+  },
+  "features_table": "data/2_features/cpet_physio/2026-11-15_090220/table.csv.gz",
+  "data_snapshot": {
+    "files": {
+      "raw/nlsp/MR080G.zip": "2e0faa4a6e9989849fd16ceb883f3fb651c2bb3dceb7f8264dab5c7cae04313e",
+      "raw/nlsp/MR079G.zip": "2b855450e015cc84eed5c0de40781135a743be28942dc54f33fb1f5bbf71019d",
+      "raw/nlsp/BRSMImmune.zip": "dfd33127f18302a6ccd3a55911f69dc268c776dd625c6f94116a992b2ac5d0c5",
+      "raw/nlsp/download_manifest.csv": "37e2e53555829b52bc45cc44a2d90e1ad8ed1289a81df3816a3171a91ca289c1"
+    },
+    "python": "3.12.12",
+    "libraries": {
+      "scikit-learn": "1.9.1",
+      "lightgbm": "4.7.0",
+      "pandas": "3.1.1",
+      "numpy": "2.5.4",
+      "scipy": "1.18.1",
+      "mne": "1.13.2",
+      "shap": "0.54.1"
+    },
+    "seed": 17
+  },
+  "note": "final = fit trên toàn bộ người trong table; chỉ dùng cho người mới. Đánh giá dùng oof.csv.gz.",
+  "models": [
+    {
+      "model": "persistence",
+      "kind": "final",
+      "path": "persistence/final.joblib",
+      "n_train_rows": 33,
+      "n_train_units": 33,
+      "file": "final.joblib",
+      "bytes": 436,
+      "sha256": "1d03134d6b7d428c1e24cb5a693ce42ac38f9384f152c8421b2a4551df44f205"
+    },
+    {
+      "model": "mean_delta",
+      "kind": "final",
+      "path": "mean_delta/final.joblib",
+      "n_train_rows": 33,
+      "n_train_units": 33,
+      "file": "final.joblib",
+      "bytes": 446,
+      "sha256": "6ec07e805b048c37616ca0eaffb4e66eb806060c33ab73f06814d1751d3722fb"
+    },
+    {
+      "model": "ridge",
+      "kind": "final",
+      "path": "ridge/final.joblib",
+      "n_train_rows": 33,
+      "n_train_units": 33,
+      "file": "final.joblib",
+      "bytes": 807,
+      "sha256": "44c099d90ccae444cdb601490c3d80dcb38d6ffdc474f1745c2073095cc3f60a"
+    },
+    {
+      "model": "lightgbm",
+      "kind": "final",
+      "path": "lightgbm/final.joblib",
+      "n_train_rows": 33,
+      "n_train_units": 33,
+      "file": "final.joblib",
+      "bytes": 14445,
+      "sha256": "8e7e5682c6e25c0c08e132cfec1d78b1d01af2a411b3183bb238b05470400009"
+    }
+  ]
+}

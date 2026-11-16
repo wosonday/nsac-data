@@ -1,0 +1,106 @@
+{
+  "task": "vitals_sbp",
+  "run_id": "2026-11-15_090356",
+  "samples": 2280,
+  "units": 23,
+  "best_model_exploratory": "ridge",
+  "deploy_model": "ridge",
+  "metrics": [
+    {
+      "model": "ridge",
+      "units": 23,
+      "mae": 5.722475,
+      "ci95_low": 5.394082,
+      "ci95_high": 6.076489,
+      "diff_vs_baseline": -1.617551,
+      "diff_ci95_low": -1.800014,
+      "diff_ci95_high": -1.43527,
+      "rmse": 7.56755
+    },
+    {
+      "model": "personal_mean",
+      "units": 23,
+      "mae": 5.773826,
+      "ci95_low": 5.434974,
+      "ci95_high": 6.135807,
+      "diff_vs_baseline": -1.5662,
+      "diff_ci95_low": -1.776351,
+      "diff_ci95_high": -1.359095,
+      "rmse": 7.637112
+    },
+    {
+      "model": "lightgbm",
+      "units": 23,
+      "mae": 5.821286,
+      "ci95_low": 5.491359,
+      "ci95_high": 6.176302,
+      "diff_vs_baseline": -1.518739,
+      "diff_ci95_low": -1.728277,
+      "diff_ci95_high": -1.309735,
+      "rmse": 7.661642
+    },
+    {
+      "model": "last_value",
+      "units": 23,
+      "mae": 7.340026,
+      "ci95_low": 6.886704,
+      "ci95_high": 7.821046,
+      "diff_vs_baseline": 0.0,
+      "diff_ci95_low": 0.0,
+      "diff_ci95_high": 0.0,
+      "rmse": 9.603408
+    }
+  ],
+  "interval_coverage": {
+    "model": "ridge",
+    "target_coverage": 0.9,
+    "observed_coverage": 0.8982456140350877,
+    "median_half_width": 12.40631524841983
+  },
+  "external": {
+    "metrics": [
+      {
+        "model": "last_value",
+        "units": 6,
+        "rows": 431,
+        "mae": 8.079138641900558,
+        "ci95_low": 6.7067383972177055,
+        "ci95_high": 9.61359975002586
+      },
+      {
+        "model": "personal_mean",
+        "units": 6,
+        "rows": 431,
+        "mae": 6.242426618090767,
+        "ci95_low": 5.244588744588746,
+        "ci95_high": 7.265790110510608
+      },
+      {
+        "model": "ridge",
+        "units": 6,
+        "rows": 431,
+        "mae": 6.141206542131144,
+        "ci95_low": 5.161256019089667,
+        "ci95_high": 7.145268491604014
+      },
+      {
+        "model": "lightgbm",
+        "units": 6,
+        "rows": 431,
+        "mae": 6.199568040854067,
+        "ci95_low": 5.207519874539256,
+        "ci95_high": 7.21492927752708
+      }
+    ],
+    "deploy_model": "ridge",
+    "coverage_deploy": 0.8988235294117647,
+    "subjects": [
+      "utmb_c1:C1G0001",
+      "utmb_c1:C1G0002",
+      "utmb_c1:C1G0003",
+      "utmb_cft70:5160",
+      "utmb_cft70:8072",
+      "utmb_cft70:8936"
+    ]
+  }
+}
