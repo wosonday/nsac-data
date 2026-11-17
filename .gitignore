@@ -31,3 +31,6 @@ data/1_source/raw/nlsp/*
 data/1_source/raw/sleep_edfx/1.0.0/sleep-cassette/
 _to_delete/
 runs/
+
+# serena local state
+.serena/
