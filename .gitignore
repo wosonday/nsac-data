@@ -34,3 +34,6 @@ runs/
 
 # serena local state
 .serena/
+
+# marimo session/export cache
+__marimo__/

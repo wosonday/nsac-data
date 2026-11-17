@@ -22,6 +22,7 @@
 | `3_models/<task>/<run>/` | **(3) Mô hình đã huấn luyện** | 3 `train`, 4 `evaluate` | `<model>/final.joblib`, `manifest.json`, `oof.csv.gz`, `folds.json`, `metrics.csv`, `summary.json`; tùy task: `confusion.csv` (sleep), `external_metrics.csv` (vitals_*) |
 | `4_predictions/<task>/<run>/` | **(2) Dữ liệu dự đoán** | 5 `predict` (+ 4 với vitals) | `<input>_<mode>_<model>[_SYNTHETIC-INPUT]_<thời điểm>.csv/.json`; `external_backtest.csv` (vitals_*: 6 persona, có đáp án) |
 | `CATALOG.csv` | Sổ cái | mọi bước | Mỗi file một dòng: `created_at_utc, kind, task, run_id, path, rows, bytes, sha256, produced_by` (`kind` = features / models / predictions / synthetic) |
+| `notebooks/` | Notebook marimo | (viết tay) | Notebook giải thích & trực quan hóa toàn bộ dữ liệu (tổng quan, catalog, nguồn, đặc trưng, mô hình/OOF, dự đoán, dữ liệu giả định, persona). Xem `notebooks/README.md`; chạy `uv run marimo edit notebooks/00_tong_quan.py` |
 
 Cùng `run_id` ở 2 – 3 – 4 = cùng một chuỗi xử lý (truy vết: dự đoán → mô hình → bảng đặc trưng → file nguồn).
 
